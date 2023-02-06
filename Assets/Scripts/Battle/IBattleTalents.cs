@@ -16,7 +16,7 @@ public interface IBattleTalents
 
     public void BurstEnemyAction(List<Enemy> enemies);
 
-    public void OnTakingDamage(Creature source, float value);
+    public void OnTakingDamage(Creature source, float value, Element element);
 
     public void OnDying();
 }

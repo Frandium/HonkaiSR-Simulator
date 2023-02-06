@@ -56,6 +56,11 @@ public class Character : Creature
     public Element element { get; private set; } = Element.Physical;
 
     public IBattleTalents attackTalents { get; private set; }
+
+    public Character()
+    {
+        attributes = new float[(int)CharacterAttribute.Count];
+    }
  
 
     // Update is called once per frame
@@ -94,12 +99,12 @@ public class Character : Creature
 
         for (int i = 0; i < (int)Element.Count; ++i)
         {
-            elementalBonus[i] = (float)(double)data["elementalBonus"][i];
+            attributes[(int)CharacterAttribute.AnemoBonus + i] = (float)(double)data["elementalBonus"][i];
         }
 
         for (int i = 0; i < (int)Element.Count; ++i)
         {
-            elementalResist[i] = (float)(double)data["elementalResist"][i];
+            attributes[(int)CommonAttribute.AnemoResist + i] = (float)(double)data["elementalResist"][i];
         }
 
         isAttackTargetEnemy = (bool)data["isAttackTargetEnemy"];
@@ -111,8 +116,8 @@ public class Character : Creature
         attackGainPointCount = (int)data["attackGainPointCount"];
         skillConsumePointCount = (int)data["skillConsumePointCount"];
 
-        selected.sprite = selectedCard;
-        // 也许之后人物的技能要改成 Lua 脚本
+
+        // 也许之后人物的技能要改成 Lua 脚本，就不用 switch 了。
         switch (dbN)
         {
             case "kazuha":
@@ -129,13 +134,15 @@ public class Character : Creature
                 break;
         }
         base.Initialize(dbN, id);
+        selected.sprite = selectedCard;
         burstImage.sprite = burstIcon;
         UpdateEnergyIcon();
     }
 
     protected void LoadFilesAndData()
     {
-        runwayAvatar = Resources.Load(databaseName + "/runway_avatar") as Sprite;
+        // 之后资源要从 Resources 或者 AssetBundle 里 Load
+        // runwayAvatar = Resources.Load(databaseName + "/runway_avatar") as Sprite;
     }
 
     public void ChargeEnergy(float e)
@@ -146,11 +153,11 @@ public class Character : Creature
         UpdateEnergyIcon();
     }
 
-    public override void TakeDamage(float value, Creature source, Element damangeType, Then then = null)
+    public override void TakeDamage(float value, Creature source, Element element, Then then = null)
     {
         PlayAudio(AudioType.TakeDamage);
-        attackTalents.OnTakingDamage(source, value);
-        base.TakeDamage(value, source, damangeType, then);
+        attackTalents.OnTakingDamage(source, value, element);
+        base.TakeDamage(value, source, element, then);
     }
 
     private void UpdateEnergyIcon()
@@ -230,7 +237,7 @@ public class Character : Creature
     {
         switch (buff.attributeType)
         {
-            case AttributeType.Taunt:
+            case (int)CharacterAttribute.Taunt:
                 tauntWeight -= (int)buff.value;
                 break;
         }

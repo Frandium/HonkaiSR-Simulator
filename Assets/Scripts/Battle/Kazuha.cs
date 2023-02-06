@@ -16,10 +16,10 @@ public class Kazuha : IBattleTalents
         switch (e.elementState)
         {
             case Element.Cryo:
-                e.AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
+                e.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.Percentage, (int)CommonAttribute.CryoResist , -.2f, 2));
                 break;
             case Element.Hydro:
-                e.AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.HydroResist, -.2f, 2));
+                e.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.Percentage, (int)CommonAttribute.HydroResist, -.2f, 2));
                 break;
             default:
                 break;
@@ -32,7 +32,7 @@ public class Kazuha : IBattleTalents
 
     public void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Physical, 88.9f);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Physical, 88.9f);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
         BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
         self.ChargeEnergy(2.5f);
@@ -45,8 +45,8 @@ public class Kazuha : IBattleTalents
     public void BurstEnemyAction(List<Enemy> enemies)
     {
         self.ClearEnergy();
-        float dmg = DamageCal.ATKDamage(self, Element.Anemo, 472);
-           enemies[0].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Anemo, 472);
+           enemies[0].AddBuff(new ValueBuff(BuffType.Debuff, ValueType.Percentage, (int)CommonAttribute.CryoResist, -.2f, 2));
         for (int i = 0; i < enemies.Count; ++i)
         {
             ReduceResist(enemies[i]);
@@ -68,14 +68,14 @@ public class Kazuha : IBattleTalents
 
     public void SkillEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Anemo, 346);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Anemo, 346);
         ReduceResist(enemies[0]);
         enemies[0].TakeDamage(dmg, self, Element.Anemo);
         self.ChargeEnergy(12.5f);
         BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
     }
 
-    public void OnTakingDamage(Creature source, float value)
+    public void OnTakingDamage(Creature source, float value, Element element)
     {
         self.ChargeEnergy(10);
     }

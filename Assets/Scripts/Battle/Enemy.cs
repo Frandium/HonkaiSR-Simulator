@@ -26,16 +26,16 @@ public class Enemy : Creature
         {
             case "hilichurl":
                 uniqueID = id;
-                def = 1305;
-                atk = 6628;
+                attributes[(int)CommonAttribute.DEF] = 1305;
+                attributes[(int)CommonAttribute.ATK] = 6628;
                 speed = 33;
-                maxHp = 25664;
+                attributes[(int)CommonAttribute.MaxHP] = 25664;
                 enemyAction = new Hilichurl(this);
                 break;
             default:
                 break;
         }
-        hp = maxHp;
+        attributes[(int)CommonAttribute.HP]  = attributes[(int)CommonAttribute.MaxHP];
     }
 
 

@@ -17,7 +17,7 @@ public class Kokomi : IBattleTalents
 
     public void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Physical, 62);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Physical, 62);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
         BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
     }
@@ -54,7 +54,7 @@ public class Kokomi : IBattleTalents
     {
     }
 
-    void IBattleTalents.OnTakingDamage(Creature source, float value)
+    void IBattleTalents.OnTakingDamage(Creature source, float value, Element element)
     {
         self.ChargeEnergy(10);
     }

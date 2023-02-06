@@ -41,6 +41,8 @@ public class BattleManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Debug.Log((int)CharacterAttribute.AnemoBonus);
+
         valueBuffPool = new ObjectPool<ValueBuff>(30);
         triggerBuffPool = new ObjectPool<TriggerBuff>(30);
         Application.targetFrameRate = 60;

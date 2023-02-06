@@ -50,13 +50,16 @@ public class TriggerBuff
 
     // 持续回合，持续 duration 次后消失
     public int duration;
+    public int times;
 
     public delegate void BuffAction(Creature c);
     
     BuffAction action;
 
-    public void Trigger(Creature c)
+    public bool Trigger(Creature c)
     {
         action(c);
+        times -= 1;
+        return times <= 0;
     }
 }

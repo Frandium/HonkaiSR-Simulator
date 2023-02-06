@@ -34,7 +34,7 @@ public class Hilichurl : IEnemyAction
             Debug.LogError("Wrong character index selected.");
             return;
         }
-        float dmg = DamageCal.ATKDamage(self, Element.Physical, 150);
+        float dmg = DamageCal.ATKDamageEnemy(self, Element.Physical, 150);
         characters[i].TakeDamage(dmg, self, Element.Physical);
         self.PlayAudio(AudioType.Attack);
     }
