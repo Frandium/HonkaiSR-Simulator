@@ -85,7 +85,6 @@ public class Runway : MonoBehaviour
             runwayAvatars.RemoveAt(0);
             if (!firstAvatar.IsBurst)
             {
-                Debug.Log(firstAvatar.creature.displayName);
                 RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
                 newOne.SetCreature(firstAvatar.creature, false);
                 newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(10, -500, 0);
@@ -171,6 +170,5 @@ public class Runway : MonoBehaviour
 
     private Vector3[] burstEndPos = { new Vector3(10, -25, 0), new Vector3(90, -25, 0), new Vector3(160, -25, 0), new Vector3(230, -25, 0), new Vector3(300, -25, 0) };
 
-    // 10, -25 + 50 * i, 0
 
 }

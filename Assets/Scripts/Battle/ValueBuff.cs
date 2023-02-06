@@ -20,6 +20,7 @@ public enum AttributeType
     HydroResist,
     CryoResist,
     GeoResist,
+    Taunt,
     Count
 }
 
@@ -30,12 +31,25 @@ public class ValueBuff
     public float value { get; protected set; } = 0;
     public int duration { get; protected set; } = 0;
 
+    public ValueBuff()
+    {
+
+    }
     public ValueBuff(BuffType type, AttributeType att, float _value, int _duration)
     {
         buffType = type;
         attributeType = att;
         value = _value;
         duration = _duration;
+    }
+
+    public ValueBuff Set(BuffType type, AttributeType att, float _value, int _duration)
+    {
+        buffType = type;
+        attributeType = att;
+        value = _value;
+        duration = _duration;
+        return this;
     }
 
     public bool Progress()

@@ -6,7 +6,6 @@ using UnityEngine.UI;
 public class Enemy : Creature
 {
     public IEnemyAction enemyAction;
-    protected static int IDs = 5;
 
     private void Update()
     {
@@ -20,13 +19,13 @@ public class Enemy : Creature
         }
     }
 
-    public override void Initialize(string disN, string dbN, BattleManager _bm)
+    public override void Initialize(string dbN, int id)
     {
-        base.Initialize(disN, dbN, _bm);
+        base.Initialize(dbN, id);
         switch (databaseName)
         {
             case "hilichurl":
-                uniqueID = IDs++;
+                uniqueID = id;
                 def = 1305;
                 atk = 6628;
                 speed = 33;
@@ -69,7 +68,7 @@ public class Enemy : Creature
 
     protected override void OnDying()
     {
-        bm.RemoveEnemy(this);
+        BattleManager.Instance.RemoveEnemy(this);
         base.OnDying();
     }
 }

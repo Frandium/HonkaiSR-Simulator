@@ -22,13 +22,24 @@ public enum BuffType
 
 public class TriggerBuff
 {
+    public TriggerBuff()
+    {
 
+    }
     public TriggerBuff(BuffTriggerMoment moment, BuffType type, int _duration, BuffAction _action)
     {
         triggerMoment = moment;
         buffType = type;
         duration = _duration;
         action = _action;
+    }
+    public TriggerBuff Set(BuffTriggerMoment moment, BuffType type, int _duration, BuffAction _action)
+    {
+        triggerMoment = moment;
+        buffType = type;
+        duration = _duration;
+        action = _action;
+        return this;
     }
 
     // ´¥·¢Ê±»ú

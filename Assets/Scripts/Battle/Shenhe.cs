@@ -20,7 +20,7 @@ public class Shenhe : IBattleTalents
         float dmg = DamageCal.ATKDamage(self, Element.Physical, 35.2f);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
         self.ChargeEnergy(4);
-        self.bm.skillPoint.GainPoint(self.attackGainPointCount);
+        BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
     }
 
     public void BurstCharacterAction(List<Character> characters)
@@ -34,12 +34,9 @@ public class Shenhe : IBattleTalents
         for (int i = 0; i < enemies.Count; ++i)
         {
             enemies[i].TakeDamage(dmg, self, Element.Cryo);
-            enemies[i].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.15f, 1));
-            enemies[i].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.PhysicalResist, -.15f, 1));
+            enemies[i].AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Debuff, AttributeType.CryoResist, -.15f, 1));
+            enemies[i].AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Debuff, AttributeType.PhysicalResist, -.15f, 1));
         }
-        // enemies[0].TakeDamage(dmg, self, Element.Cryo, self.bm.NextTurn);
-        // enemies[0].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.15f, 1));
-        // enemies[0].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.PhysicalResist, -.15f, 1));
     }
 
     public void OnDying()
@@ -49,13 +46,13 @@ public class Shenhe : IBattleTalents
     public void SkillCharacterAction(List<Character> characters)
     {
         self.ChargeEnergy(10);
-        characters[0].AddBuff(new ValueBuff(BuffType.Buff, AttributeType.CryoBonus, .2f, 2));
+        characters[0].AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Buff, AttributeType.CryoBonus, .2f, 2));
         characters[0].ChargeEnergy(10);
         if (characters[0].element == Element.Cryo)
         {
             characters[0].ChargeEnergy(5);
         }
-        self.bm.skillPoint.ConsumePoint(1);
+        BattleManager.Instance.skillPoint.ConsumePoint(1);
     }
 
     public void SkillEnemyAction(List<Enemy> enemies)

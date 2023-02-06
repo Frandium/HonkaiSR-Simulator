@@ -5,14 +5,14 @@ using UnityEngine.UI;
 
 public enum Element
 {
-    Anemo, // 风 = 1
-    Geo, // 岩 = 2
-    Hydro, // 水 = 3
-    Pyro, //火 = 4
-    Cryo, // 冰 = 5
+    Anemo, // 风 = 0
+    Geo, // 岩 = 1
+    Hydro, // 水 = 2
+    Pyro, //火 = 3
+    Cryo, // 冰 = 4
     Electro, //雷 = 6
-    Dendro, // 草 = 7
-    Physical, // 物理 = 8
+    Dendro, // 草 = 6
+    Physical, // 物理 = 7
     Count
 }
 
@@ -50,8 +50,7 @@ public class Creature : MonoBehaviour
 
     public string databaseName { get; protected set; } = "default";
     public string displayName { get; protected set; } = "默认名字";
-
-    public BattleManager  bm { get; private set; }    
+ 
 
     public void SetLocation(float new_location)
     {
@@ -138,7 +137,7 @@ public class Creature : MonoBehaviour
         {
             elementState = Element.Count;
         }
-        eleImage.sprite = bm.elementSymbols[(int)elementState];
+        eleImage.sprite = BattleManager.Instance.elementSymbols[(int)elementState];
     }
 
     public virtual void TakeHeal(float  value, Creature source, Then then = null)
@@ -166,7 +165,7 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnDying()
     {
-        bm.runway.RemoveFromRunway(this);
+        BattleManager.Instance.runway.RemoveFromRunway(this);
         Destroy(this.gameObject);
     }
 
@@ -210,14 +209,16 @@ public class Creature : MonoBehaviour
         isMyTurn = false;
         alpha = 0;
         selected.color = new Color(0, 0, 0, 0);
-        foreach (ValueBuff b in valueBuffs)
+        for(int i = valueBuffs.Count - 1; i >= 0; --i)
         {
+            ValueBuff b = valueBuffs[i];
             if (b.Progress())
             {
                 RemoveBuffEffect(b);
+                valueBuffs.Remove(b);
+                BattleManager.Instance.valueBuffPool.ReturnOne(b);
             }
         }
-        valueBuffs.RemoveAll(b => b.duration <= 0);
         UpdateBuffIcon();
     }
 
@@ -225,15 +226,15 @@ public class Creature : MonoBehaviour
     {
         if (valueBuffs.Count == 0)
         {
-            buffImage.sprite = bm.nullBuffSprite;
+            buffImage.sprite = BattleManager.Instance.nullBuffSprite;
             return;
         }
-        buffImage.sprite = bm.buffSprite;
+        buffImage.sprite = BattleManager.Instance.buffSprite;
         foreach (ValueBuff b in valueBuffs)
         {
             if (b.buffType == BuffType.Debuff)
             {
-                buffImage.sprite = bm.debuffSprite;
+                buffImage.sprite = BattleManager.Instance.debuffSprite;
                 return;
             }
         }
@@ -254,11 +255,10 @@ public class Creature : MonoBehaviour
         }
     }
 
-    public virtual void Initialize(string disN, string dbN, BattleManager _bm)
+    public virtual void Initialize(string dbN, int id)
     {
-        displayName = disN;
+        uniqueID = id;
         databaseName = dbN;
-        bm = _bm;
         hp = maxHp;
         hpLine.fillAmount = hp / maxHp;
     }
@@ -276,7 +276,7 @@ public class Creature : MonoBehaviour
         } 
     }
 
-    public void AddBuff(ValueBuff buff, Then then = null)
+    public virtual void AddBuff(ValueBuff buff, Then then = null)
     {
         valueBuffs.Add(buff);
         switch (buff.attributeType)
@@ -292,12 +292,12 @@ public class Creature : MonoBehaviour
         }
         if (buff.buffType == BuffType.Debuff)
         {
-            buffImage.sprite = bm.debuffSprite;
+            buffImage.sprite = BattleManager.Instance.debuffSprite;
 
         }
-        else if (buffImage.sprite = bm.nullBuffSprite)
+        else if (buffImage.sprite = BattleManager.Instance.nullBuffSprite)
         {
-            buffImage.sprite = bm.buffSprite;
+            buffImage.sprite = BattleManager.Instance.buffSprite;
         }
         StartCoroutine(InvokeNextFrame(then));
     }

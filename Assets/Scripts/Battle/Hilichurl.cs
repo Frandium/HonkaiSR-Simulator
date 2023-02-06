@@ -27,7 +27,7 @@ public class Hilichurl : IEnemyAction
         {
             if (rand < characters[i].tauntWeight)
                 break;
-            tauntWeight -= characters[i].tauntWeight;
+            rand -= characters[i].tauntWeight;
         }
         if(i >= characters.Count)
         {

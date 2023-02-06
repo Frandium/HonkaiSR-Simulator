@@ -34,7 +34,7 @@ public class Kazuha : IBattleTalents
     {
         float dmg = DamageCal.ATKDamage(self, Element.Physical, 88.9f);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
-        self.bm.skillPoint.GainPoint(self.attackGainPointCount);
+        BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
         self.ChargeEnergy(2.5f);
     }
 
@@ -54,7 +54,7 @@ public class Kazuha : IBattleTalents
 //            enemies[i].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
         }
         // ReduceResist(enemies[enemies.Count - 1]);
-        // enemies[enemies.Count - 1].TakeDamage(dmg, self, Element.Anemo, self.bm.NextTurn);
+        // enemies[enemies.Count - 1].TakeDamage(dmg, self, Element.Anemo, BattleManager.Instance.NextTurn);
         //
     }
 
@@ -72,7 +72,7 @@ public class Kazuha : IBattleTalents
         ReduceResist(enemies[0]);
         enemies[0].TakeDamage(dmg, self, Element.Anemo);
         self.ChargeEnergy(12.5f);
-        self.bm.skillPoint.ConsumePoint(self.skillConsumePointCount);
+        BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
     }
 
     public void OnTakingDamage(Creature source, float value)

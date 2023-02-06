@@ -19,14 +19,14 @@ public class Kokomi : IBattleTalents
     {
         float dmg = DamageCal.ATKDamage(self, Element.Physical, 62);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
-        self.bm.skillPoint.GainPoint(self.attackGainPointCount);
+        BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
     }
 
     public void BurstCharacterAction(List<Character> characters)
     {
         self.ClearEnergy();
         float heal = DamageCal.MaxHPHeal(self, 20.1f, 1692);
-//        characters[0].TakeHeal(heal, self, self.bm.NextTurn);
+//        characters[0].TakeHeal(heal, self, BattleManager.Instance.NextTurn);
         for(int i = 0; i < characters.Count; ++i)
         {
             characters[i].TakeHeal(heal, self);
@@ -46,7 +46,7 @@ public class Kokomi : IBattleTalents
         float heal = DamageCal.MaxHPHeal(self, 7.5f, 862);
         characters[0].TakeHeal(heal, self);
         characters[0].TakeElementOnly(self, Element.Hydro);
-        self.bm.skillPoint.ConsumePoint(self.skillConsumePointCount);
+        BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
         self.ChargeEnergy(18.5f);
     }
 

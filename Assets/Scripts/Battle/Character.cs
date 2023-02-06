@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using System.IO;
+using LitJson;
 
 public enum AudioType
 {
@@ -17,7 +19,6 @@ public enum AudioType
 
 public class Character : Creature
 {
-    // -1是全体，0是不选择，1是选择。
     public bool isAttackTargetEnemy { get; protected set; } = true;
     public SelectionType attackSelectionType { get; protected set; } = SelectionType.One;
     public bool isSkillTargetEnemy { get; protected set; } = true;
@@ -76,81 +77,58 @@ public class Character : Creature
         selected.color = Color.green;
     }
 
-    public override void Initialize(string disN, string dbN, BattleManager _bm)
+    public override void Initialize(string dbN, int id)
     {
-        base.Initialize(disN, dbN, _bm);
+        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.characterDir + "/" + dbN + ".json");
+        JsonData data = JsonMapper.ToObject(jsonString);
+
+        // set character template
+        databaseName = (string)data["dbname"];
+        displayName = (string)data["disname"];
+        atk = (float)(double)data["atk"];
+        def = (float)(double)data["def"];
+        speed = (float)(double)data["speed"];
+        maxHp = (float)(double)data["maxHp"];
+        maxEnergy = (float)(double)data["maxEnergy"];
+        element = (Element)(int)data["element"];
+
+        for (int i = 0; i < (int)Element.Count; ++i)
+        {
+            elementalBonus[i] = (float)(double)data["elementalBonus"][i];
+        }
+
+        for (int i = 0; i < (int)Element.Count; ++i)
+        {
+            elementalResist[i] = (float)(double)data["elementalResist"][i];
+        }
+
+        isAttackTargetEnemy = (bool)data["isAttackTargetEnemy"];
+        attackSelectionType = (SelectionType)(int)data["attackSelectionType"];
+        isSkillTargetEnemy = (bool)data["isSkillTargetEnemy"];
+        skillSelectionType = (SelectionType)(int)data["skillSelectionType"];
+        isBurstTargetEnemy = (bool)data["isBurstTargetEnemy"];
+        burstSelectionType = (SelectionType)(int)data["burstSelectionType"];
+        attackGainPointCount = (int)data["attackGainPointCount"];
+        skillConsumePointCount = (int)data["skillConsumePointCount"];
+
         selected.sprite = selectedCard;
-        switch (databaseName)
+        // 也许之后人物的技能要改成 Lua 脚本
+        switch (dbN)
         {
             case "kazuha":
-                isAttackTargetEnemy = true;
-                attackSelectionType = SelectionType.One;
-                isSkillTargetEnemy = true;
-                skillSelectionType = SelectionType.One;
-                isBurstTargetEnemy = true;
-                burstSelectionType = SelectionType.All;
-                uniqueID = 1;
-                atk = 1313;
-                speed = 41;
-                maxHp = 20676;
-                element = Element.Anemo;
-                def = 1131;
-                maxEnergy = 60;
                 attackTalents = new Kazuha(this);
                 break;
             case "ganyu":
-                isAttackTargetEnemy = true;
-                attackSelectionType = SelectionType.One;
-                isSkillTargetEnemy = true;
-                skillSelectionType = SelectionType.One;
-                isBurstTargetEnemy = true;
-                burstSelectionType = SelectionType.All;
-                uniqueID = 2;
-                atk = 2602;
-                speed = 43;
-                maxHp = 15085;
-                def = 674;
-                maxEnergy = 60;
-                element = Element.Cryo;
                 attackTalents = new Ganyu(this);
                 break;
             case "shenhe":
-                isAttackTargetEnemy = true;
-                attackSelectionType = SelectionType.One;
-                isSkillTargetEnemy = false;
-                skillSelectionType = SelectionType.One;
-                isBurstTargetEnemy = true;
-                burstSelectionType = SelectionType.All;
-                uniqueID = 3;
-                atk = 3159;
-                speed = 38;
-                maxHp = 18473;
-                def = 806;
-                maxEnergy = 80;
-                element = Element.Cryo;
                 attackTalents = new Shenhe(this);
                 break;
             case "kokomi":
-                isAttackTargetEnemy = true;
-                attackSelectionType = SelectionType.One;
-                isSkillTargetEnemy = false;
-                skillSelectionType = SelectionType.One;
-                isBurstTargetEnemy = false;
-                burstSelectionType = SelectionType.All;
-                uniqueID = 4;
-                atk = 1190;
-                maxHp = 40277;
-                speed = 30;
-                def = 911;
-                maxEnergy = 70;
-                element = Element.Hydro;
                 attackTalents = new Kokomi(this);
                 break;
         }
-        hp = maxHp;
-        // 目前 files 在 editor 里手动绑定了，data在上面这个 switch 里 hardcode 了。
-        //        LoadFilesAndData();
-        hpLine.fillAmount = hp / maxHp;
+        base.Initialize(dbN, id);
         burstImage.sprite = burstIcon;
         UpdateEnergyIcon();
     }
@@ -244,8 +222,19 @@ public class Character : Creature
         Debug.Log(this);
         cardSR.color = new Color(.25f, .25f, .25f, .25f);
         attackTalents.OnDying();
-        bm.RemoveCharacter(this);
+        BattleManager.Instance.RemoveCharacter(this);
         base.OnDying();
+    }
+
+    public override void AddBuff(ValueBuff buff, Then then = null)
+    {
+        switch (buff.attributeType)
+        {
+            case AttributeType.Taunt:
+                tauntWeight -= (int)buff.value;
+                break;
+        }
+        base.AddBuff(buff, then);
     }
 
     public override void PlayAudio(AudioType audioType)

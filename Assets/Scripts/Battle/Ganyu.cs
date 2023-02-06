@@ -19,7 +19,7 @@ public class Ganyu : IBattleTalents
     {
         float dmg = DamageCal.ATKDamage(self, Element.Physical, 89.9f);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
-        self.bm.skillPoint.GainPoint(self.attackGainPointCount);
+        BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
         self.ChargeEnergy(2.5f);
     }
 
@@ -35,7 +35,6 @@ public class Ganyu : IBattleTalents
         {
             enemies[i].TakeDamage(dmg, self, Element.Cryo);
         }
-//        enemies[enemies.Count - 1].TakeDamage(dmg, self, Element.Cryo, self.bm.NextTurn);
     }
 
     public void OnDying()
@@ -51,9 +50,8 @@ public class Ganyu : IBattleTalents
     {
         float dmg = DamageCal.ATKDamage(self, Element.Cryo, 238);
         enemies[0].TakeDamage(dmg, self, Element.Cryo);
-        float heal = DamageCal.MaxHPHeal(self, 2.5f, 428);
-        self.TakeHeal(heal, self, null);
-        self.bm.skillPoint.ConsumePoint(self.skillConsumePointCount);
+        self.AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Buff, AttributeType.Taunt, -20, 2));
+        BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
         self.ChargeEnergy(10);
     }
 

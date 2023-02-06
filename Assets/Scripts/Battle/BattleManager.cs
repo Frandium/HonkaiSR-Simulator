@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.UI;
+using System.IO;
 
 
 public enum SelectionType
@@ -24,18 +25,42 @@ public enum TurnStage
 
 public class BattleManager : MonoBehaviour
 {
+    public static BattleManager Instance = null;
+    
+    public BattleManager()
+    {
+        if(Instance != null)
+        {
+            return;
+        }
+        Instance = this;
+    }
 
+    public ObjectPool<ValueBuff> valueBuffPool;
+    public ObjectPool<TriggerBuff> triggerBuffPool;
     // Start is called before the first frame update
     void Start()
     {
+        valueBuffPool = new ObjectPool<ValueBuff>(30);
+        triggerBuffPool = new ObjectPool<TriggerBuff>(30);
         Application.targetFrameRate = 60;
-        characters[0].Initialize("枫原万叶", "kazuha", this);
-        characters[1].Initialize("甘雨", "ganyu", this);
-        characters[2].Initialize("申鹤", "shenhe", this);
-        characters[3].Initialize("珊瑚宫心海", "kokomi", this);
-        enemies[0].Initialize("丘丘人", "hilichurl", this);
-        enemies[1].Initialize("丘丘人", "hilichurl", this);
-        enemies[2].Initialize("丘丘人", "hilichurl", this);
+        
+        for(int i = 0; i< characters.Count; ++i)
+        {
+            // 这里后面会改成 Load Battle。
+            characters[i].Initialize(GlobalInfoHolder.Instance.teamMembers[i], i);
+        }
+        for(int i = 0; i < enemies.Count; ++i)
+        {
+            enemies[i].Initialize(GlobalInfoHolder.Instance.enemyMembers[i], characters.Count + i);
+        }
+        //characters[0].Initialize("枫原万叶", "kazuha");
+        //characters[1].Initialize("甘雨", "ganyu");
+        //characters[2].Initialize("申鹤", "shenhe");
+        //characters[3].initialize("珊瑚宫心海", "kokomi");
+        //enemies[0].Initialize("丘丘人", "hilichurl");
+        //enemies[1].Initialize("丘丘人", "hilichurl");
+        //enemies[2].Initialize("丘丘人", "hilichurl");
         runway.Initialize();
         skillPoint.GainPoint(2);
         NextTurn();
@@ -45,6 +70,7 @@ public class BattleManager : MonoBehaviour
     bool isAttackSelected = false;
     float animTime = .2f;
 
+    // Object Bounding
     public RectTransform attackRecttrans;
     public RectTransform skillRecttrans;
 
@@ -78,8 +104,8 @@ public class BattleManager : MonoBehaviour
     public Image GameEndImage;
     public Text GameEndText;
 
-
     private bool isBurst = false;
+
     
     // 一个我方回合包含指令输入阶段、结算动画阶段
     // 一个敌方回合包含结算动画阶段
@@ -264,7 +290,9 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(ChangeLocalScale(skillRecttrans, Vector3.one, animTime));
         isAttackSelected = true;
         if (curCharacter.isAttackTargetEnemy)
+        {
             selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.attackTalents.AttackEnemyAction);
+        }
         else
             selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.attackTalents.AttackCharacterAction);
     }

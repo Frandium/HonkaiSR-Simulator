@@ -1,0 +1,39 @@
+{
+    "dbname": "test",
+    "disname": "\u6D4B\u8BD5\u89D2\u8272",
+    "ID": 1,
+    "speed": 38.0,
+    "maxHp": 18473.0,
+    "atk": 1313.0,
+    "def": 806.0,
+    "maxEnergy": 80.0,
+    "element": 4,
+    "elementalBonus": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "elementalResist": [
+        0.100000001490116,
+        0.100000001490116,
+        0.100000001490116,
+        0.100000001490116,
+        0.100000001490116,
+        0.100000001490116,
+        0.100000001490116,
+        0.100000001490116
+    ],
+    "isAttackTargetEnemy": true,
+    "attackSelectionType": 1,
+    "isSkillTargetEnemy": false,
+    "skillSelectionType": 1,
+    "isBurstTargetEnemy": true,
+    "burstSelectionType": 3,
+    "attackGainPointCount": 1,
+    "skillConsumePointCount": 1
+}
