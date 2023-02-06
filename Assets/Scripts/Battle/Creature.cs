@@ -152,7 +152,7 @@ public class Creature : MonoBehaviour
     public float GetFinalAttr(int attr)
     {
         float b = attributes[attr];
-        float p = 0, n = 1;
+        float p = 1, n = 0;
         foreach(ValueBuff buff in valueBuffs)
         {
             if (buff.attributeType != (int)attr)
@@ -233,7 +233,8 @@ public class Creature : MonoBehaviour
     protected virtual void OnDying()
     {
         BattleManager.Instance.runway.RemoveFromRunway(this);
-        Destroy(this.gameObject);
+        gameObject.SetActive(false);
+//        Destroy(this.gameObject);
     }
 
 
@@ -311,6 +312,8 @@ public class Creature : MonoBehaviour
 
     public virtual void Initialize(string dbN, int id)
     {
+        location = 0;
+        BattleManager.Instance.runway.AddToRunway(this);
         uniqueID = id;
         databaseName = dbN;
         hp = maxHp;

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Video;
 using UnityEngine.UI;
 using System.IO;
+using LitJson;
 
 
 public enum SelectionType
@@ -41,28 +42,11 @@ public class BattleManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        Debug.Log((int)CharacterAttribute.AnemoBonus);
-
         valueBuffPool = new ObjectPool<ValueBuff>(30);
         triggerBuffPool = new ObjectPool<TriggerBuff>(30);
         Application.targetFrameRate = 60;
-        
-        for(int i = 0; i< characters.Count; ++i)
-        {
-            // 这里后面会改成 Load Battle。
-            characters[i].Initialize(GlobalInfoHolder.Instance.teamMembers[i], i);
-        }
-        for(int i = 0; i < enemies.Count; ++i)
-        {
-            enemies[i].Initialize(GlobalInfoHolder.Instance.enemyMembers[i], characters.Count + i);
-        }
-        //characters[0].Initialize("枫原万叶", "kazuha");
-        //characters[1].Initialize("甘雨", "ganyu");
-        //characters[2].Initialize("申鹤", "shenhe");
-        //characters[3].initialize("珊瑚宫心海", "kokomi");
-        //enemies[0].Initialize("丘丘人", "hilichurl");
-        //enemies[1].Initialize("丘丘人", "hilichurl");
-        //enemies[2].Initialize("丘丘人", "hilichurl");
+
+        LoadBattle();
         runway.Initialize();
         skillPoint.GainPoint(2);
         NextTurn();
@@ -76,6 +60,10 @@ public class BattleManager : MonoBehaviour
     public RectTransform attackRecttrans;
     public RectTransform skillRecttrans;
 
+    List<string> chaNames;
+    List<List<string>> enmNames;
+    int enmWave = 0;
+    int unitCount = 0;
     public List<Character> characters;
     public List<Enemy> enemies;
 
@@ -190,6 +178,38 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+
+    public void LoadBattle()
+    {
+        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.battleFilePath);
+        JsonData data = JsonMapper.ToObject(jsonString);
+
+        // set character template
+       chaNames = new List<string>();
+        for(int i = 0; i < data["characters"].Count; ++i)
+        {
+            chaNames.Add((string)data["characters"][i]);
+        }
+        enmNames = new List<List<string>>();
+        for(int i = 0; i < data["enemies"].Count; ++i)
+        {
+            List<string> enm = new List<string>();
+            for(int j = 0; j < data["enemies"][i].Count; ++j)
+            {
+                enm.Add((string)data["enemies"][i][j]);
+            }
+            enmNames.Add(enm);
+        }
+        for (int i = 0; i < characters.Count; ++i)
+        {
+            characters[i].Initialize(chaNames[i], unitCount++);
+        }
+        for (int i = 0; i < enemies.Count; ++i)
+        {
+            enemies[i].Initialize(enmNames[0][i], unitCount++);
+        }
+    }
+
     IEnumerator ChangeLocalScale(RectTransform tran, Vector3 target, float time)
     {
         Vector3 diff = target - tran.localScale;
@@ -210,11 +230,23 @@ public class BattleManager : MonoBehaviour
         // 首先判断是否游戏结束
         if (enemies.Count == 0)
         {
-            GameEndImage.gameObject.SetActive(true);
-            GameEndImage.color = new Color(1, .5f, 0, .875f);
-            GameEndText.text = "挑 战 成 功";
-            bgm.Stop();
-            return;
+            if (++enmWave >= enmNames.Count)
+            {
+                GameEndImage.gameObject.SetActive(true);
+                GameEndImage.color = new Color(1, .5f, 0, .875f);
+                GameEndText.text = "挑 战 成 功";
+                bgm.Stop();
+                return;
+            }
+            else
+            {
+                // 需要重新 initialize
+                return;
+                for(int i = 0; i < enmNames[enmWave].Count; ++i)
+                {
+                    enemies[i].Initialize(enmNames[enmWave][i], unitCount++);
+                }
+            }
         }
         if (characters.Count == 0)
         {

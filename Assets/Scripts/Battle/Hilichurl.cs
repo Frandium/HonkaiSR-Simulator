@@ -5,17 +5,15 @@ using UnityEngine;
 public class Hilichurl : IEnemyAction
 {
     Enemy self;
-    BattleManager bm;
 
     public Hilichurl(Enemy _self)
     {
         self = _self;
-        bm = GameObject.Find("battleManager").GetComponent<BattleManager>();
     }
 
     public void MyTurn()
     {
-        List<Character> characters = bm.characters;
+        List<Character> characters = BattleManager.Instance.characters;
         int tauntWeight = 0;
         foreach(Character c in characters)
         {
@@ -38,5 +36,4 @@ public class Hilichurl : IEnemyAction
         characters[i].TakeDamage(dmg, self, Element.Physical);
         self.PlayAudio(AudioType.Attack);
     }
-
 }

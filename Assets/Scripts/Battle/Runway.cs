@@ -6,8 +6,6 @@ using UnityEngine.UI;
 public class Runway : MonoBehaviour
 {
 
-    public BattleManager bm;
-
     float len = 100;
 
     private Queue<Creature> burstInsertQueue;
@@ -33,14 +31,6 @@ public class Runway : MonoBehaviour
         burstAvatars = new List<RunwayAvatar>();
         runwayAvatars = new List<RunwayAvatar>();
         creature2RunwayAvatar = new Dictionary<Creature, RunwayAvatar>();
-        foreach (Character c in bm.characters)
-        {
-            creatures.Add(c);
-        }
-        foreach (Enemy e in bm.enemies)
-        {
-            creatures.Add(e);
-        }
 
         float fastest_time = 100;
         foreach (Creature c in creatures)
@@ -74,6 +64,12 @@ public class Runway : MonoBehaviour
     }
 
     private bool firstTime = true;
+
+    public void AddToRunway(Creature c)
+    {
+        creatures.Add(c);
+        c.SetLocation(0);
+    }
 
     public Creature UpdateRunway(out bool isBurst)
     {

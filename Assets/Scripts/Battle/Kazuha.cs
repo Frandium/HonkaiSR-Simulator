@@ -12,18 +12,9 @@ public class Kazuha : IBattleTalents
     }
 
     void ReduceResist(Enemy e)
-    { // 一定要先减抗再 take damage，不然就被反应掉了。
-        switch (e.elementState)
-        {
-            case Element.Cryo:
-                e.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.Percentage, (int)CommonAttribute.CryoResist , -.2f, 2));
-                break;
-            case Element.Hydro:
-                e.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.Percentage, (int)CommonAttribute.HydroResist, -.2f, 2));
-                break;
-            default:
-                break;
-        }
+    { 
+        // 一定要先减抗再 take damage，不然就被反应掉了。
+        e.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.AnemoResist + (int)e.elementState , -.2f, 2));
     }
 
     public void AttackCharacterAction(List<Character> characters)
@@ -46,16 +37,11 @@ public class Kazuha : IBattleTalents
     {
         self.ClearEnergy();
         float dmg = DamageCal.ATKDamageCharacter(self, Element.Anemo, 472);
-           enemies[0].AddBuff(new ValueBuff(BuffType.Debuff, ValueType.Percentage, (int)CommonAttribute.CryoResist, -.2f, 2));
         for (int i = 0; i < enemies.Count; ++i)
         {
             ReduceResist(enemies[i]);
             enemies[i].TakeDamage(dmg, self, Element.Anemo);
-//            enemies[i].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
         }
-        // ReduceResist(enemies[enemies.Count - 1]);
-        // enemies[enemies.Count - 1].TakeDamage(dmg, self, Element.Anemo, BattleManager.Instance.NextTurn);
-        //
     }
 
     public void OnDying()

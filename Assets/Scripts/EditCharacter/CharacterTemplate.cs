@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using LitJson;
 
-public class CreatureTemplate
+
+public class CharacterTemplate
 {
     public string dbname = "test";
     public string disname = "²âÊÔ½ÇÉ«";
@@ -28,6 +25,4 @@ public class CreatureTemplate
     public SelectionType burstSelectionType  = SelectionType.All;
     public int attackGainPointCount  = 1;
     public int skillConsumePointCount  = 1;
-
-
 }

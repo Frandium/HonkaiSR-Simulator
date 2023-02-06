@@ -1,10 +1,9 @@
 {
-    "dbname": "test",
+    "dbname": "ganyu",
     "disname": "\u6D4B\u8BD5\u89D2\u8272",
-    "ID": 1,
     "speed": 43.0,
     "maxHp": 15085.0,
-    "atk": 2602.0,
+    "atk": 26020.0,
     "def": 674.0,
     "maxEnergy": 60.0,
     "element": 4,

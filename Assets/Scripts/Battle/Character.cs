@@ -125,6 +125,7 @@ public class Character : Creature
                 break;
             case "ganyu":
                 attackTalents = new Ganyu(this);
+                energy = maxEnergy;
                 break;
             case "shenhe":
                 attackTalents = new Shenhe(this);

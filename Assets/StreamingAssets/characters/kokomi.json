@@ -1,7 +1,6 @@
 {
-    "dbname": "test",
+    "dbname": "kokomi",
     "disname": "\u6D4B\u8BD5\u89D2\u8272",
-    "ID": 1,
     "speed": 30.0,
     "maxHp": 40277.0,
     "atk": 1190.0,
