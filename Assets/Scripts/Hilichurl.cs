@@ -16,7 +16,24 @@ public class Hilichurl : IEnemyAction
     public void MyTurn()
     {
         List<Character> characters = bm.characters;
-        int i = Random.Range(0, characters.Count);
+        int tauntWeight = 0;
+        foreach(Character c in characters)
+        {
+            tauntWeight += c.tauntWeight;
+        }
+        int rand = Random.Range(0, tauntWeight);
+        int i = 0;
+        for(; i < characters.Count; ++i)
+        {
+            if (rand < characters[i].tauntWeight)
+                break;
+            tauntWeight -= characters[i].tauntWeight;
+        }
+        if(i >= characters.Count)
+        {
+            Debug.LogError("Wrong character index selected.");
+            return;
+        }
         float dmg = DamageCal.ATKDamage(self, Element.Physical, 150);
         characters[i].TakeDamage(dmg, self, Element.Physical);
         self.PlayAudio(AudioType.Attack);

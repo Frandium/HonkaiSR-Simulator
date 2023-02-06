@@ -27,6 +27,11 @@ public class Character : Creature
     public int attackGainPointCount { get; protected set; } = 1;
     public int skillConsumePointCount { get; protected set; } = 1;
 
+    public int tauntWeight { get; protected set; } = 100;
+
+    float energy = 0;
+    public float maxEnergy { get; protected set; } = 60;
+
     public Sprite attackIcon;
     public Sprite skillIcon;
     public Sprite burstIcon;
@@ -47,15 +52,10 @@ public class Character : Creature
     public VideoClip burstVideo;
 
 
-    public float tuntWeight = 100;
-
-    float energy = 0;
-    float maxEnergy = 60;
     public Element element { get; private set; } = Element.Physical;
 
     public IBattleTalents attackTalents { get; private set; }
-
-    public 
+ 
 
     // Update is called once per frame
     void Update()
