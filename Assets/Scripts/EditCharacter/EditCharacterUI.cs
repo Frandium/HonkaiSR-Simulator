@@ -10,16 +10,17 @@ public class EditCharacterUI : MonoBehaviour
 {
     public Dropdown chaList;
 
-    CreatureTemplate temp;
+    CharacterTemplate temp;
 
     string jsonPath { get {
             return GlobalInfoHolder.Instance.characterDir + "/" + temp.dbname + ".json";
         } }
     List<string> files;
+
     // Start is called before the first frame update
     void Start()
     {
-        temp = new CreatureTemplate();
+        temp = new CharacterTemplate();
         ListAllJson();
         chaList.onValueChanged.AddListener(OptionChange);
     }
@@ -65,7 +66,7 @@ public class EditCharacterUI : MonoBehaviour
         temp.speed = (double)data["speed"];
         temp.maxHp = (double)data["maxHp"];
         temp.maxEnergy = (double)data["maxEnergy"];
-        temp.element = (Element)(int)data["Element"];
+        temp.element = (Element)(int)data["element"];
         
         for(int i = 0; i < (int)Element.Count; ++i)
         {
@@ -91,11 +92,10 @@ public class EditCharacterUI : MonoBehaviour
 
     public void DumpJson()
     {
-        string s = JsonMapper.ToJson(temp);
-        Debug.Log(s);
+        BattleTemplate bt = new BattleTemplate();
         FileStream fs;
-        fs = File.Open(jsonPath, FileMode.OpenOrCreate);
-        string content = JsonMapper.ToJson(temp);
+        fs = File.Open(GlobalInfoHolder.Instance.battleDir + "/" + "default_battle.json", FileMode.OpenOrCreate);
+        string content = JsonMapper.ToJson(bt);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();
         ListAllJson();

@@ -12,18 +12,9 @@ public class Kazuha : IBattleTalents
     }
 
     void ReduceResist(Enemy e)
-    { // 一定要先减抗再 take damage，不然就被反应掉了。
-        switch (e.elementState)
-        {
-            case Element.Cryo:
-                e.AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
-                break;
-            case Element.Hydro:
-                e.AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.HydroResist, -.2f, 2));
-                break;
-            default:
-                break;
-        }
+    { 
+        // 一定要先减抗再 take damage，不然就被反应掉了。
+        e.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.AnemoResist + (int)e.elementState , -.2f, 2));
     }
 
     public void AttackCharacterAction(List<Character> characters)
@@ -32,7 +23,7 @@ public class Kazuha : IBattleTalents
 
     public void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Physical, 88.9f);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Physical, 88.9f);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
         BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
         self.ChargeEnergy(2.5f);
@@ -45,17 +36,12 @@ public class Kazuha : IBattleTalents
     public void BurstEnemyAction(List<Enemy> enemies)
     {
         self.ClearEnergy();
-        float dmg = DamageCal.ATKDamage(self, Element.Anemo, 472);
-           enemies[0].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Anemo, 472);
         for (int i = 0; i < enemies.Count; ++i)
         {
             ReduceResist(enemies[i]);
             enemies[i].TakeDamage(dmg, self, Element.Anemo);
-//            enemies[i].AddBuff(new ValueBuff(BuffType.Debuff, AttributeType.CryoResist, -.2f, 2));
         }
-        // ReduceResist(enemies[enemies.Count - 1]);
-        // enemies[enemies.Count - 1].TakeDamage(dmg, self, Element.Anemo, BattleManager.Instance.NextTurn);
-        //
     }
 
     public void OnDying()
@@ -68,14 +54,14 @@ public class Kazuha : IBattleTalents
 
     public void SkillEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Anemo, 346);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Anemo, 346);
         ReduceResist(enemies[0]);
         enemies[0].TakeDamage(dmg, self, Element.Anemo);
         self.ChargeEnergy(12.5f);
         BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
     }
 
-    public void OnTakingDamage(Creature source, float value)
+    public void OnTakingDamage(Creature source, float value, Element element)
     {
         self.ChargeEnergy(10);
     }

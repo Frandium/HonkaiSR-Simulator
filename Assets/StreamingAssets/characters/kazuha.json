@@ -1,7 +1,6 @@
 {
-    "dbname": "test",
+    "dbname": "kazuha",
     "disname": "\u6D4B\u8BD5\u89D2\u8272",
-    "ID": 1,
     "speed": 41.0,
     "maxHp": 20676.0,
     "atk": 1313.0,

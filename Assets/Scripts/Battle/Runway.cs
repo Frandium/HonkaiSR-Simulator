@@ -6,11 +6,9 @@ using UnityEngine.UI;
 public class Runway : MonoBehaviour
 {
 
-    public BattleManager bm;
-
     float len = 100;
 
-    private Queue<Creature> burstInsertQueue;
+    private Queue<Creature> burstWaitingQueue;
     private List<RunwayAvatar> burstAvatars;
     private List<RunwayAvatar> runwayAvatars;
     Dictionary<Creature, RunwayAvatar> creature2RunwayAvatar;
@@ -26,60 +24,35 @@ public class Runway : MonoBehaviour
 
 
     private readonly Vector3 firstRunwayAvatarPos = new Vector3(10, -25, 0);
+    private readonly Vector3 runwayAvatarInternal = new Vector3(0, -55, 0);
 
-    public void Initialize()
+    void Start()
     {
-        burstInsertQueue = new Queue<Creature>();
+        burstWaitingQueue = new Queue<Creature>();
         burstAvatars = new List<RunwayAvatar>();
         runwayAvatars = new List<RunwayAvatar>();
         creature2RunwayAvatar = new Dictionary<Creature, RunwayAvatar>();
-        foreach (Character c in bm.characters)
-        {
-            creatures.Add(c);
-        }
-        foreach (Enemy e in bm.enemies)
-        {
-            creatures.Add(e);
-        }
-
-        float fastest_time = 100;
-        foreach (Creature c in creatures)
-        {
-            fastest_time = Mathf.Min((len - c.location) / c.speed, fastest_time);
-        }
-        foreach (Creature c in creatures)
-        {
-            c.SetLocation(c.location + fastest_time * c.speed);
-        }
-
-        creatures.Sort((c1, c2) =>
-        {
-            if (c1.location == c2.location)
-            {
-                return c1.uniqueID < c2.uniqueID ? 1: -1;
-            }
-            return c1.location < c2.location ? 1 : -1;
-        });
-
-        for (int i = 0; i < creatures.Count; ++i)
-        {
-            Creature c = creatures[i];
-            GameObject go = Instantiate(avatarPrefab, runwayTransform);
-            RunwayAvatar ra = go.GetComponent<RunwayAvatar>();
-            runwayAvatars.Add(ra);
-            creature2RunwayAvatar[c] = ra;
-            ra.SetCreature(c, false);
-            go.GetComponent<RectTransform>().anchoredPosition = firstRunwayAvatarPos + new Vector3(0, -55 * i, 0);
-        }
     }
 
     private bool firstTime = true;
 
+    public void AddCreature(Creature c)
+    {
+        creatures.Add(c);
+        c.SetLocation(0);
+        RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
+        newOne.SetCreature(c, false);
+        newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(10, -500, 0);
+        runwayAvatars.Add(newOne);
+        creature2RunwayAvatar[c] = newOne;
+    }
+
     public Creature UpdateRunway(out bool isBurst)
     {
-        isBurst = burstInsertQueue.Count > 0;
+        isBurst = burstWaitingQueue.Count > 0;
         if (!firstTime)
         {
+            // 移除第一个 avatar，如果被移除的不是 burst，在队尾创建一个新的
             RunwayAvatar firstAvatar = runwayAvatars[0];
             firstAvatar.MoveTowards(new Vector3(10, 25, 0), () => { Destroy(firstAvatar.gameObject); });
             runwayAvatars.RemoveAt(0);
@@ -92,24 +65,21 @@ public class Runway : MonoBehaviour
                 creature2RunwayAvatar[firstAvatar.creature] = newOne;
             }
         }
-        else
-        {
-            firstTime = false;
-            return creatures[0];
-        }
+        firstTime = false;
 
         // 有插入的大招时，先放大招
         if (isBurst)
         {
             for(int i  =0; i < burstAvatars.Count; ++i)
             {
-                burstAvatars[i].MoveTowards(burstEndPos[i]);
+                burstAvatars[i].MoveTowards(firstBurstEndPos + i * burstAvatarInternal);// burstEndPos[i]);
             }
             runwayAvatars.Insert(0, burstAvatars[0]);
             burstAvatars.RemoveAt(0);
-            return burstInsertQueue.Dequeue();
+            return burstWaitingQueue.Dequeue();
         }
 
+        // 非大招回合，update 所有人的进度，更新UI
         float fastest_time = 100;
         foreach(Creature c in creatures)
         {
@@ -119,17 +89,17 @@ public class Runway : MonoBehaviour
         {
             c.SetLocation(c.location + fastest_time * c.speed);
         }
-        RearrangeRunway();
-        return creatures[0];
-    }
-
-    private void RearrangeRunway()
-    {
         creatures.Sort((c1, c2) =>
         {
             if (c1.location == c2.location) return 0;
             return c1.location < c2.location ? 1 : -1;
         });
+        RearrangeRunwayUI();
+        return creatures[0];
+    }
+
+    private void RearrangeRunwayUI()
+    {
         runwayAvatars.Sort((ra1, ra2) =>
        {
            if (ra1.IsBurst) return 1;
@@ -137,13 +107,13 @@ public class Runway : MonoBehaviour
            if (ra1.creature.location == ra2.creature.location) return 0;
            return ra1.creature.location < ra2.creature.location ? 1 : -1;
        });
-        for(int i = 0;i<runwayAvatars.Count; ++i)
+        for(int i = 0; i<runwayAvatars.Count; ++i)
         {
-            runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + new Vector3(0, -55 * i, 0));
+            runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + i * runwayAvatarInternal);
         }
     }
 
-    public void RemoveFromRunway(Creature creature)
+    public void RemoveCreature(Creature creature)
     {
         creatures.Remove(creature);
         RunwayAvatar ra = runwayAvatars.Find(r =>
@@ -154,21 +124,33 @@ public class Runway : MonoBehaviour
         runwayAvatars.Remove(ra);
     }
 
-    public void InsertBurst(Character c)
+    public void InsertBurst(Character c, bool isBurstNow = false)
     {
-        burstInsertQueue.Enqueue(c);
+        // 首先创建一个新的 avatar，设置它的 creature
         GameObject go = Instantiate(avatarPrefab, runwayTransform);
-        RunwayAvatar ra = go.GetComponent<RunwayAvatar>();
-        burstAvatars.Add(ra);
-        ra.SetCreature(c, true);
-        go.GetComponent<RectTransform>().anchoredPosition = burstStartPos[burstInsertQueue.Count];
+        go.GetComponent<RectTransform>().anchoredPosition = firstBurstStartPos + burstWaitingQueue.Count * burstAvatarInternal; // burstStartPos[burstWaitingQueue.Count + 1];
         go.GetComponent<Image>().sprite = c.runwayAvatar;
-        ra.MoveTowards(burstEndPos[burstInsertQueue.Count]);
+        RunwayAvatar ra = go.GetComponent<RunwayAvatar>();
+        ra.SetCreature(c, true);
+
+        if (isBurstNow)
+        { // 如果现在是 burst，那么当前插入的回合去等待队列
+            burstWaitingQueue.Enqueue(c);
+            burstAvatars.Add(ra);
+            ra.MoveTowards(firstBurstEndPos + burstWaitingQueue.Count * burstAvatarInternal);// burstEndPos[burstWaitingQueue.Count]);
+        }
+        else
+        { // 如果现在不是 burst，那么当前插入的回合到 runway 头，其他人后退
+            for (int i = 0; i < runwayAvatars.Count; ++i)
+            {
+                runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + (i + 1) * runwayAvatarInternal);
+            }
+            runwayAvatars.Insert(0, ra);
+            ra.MoveTowards(firstRunwayAvatarPos);
+        }
     }
 
-    private Vector3[] burstStartPos = { new Vector3(0, 0, 0), new Vector3(270, -25, 0), new Vector3(340, -25, 0), new Vector3(410, -25, 0), new Vector3(480, -25, 0) };
-
-    private Vector3[] burstEndPos = { new Vector3(10, -25, 0), new Vector3(90, -25, 0), new Vector3(160, -25, 0), new Vector3(230, -25, 0), new Vector3(300, -25, 0) };
-
-
+    private readonly Vector3 firstBurstStartPos = new Vector3(200, -25, 0);
+    private readonly Vector3 firstBurstEndPos = new Vector3(10, -25, -0);
+    private readonly Vector3 burstAvatarInternal = new Vector3(70, 0, 0);
 }

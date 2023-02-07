@@ -17,7 +17,7 @@ public class Ganyu : IBattleTalents
 
     public void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Physical, 89.9f);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Physical, 89.9f);
         enemies[0].TakeDamage(dmg, self, Element.Physical);
         BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
         self.ChargeEnergy(2.5f);
@@ -30,7 +30,7 @@ public class Ganyu : IBattleTalents
     public void BurstEnemyAction(List<Enemy> enemies)
     {
         self.ClearEnergy();
-        float dmg = DamageCal.ATKDamage(self, Element.Cryo, 126 * 4);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Cryo, 126 * 4);
         for (int i = 0; i < enemies.Count; ++ i)
         {
             enemies[i].TakeDamage(dmg, self, Element.Cryo);
@@ -48,14 +48,14 @@ public class Ganyu : IBattleTalents
 
     public void SkillEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamage(self, Element.Cryo, 238);
+        float dmg = DamageCal.ATKDamageCharacter(self, Element.Cryo, 238);
         enemies[0].TakeDamage(dmg, self, Element.Cryo);
-        self.AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Buff, AttributeType.Taunt, -20, 2));
+        self.AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Buff, ValueType.InstantNumber, (int)CharacterAttribute.Taunt, -20, 2));
         BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
         self.ChargeEnergy(10);
     }
 
-    void IBattleTalents.OnTakingDamage(Creature source, float value)
+    void IBattleTalents.OnTakingDamage(Creature source, float value, Element element)
     {
         self.ChargeEnergy(10);
     }

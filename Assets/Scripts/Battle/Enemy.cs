@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.IO;
+using LitJson;
 
 public class Enemy : Creature
 {
@@ -21,23 +23,32 @@ public class Enemy : Creature
 
     public override void Initialize(string dbN, int id)
     {
-        base.Initialize(dbN, id);
+        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.enemyDir + "/" + dbN + ".json");
+        JsonData data = JsonMapper.ToObject(jsonString);
+
+        // set character template
+        databaseName = (string)data["dbname"];
+        displayName = (string)data["disname"];
+        atk = (float)(double)data["atk"];
+        def = (float)(double)data["def"];
+        speed = (float)(double)data["speed"];
+        maxHp = (float)(double)data["maxHp"];
+       
+        for (int i = 0; i < (int)Element.Count; ++i)
+        {
+            attributes[(int)CommonAttribute.AnemoResist + i] = (float)(double)data["elementalResist"][i];
+        }
+
         switch (databaseName)
         {
             case "hilichurl":
-                uniqueID = id;
-                def = 1305;
-                atk = 6628;
-                speed = 33;
-                maxHp = 25664;
                 enemyAction = new Hilichurl(this);
                 break;
             default:
                 break;
         }
-        hp = maxHp;
+        base.Initialize(dbN, id);
     }
-
 
     protected override IEnumerator TakeDamangeAnim(int dmg, Then nextToDo)
     {
