@@ -32,7 +32,6 @@ public class JSONCharacterTalents : ACharacterTalents
                     attr = (int)action["valueBase"];
                     rate = action["rate"];
                     offset = action["offset"];
-                    e = (Element)(int)action["element"];
                     dmg = DamageCal.Heal(self, (CommonAttribute)attr, rate, offset);
                     foreach (Creature c in creatures)
                     {

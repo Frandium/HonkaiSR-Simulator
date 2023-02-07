@@ -5,6 +5,7 @@ using UnityEngine.Video;
 using UnityEngine.UI;
 using System.IO;
 using LitJson;
+using UnityEngine.SceneManagement;
 
 public enum SelectionType
 {
@@ -222,7 +223,7 @@ public class BattleManager : MonoBehaviour
         {   
             if (++enmWave >= enmNames.Count) // 没有下一波了，结束
             {
-                StartCoroutine(ShowBanner("挑 战 成 功", new Color(1, .5f, 0, .875f), 1));
+                StartCoroutine(ShowBanner("挑 战 成 功", new Color(1, .5f, 0, .875f), 1, true));
                 bgm.Stop();
                 curStage = TurnStage.GameEnd;
                 return;
@@ -240,7 +241,7 @@ public class BattleManager : MonoBehaviour
         }
         if (characters.Count == 0)
         {
-            StartCoroutine(ShowBanner("挑 战 失败", new Color(1, .5f, 0, .875f), 1));
+            StartCoroutine(ShowBanner("挑 战 失败", new Color(1, .5f, 0, .875f), 1, true));
             bgm.Stop();
             curStage = TurnStage.GameEnd;
             return;
@@ -436,7 +437,7 @@ public class BattleManager : MonoBehaviour
         curStage = TurnStage.Animation;
     }
 
-    IEnumerator ShowBanner(string info, Color c, float seconds)
+    IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)
     {
         bannerImgae.gameObject.SetActive(true);
         bannerImgae.color = c; //new Color(1, .5f, 0, .875f);
@@ -446,5 +447,7 @@ public class BattleManager : MonoBehaviour
         yield return new WaitForSeconds(seconds);
         yield return ChangeLocalScale(bannerImgae.rectTransform, new Vector3(1, .01f, 1), animTime);
         bannerImgae.gameObject.SetActive(false);
+        if(returnToIndex)
+            SceneManager.LoadScene("Index");
     }
 }

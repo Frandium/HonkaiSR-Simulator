@@ -158,21 +158,24 @@ public class Character : Creature
 
 
         // 也许之后人物的技能要改成 Lua 脚本，就不用 switch 了。
-        switch (dbN)
-        {
-            case "kazuha":
-                talents = new Kazuha(this);
-                break;
-            case "ganyu":
-                talents = new JSONCharacterTalents(this);//new Ganyu(this);
-                break;
-            case "shenhe":
-                talents = new Shenhe(this);
-                break;
-            case "kokomi":
-                talents = new Kokomi(this);
-                break;
-        }
+        if (attackActionSeries.Count == 0 && skillActionSeries.Count == 0 && BurstActionSeries.Count == 0)
+            switch (dbN)
+            {
+                case "kazuha":
+                    talents = new Kazuha(this);
+                    break;
+                case "ganyu":
+                    talents = new Ganyu(this);
+                    break;
+                case "shenhe":
+                    talents = new Shenhe(this);
+                    break;
+                case "kokomi":
+                    talents = new Kokomi(this);
+                    break;
+            }
+        else
+            talents = new JSONCharacterTalents(this);
         base.Initialize(dbN, id);
         selectedSR.sprite = selectedCard;
         burstImage.sprite = burstIcon;
@@ -286,6 +289,8 @@ public class Character : Creature
         Color c = ElementColors[(int)element];
         c.a = 1;
         burstFillingImage.color = c;
+        alpha = 0;
+        selectedSR.color = new Color(0, 0, 0, 0);
     }
 
     public void InterruptedByBurst()

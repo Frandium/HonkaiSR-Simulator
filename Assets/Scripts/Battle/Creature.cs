@@ -155,6 +155,10 @@ public class Creature : MonoBehaviour
         {
             elementState = e;
         }
+        else if (elementState == e)
+        {
+            // 同样的元素，不反应
+        }
         else // 发生反应，清空元素附着
         {
             if ((elementState == Element.Hydro && e == Element.Cryo) ||
