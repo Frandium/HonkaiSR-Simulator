@@ -67,6 +67,7 @@ public class BattleManager : MonoBehaviour
     public List<Character> characters;
     public List<Enemy> enemies;
 
+    public Object EnemyPrefab;
     public Creature curCreature { get; private set; }
     private Character curCharacter;
 
