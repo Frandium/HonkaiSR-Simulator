@@ -118,6 +118,7 @@ public class Character : Creature
 
 
         // 也许之后人物的技能要改成 Lua 脚本，就不用 switch 了。
+        energy = maxEnergy;
         switch (dbN)
         {
             case "kazuha":

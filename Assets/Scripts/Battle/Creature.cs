@@ -232,7 +232,7 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnDying()
     {
-        BattleManager.Instance.runway.RemoveFromRunway(this);
+        BattleManager.Instance.runway.RemoveCreature(this);
         gameObject.SetActive(false);
 //        Destroy(this.gameObject);
     }
@@ -313,7 +313,7 @@ public class Creature : MonoBehaviour
     public virtual void Initialize(string dbN, int id)
     {
         location = 0;
-        BattleManager.Instance.runway.AddToRunway(this);
+        BattleManager.Instance.runway.AddCreature(this);
         uniqueID = id;
         databaseName = dbN;
         hp = maxHp;

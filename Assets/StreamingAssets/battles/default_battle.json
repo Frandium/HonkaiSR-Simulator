@@ -1,7 +1,7 @@
 {
     "characters": ["kazuha", "ganyu", "shenhe", "kokomi"],
     "enemies": [
-        ["hilichurl", "hilichurl", "hilichurl"],
+        ["hilichurl", "hilichurl", "hilichurl", "hilichurl"],
         ["hilichurl", "hilichurl", "hilichurl"]
     ]
 }
