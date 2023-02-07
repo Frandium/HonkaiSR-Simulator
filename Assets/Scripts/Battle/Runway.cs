@@ -81,17 +81,18 @@ public class Runway : MonoBehaviour
 
         // 非大招回合，update 所有人的进度，更新UI
         float fastest_time = 100;
-        foreach(Creature c in creatures)
+        for(int i = 0; i < creatures.Count; ++i)
         {
-            fastest_time = Mathf.Min((len - c.location) / c.speed, fastest_time);
+            fastest_time = Mathf.Min((len - creatures[i].location) / creatures[i].GetFinalAttr((int)CommonAttribute.Speed), fastest_time);
         }
         foreach(Creature c in creatures)
         {
-            c.SetLocation(c.location + fastest_time * c.speed);
+            c.SetLocation(c.location + fastest_time * c.GetFinalAttr((int)CommonAttribute.Speed));
         }
         creatures.Sort((c1, c2) =>
         {
-            if (c1.location == c2.location) return 0;
+            if (c1.location == c2.location) 
+                return 0;
             return c1.location < c2.location ? 1 : -1;
         });
         RearrangeRunwayUI();
@@ -124,7 +125,7 @@ public class Runway : MonoBehaviour
         runwayAvatars.Remove(ra);
     }
 
-    public void InsertBurst(Character c, bool isBurstNow = false)
+    public void InsertBurst(Character c, bool immediately = false)
     {
         // 首先创建一个新的 avatar，设置它的 creature
         GameObject go = Instantiate(avatarPrefab, runwayTransform);
@@ -133,8 +134,8 @@ public class Runway : MonoBehaviour
         RunwayAvatar ra = go.GetComponent<RunwayAvatar>();
         ra.SetCreature(c, true);
 
-        if (isBurstNow)
-        { // 如果现在是 burst，那么当前插入的回合去等待队列
+        if (!immediately)
+        { // 如果现在是 burst / 敌人的回合，那么当前插入的回合去等待队列
             burstWaitingQueue.Enqueue(c);
             burstAvatars.Add(ra);
             ra.MoveTowards(firstBurstEndPos + burstWaitingQueue.Count * burstAvatarInternal);// burstEndPos[burstWaitingQueue.Count]);

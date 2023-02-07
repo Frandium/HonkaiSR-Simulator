@@ -3,7 +3,7 @@
     "disname": "\u6D4B\u8BD5\u89D2\u8272",
     "speed": 43.0,
     "maxHp": 15085.0,
-    "atk": 26020.0,
+    "atk": 2602.0,
     "def": 674.0,
     "maxEnergy": 60.0,
     "element": 4,
@@ -29,10 +29,45 @@
     ],
     "isAttackTargetEnemy": true,
     "attackSelectionType": 1,
+    "attackGainEnergy": 2.5,
+    "attackGainPointCount": 1,
+    "attackAction":[
+        {
+            "actionType": 1,
+            "valueBase": 0,
+            "rate": 89.9,
+            "element": 4
+        }
+    ],
     "isSkillTargetEnemy": true,
     "skillSelectionType": 1,
+    "skillConsumePointCount": 1,
+    "skillGainEnergy": 10.0,
+    "skillAction":[
+        {
+            "actionType": 1,
+            "valueBase": 0,
+            "rate": 238,
+            "element": 4
+        },
+        {
+            "actionType": 3,
+            "buffType": 1,
+            "attribute": 27,
+            "valueType": 1,
+            "value": -20,
+            "duration": 2
+        }
+    ],
     "isBurstTargetEnemy": true,
     "burstSelectionType": 3,
-    "attackGainPointCount": 1,
-    "skillConsumePointCount": 1
+    "burstAction":[
+        {
+            "actionType": 1,
+            "valueBase": 0,
+            "rate": 504,
+            "element": 4
+        }
+    ],
+    "takeDmgGainEnergy": 5.0
 }

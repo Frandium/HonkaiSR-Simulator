@@ -27,8 +27,5 @@ public class GlobalInfoHolder
     public string battleDir = Application.streamingAssetsPath + "/battles";
 
     // 之后会改成 battle.json 里配置这些
-    public string[] teamMembers = { "kazuha", "ganyu", "shenhe", "kokomi" };
-    public string[] enemyMembers = { "hilichurl", "hilichurl", "hilichurl" };
-
     public string battleFilePath = Application.streamingAssetsPath + "/battles/default_battle.json";
 }

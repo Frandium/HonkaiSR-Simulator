@@ -15,6 +15,13 @@ public enum Element
     Count
 }
 
+public enum ElementBuff
+{
+    Frozen, // 冻结 = 0
+    Catalyze, // 激化 = 1
+    Count
+}
+
 public enum CharacterAttribute
 {
     CriticalRate = CommonAttribute.Count,
@@ -40,7 +47,6 @@ public enum CommonAttribute
     ATK,
     DEF,
     MaxHP,
-    HP,
     Speed,
     GeneralResist,
     AnemoResist,
@@ -63,6 +69,23 @@ public enum ValueType
 {
     Percentage,
     InstantNumber,
+    Count
+}
+
+public enum DamageType
+{
+    Attack,
+    Skill,
+    Burst,
+    Count
+}
+
+public enum ActionType
+{
+    DealDamage, // 造成伤害，0
+    DealHeal, // 造成治疗，1
+    DealElement, // 附着元素，2
+    AddBuff, // 增加 buff，3
     Count
 }
 

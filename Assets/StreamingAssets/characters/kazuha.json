@@ -34,5 +34,8 @@
     "isBurstTargetEnemy": true,
     "burstSelectionType": 3,
     "attackGainPointCount": 1,
-    "skillConsumePointCount": 1
+    "skillConsumePointCount": 1,
+    "attackGainEnergy": 3.5,
+    "skillGainEnergy": 12.0,
+    "takeDmgGainEnergy": 5.0
 }

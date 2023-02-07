@@ -20,6 +20,7 @@ public enum TurnStage
 {
     Instruction,
     Animation,
+    GameEnd,
     Count
 }
 
@@ -45,6 +46,8 @@ public class BattleManager : MonoBehaviour
     float animTime = .2f;
     int enmWave = -1;
     int unitCount = 0;
+    float turnTime = 0;
+    float minTurnTime = 3; // 每个回合最少 3 秒，防止操作输入太快出 bug
     private bool isBurst = false;
     public List<Character> characters;
     public List<Enemy> enemies { get; private set; } = new List<Enemy>();
@@ -64,11 +67,11 @@ public class BattleManager : MonoBehaviour
     public SkillPoint skillPoint;
 
     // UI Bounding
-    public Text gameEndText;
+    public Text bannerText;
     public Image attackImage;
     public Image skillImage;
     public Image splash;
-    public Image gameEndImage;
+    public Image bannerImgae;
     public AudioClip EAudio;
     public AudioClip QAudio;
     public AudioClip error;
@@ -119,9 +122,9 @@ public class BattleManager : MonoBehaviour
 
                         isAttackOrSkill = false;
                         if (curCharacter.isSkillTargetEnemy)
-                            selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.attackTalents.SkillEnemyAction);
+                            selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.characterTalents.SkillEnemyAction);
                         else
-                            selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.attackTalents.SkillCharacterAction);
+                            selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.characterTalents.SkillCharacterAction);
                     }
                     else
                     {
@@ -159,13 +162,16 @@ public class BattleManager : MonoBehaviour
                 }
                 break;
             case TurnStage.Animation:
-                if (characters.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.IsPerformanceFinished))
+                if (turnTime > minTurnTime && characters.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.IsPerformanceFinished))
                 {
                     NextTurn();
                 }
+                turnTime += Time.deltaTime;
+                break;
+            case TurnStage.GameEnd:
                 break;
             default:
-                Debug.LogError("Unknown turn stage: " + curStage);
+                Debug.LogError("Unhandled turn stage: " + curStage);
                 break;
         }
 
@@ -179,6 +185,7 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    // Game process
     public void LoadBattle()
     {
         string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.battleFilePath);
@@ -209,6 +216,7 @@ public class BattleManager : MonoBehaviour
 
     public void NextTurn()
     {
+        turnTime = 0;
         // 首先判断是否游戏结束
         if (enemies.Count == 0) // 所有敌人都死了
         {   
@@ -216,14 +224,12 @@ public class BattleManager : MonoBehaviour
             {
                 StartCoroutine(ShowBanner("挑 战 成 功", new Color(1, .5f, 0, .875f), 1));
                 bgm.Stop();
+                curStage = TurnStage.GameEnd;
                 return;
             }
             else// 还有下一波
             {
                 StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enmNames.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
-                //gameEndImage.gameObject.SetActive(true);
-                //gameEndImage.color = new Color(1, .5f, 0, .875f);
-                //gameEndText.text = "挑 战 成 功";
                 for (int i = 0; i < enmNames[enmWave].Count; ++i)
                 {
                     Enemy e = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -30, 0)).GetComponent<Enemy>();
@@ -234,10 +240,9 @@ public class BattleManager : MonoBehaviour
         }
         if (characters.Count == 0)
         {
-            gameEndImage.gameObject.SetActive(true);
-            gameEndImage.color = new Color(0, .5f, .75f, .875f);
-            gameEndText.text = "挑 战 失 败";
+            StartCoroutine(ShowBanner("挑 战 失败", new Color(1, .5f, 0, .875f), 1));
             bgm.Stop();
+            curStage = TurnStage.GameEnd;
             return;
         }
 
@@ -247,21 +252,19 @@ public class BattleManager : MonoBehaviour
             // 刚结束的回合是元素爆发回合
             if (isBurst && curCreature is Character)
             {
-                (curCreature as Character).BurstEnd();
+                (curCreature as Character).EndBurstTurn();
             }
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.location = 0;
+                curCreature.SetLocation(0);
                 curCreature.EndMyTurn();
             }
         }
 
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
-        bool isBurstPre = isBurst;
         curCreature = runway.UpdateRunway(out isBurst);
-
 
         if (curCreature is Character) // 玩家的回合
         {
@@ -270,39 +273,46 @@ public class BattleManager : MonoBehaviour
             // 先进入输入指令阶段
             if (isBurst)
             { // 元素爆发回合不触发 turn start hook
-                BurstTurn(curCharacter);
+                BurstTurn();
             }
             else
             {
-                if(!isBurstPre) // 上一回合不是 burst，才触发回合开始 hook，不然会多次触发回合开始。
-                    curCreature.StartMyTurn();
+                bool skip = curCreature.StartMyTurn();
                 curCharacter.PlayAudio(AudioType.Change);
                 attackImage.sprite = curCharacter.attackIcon;
                 skillImage.sprite = curCharacter.skillIcon;
-                selection.StartNewTurn(curCharacter);
-                SelectTarget();
+                if (skip)
+                {
+                    curStage = TurnStage.Animation;
+                }
+                else
+                {
+                    selection.StartNewTurn(curCharacter);
+                    SelectTarget();
+                }
             }
         }
         else if (curCreature is Enemy)
         {
             // 敌人的回合直接进入结算动画阶段，插入的 burst 要等敌人行动完
-            curCreature.StartMyTurn();
+
+            bool skip = curCreature.StartMyTurn();
             curStage = TurnStage.Animation;
             Enemy e = curCreature as Enemy;
-            e.enemyAction.MyTurn();
+            if(!skip)
+                e.enemyTalents.MyTurn();
         }
     }
 
-    protected void BurstTurn(Character c)
+    protected void BurstTurn()
     {
-        curCharacter = c;
-        curCreature = c;
+        curCharacter.StartBurstTurn();
         BurstSplash(curCharacter);
         curCharacter.PlayAudio(AudioType.BurstPrepare);
         if (curCharacter.isBurstTargetEnemy)
-            selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.attackTalents.BurstEnemyAction);
+            selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.characterTalents.BurstEnemyAction);
         else
-            selection.StartCharacterSelection(curCharacter.burstSelectionType, curCharacter.attackTalents.BurstCharacterAction);
+            selection.StartCharacterSelection(curCharacter.burstSelectionType, curCharacter.characterTalents.BurstCharacterAction);
     }
 
     protected void SelectTarget()
@@ -313,10 +323,10 @@ public class BattleManager : MonoBehaviour
         isAttackOrSkill = true;
         if (curCharacter.isAttackTargetEnemy)
         {
-            selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.attackTalents.AttackEnemyAction);
+            selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.characterTalents.AttackEnemyAction);
         }
         else
-            selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.attackTalents.AttackCharacterAction);
+            selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.characterTalents.AttackCharacterAction);
     }
 
     private void TestAndInsertBurst(int i)
@@ -325,15 +335,22 @@ public class BattleManager : MonoBehaviour
         if (c.isBurstActivated || !c.isAlive || !c.isFullyCharged)
             return;
 
-        runway.InsertBurst(c, isBurst);
         c.ActivateBurst();
         audioSource.clip = burstInsert;
         audioSource.Play();
         // 只有在目前不是 burst 回合，且仍处于 instruction 阶段时，才能打断别人的行动
         if (!isBurst && curStage == TurnStage.Instruction)
         {
+            runway.InsertBurst(c, true);
             isBurst = true;
-            BurstTurn(c);
+            curCharacter.InterruptedByBurst();
+            curCharacter = c;
+            curCreature = c;
+            BurstTurn();
+        }
+        else
+        {
+            runway.InsertBurst(c, false);
         }
     }
 
@@ -345,6 +362,12 @@ public class BattleManager : MonoBehaviour
     public void RemoveCharacter(Character c)
     {
         characters.Remove(c);
+    }
+
+    public void DealDamage(Creature source, Creature target, Element element, DamageType type, float value)
+    {
+        source.talents.OnDealingDamage(target, value, element, type);
+        target.TakeDamage(source, value, element, type);
     }
 
     // Animation Settings
@@ -415,13 +438,13 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator ShowBanner(string info, Color c, float seconds)
     {
-        gameEndImage.gameObject.SetActive(true);
-        gameEndImage.color = c; //new Color(1, .5f, 0, .875f);
-        gameEndText.text = info; //  "挑 战 成 功";
-        gameEndImage.rectTransform.localScale = new Vector3(1, .01f, 1);
-        yield return ChangeLocalScale(gameEndImage.rectTransform, Vector3.one, animTime);
+        bannerImgae.gameObject.SetActive(true);
+        bannerImgae.color = c; //new Color(1, .5f, 0, .875f);
+        bannerText.text = info; //  "挑 战 成 功";
+        bannerImgae.rectTransform.localScale = new Vector3(1, .01f, 1);
+        yield return ChangeLocalScale(bannerImgae.rectTransform, Vector3.one, animTime);
         yield return new WaitForSeconds(seconds);
-        yield return ChangeLocalScale(gameEndImage.rectTransform, new Vector3(1, .01f, 1), animTime);
-        gameEndImage.gameObject.SetActive(false);
+        yield return ChangeLocalScale(bannerImgae.rectTransform, new Vector3(1, .01f, 1), animTime);
+        bannerImgae.gameObject.SetActive(false);
     }
 }

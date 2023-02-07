@@ -2,16 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Hilichurl : IEnemyAction
+public class Hilichurl : AEnemyTalents
 {
-    Enemy self;
-
-    public Hilichurl(Enemy _self)
+    public Hilichurl(Enemy _self): base(_self)
     {
-        self = _self;
+
     }
 
-    public void MyTurn()
+    public override void MyTurn()
     {
         List<Character> characters = BattleManager.Instance.characters;
         int tauntWeight = 0;
@@ -33,7 +31,7 @@ public class Hilichurl : IEnemyAction
             return;
         }
         float dmg = DamageCal.ATKDamageEnemy(self, Element.Physical, 150);
-        characters[i].TakeDamage(dmg, self, Element.Physical);
+        BattleManager.Instance.DealDamage(self, characters[i], Element.Physical, DamageType.Attack, dmg);
         self.PlayAudio(AudioType.Attack);
     }
 }

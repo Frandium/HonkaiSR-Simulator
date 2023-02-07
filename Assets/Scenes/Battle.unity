@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44019705, g: 0.48873144, b: 0.5689121, a: 1}
+  m_IndirectSpecularColor: {r: 0.43774465, g: 0.4856404, b: 0.56591517, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -98,7 +98,7 @@ LightmapSettings:
     m_TrainingDataDestination: TrainingData
     m_LightProbeSampleCountMultiplier: 4
   m_LightingDataAsset: {fileID: 0}
-  m_LightingSettings: {fileID: 0}
+  m_LightingSettings: {fileID: 4890085278179872738, guid: f69bfe6c696e112408be9ab65139fa83, type: 2}
 --- !u!196 &4
 NavMeshSettings:
   serializedVersion: 2
@@ -1791,7 +1791,7 @@ Light:
   m_BounceIntensity: 1
   m_ColorTemperature: 6570
   m_UseColorTemperature: 0
-  m_BoundingSphereOverride: {x: 0, y: 0, z: 0, w: 0}
+  m_BoundingSphereOverride: {x: 5.9e-44, y: 0, z: 0, w: 3.4e-44}
   m_UseBoundingSphereOverride: 0
   m_UseViewFrustumForShadowCasterCull: 1
   m_ShadowRadius: 0
@@ -1803,14 +1803,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 705507993}
-  m_LocalRotation: {x: -0.5436279, y: 0.21393712, z: -0.14566463, w: -0.79842436}
+  m_LocalRotation: {x: -0.6111466, y: 0.2004275, z: -0.1637562, w: -0.74800575}
   m_LocalPosition: {x: 0, y: 3, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: -291.5, y: -30, z: 0}
+  m_LocalEulerAnglesHint: {x: -281.5, y: -30, z: 0}
 --- !u!1 &718303792
 GameObject:
   m_ObjectHideFlags: 0
@@ -5426,11 +5426,11 @@ MonoBehaviour:
   selection: {fileID: 555861066}
   runway: {fileID: 1097789668}
   skillPoint: {fileID: 1292744589}
-  gameEndText: {fileID: 0}
+  bannerText: {fileID: 1180665445}
   attackImage: {fileID: 614750097}
   skillImage: {fileID: 888113826}
   splash: {fileID: 1489712066}
-  gameEndImage: {fileID: 721349821}
+  bannerImgae: {fileID: 721349821}
   EAudio: {fileID: 8300000, guid: 5537589990acb33458bf2ad6201c127f, type: 3}
   QAudio: {fileID: 8300000, guid: 461d6836a4a18824c834fa4ad7efaedc, type: 3}
   error: {fileID: 8300000, guid: 18f360df890d16c44a997b9cb8cb29e3, type: 3}
@@ -5845,7 +5845,8 @@ MonoBehaviour:
   hpLine: {fileID: 1775427810}
   dmgText: {fileID: 90640552}
   dmgGO: {fileID: 461689866}
-  selected: {fileID: 924361043}
+  cardSR: {fileID: 1942912917}
+  selectedSR: {fileID: 924361043}
   eleImage: {fileID: 1204738027}
   buffImage: {fileID: 1874957870}
   attackAudios:
@@ -5859,8 +5860,6 @@ MonoBehaviour:
   burstIcon: {fileID: 21300000, guid: c91de4a8ece9c7c48a4d9c592879de09, type: 3}
   selectedCard: {fileID: 21300000, guid: 86243bc27a4f49a43ade4d9863d82f19, type: 3}
   burstSplash: {fileID: 21300000, guid: 948f04960e59da94d884baf9f06f53b3, type: 3}
-  selectedCardSR: {fileID: 924361043}
-  cardSR: {fileID: 1942912917}
   burstImage: {fileID: 998626830}
   burstFillingImage: {fileID: 94036076}
   skillAudios:
@@ -6229,7 +6228,8 @@ MonoBehaviour:
   hpLine: {fileID: 1432150063}
   dmgText: {fileID: 947206057}
   dmgGO: {fileID: 1456139953}
-  selected: {fileID: 1258426547}
+  cardSR: {fileID: 1986744191}
+  selectedSR: {fileID: 1258426547}
   eleImage: {fileID: 718303794}
   buffImage: {fileID: 783982562}
   attackAudios:
@@ -6243,8 +6243,6 @@ MonoBehaviour:
   burstIcon: {fileID: 21300000, guid: d1d52755c6bc50a4b85ee51dcb72a350, type: 3}
   selectedCard: {fileID: 21300000, guid: a0cc9c55c12ebb041b0f2c2772caddfb, type: 3}
   burstSplash: {fileID: 21300000, guid: bf3769fe58ff7fe458460b36e255f052, type: 3}
-  selectedCardSR: {fileID: 1258426547}
-  cardSR: {fileID: 1986744191}
   burstImage: {fileID: 1242136605}
   burstFillingImage: {fileID: 16816020}
   skillAudios:
@@ -6817,7 +6815,8 @@ MonoBehaviour:
   hpLine: {fileID: 1206617803}
   dmgText: {fileID: 14793926}
   dmgGO: {fileID: 1638887496}
-  selected: {fileID: 1908138481}
+  cardSR: {fileID: 2086364215}
+  selectedSR: {fileID: 1908138481}
   eleImage: {fileID: 1304806707}
   buffImage: {fileID: 233973634}
   attackAudios:
@@ -6831,8 +6830,6 @@ MonoBehaviour:
   burstIcon: {fileID: 21300000, guid: c8f4d17f527925e4c8b5b5778c814137, type: 3}
   selectedCard: {fileID: 21300000, guid: ec6b57e0a2d251c40b125799d79c4c14, type: 3}
   burstSplash: {fileID: 21300000, guid: 6b1da5b58ca8b9140b985420fc0669c6, type: 3}
-  selectedCardSR: {fileID: 1908138481}
-  cardSR: {fileID: 2086364215}
   burstImage: {fileID: 1995953942}
   burstFillingImage: {fileID: 1911599815}
   skillAudios:
@@ -7114,6 +7111,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1448225970}
     - target: {fileID: 4129915578433855376, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+      propertyPath: selectedSR
+      value: 
+      objectReference: {fileID: 4129915577082219952}
+    - target: {fileID: 4129915578433855376, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
       propertyPath: burstFillingImage
       value: 
       objectReference: {fileID: 1652928227}
@@ -7171,3 +7172,8 @@ PrefabInstance:
       objectReference: {fileID: 963194227}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+--- !u!212 &4129915577082219952 stripped
+SpriteRenderer:
+  m_CorrespondingSourceObject: {fileID: 4129915577640034049, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+  m_PrefabInstance: {fileID: 4129915577082219951}
+  m_PrefabAsset: {fileID: 0}

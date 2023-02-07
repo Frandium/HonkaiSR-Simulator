@@ -29,18 +29,19 @@ public class Character : Creature
     public int skillConsumePointCount { get; protected set; } = 1;
 
     public int tauntWeight { get; protected set; } = 100;
-
+    bool isInterrupted = false;
     float energy = 0;
     public float maxEnergy { get; protected set; } = 60;
+
+    public float attackGainEnergy { get; protected set; } = 5;
+    public float skillGainEnergy { get; protected set; } = 5;
+    public float takeDmgGainEnergy { get; protected set; } = 5;
 
     public Sprite attackIcon;
     public Sprite skillIcon;
     public Sprite burstIcon;
     public Sprite selectedCard;
     public Sprite burstSplash;
-
-    public SpriteRenderer selectedCardSR;
-    public SpriteRenderer cardSR;
 
     public Image burstImage;
     public Image burstFillingImage;
@@ -52,10 +53,14 @@ public class Character : Creature
 
     public VideoClip burstVideo;
 
-
     public Element element { get; private set; } = Element.Physical;
 
-    public IBattleTalents attackTalents { get; private set; }
+    public ACharacterTalents characterTalents { get { return (ACharacterTalents)talents; } }
+
+    public Dictionary<string, float> attackActionSeries;
+    public Dictionary<string, float> skillActionSeries;
+    public Dictionary<string, float> BurstActionSeries;
+
 
     public Character()
     {
@@ -70,8 +75,8 @@ public class Character : Creature
         {
             alpha += Time.deltaTime * alphaSpeed * alphaDirection;
             if (alpha > 1 || alpha < 0) alphaDirection *= -1;
-            if (isSelected) selected.color = new Color(0, 1, 0, alpha);
-            else if (isMyTurn) selected.color = new Color(0, 0, 1, alpha);
+            if (isSelected) selectedSR.color = new Color(0, 1, 0, alpha);
+            else if (isMyTurn) selectedSR.color = new Color(0, 0, 1, alpha);
         }
     }
 
@@ -79,7 +84,7 @@ public class Character : Creature
     {
         alpha = 1;
         isSelected = true;
-        selected.color = Color.green;
+        selectedSR.color = Color.green;
     }
 
     public override void Initialize(string dbN, int id)
@@ -90,12 +95,15 @@ public class Character : Creature
         // set character template
         databaseName = (string)data["dbname"];
         displayName = (string)data["disname"];
-        atk = (float)(double)data["atk"];
-        def = (float)(double)data["def"];
-        speed = (float)(double)data["speed"];
-        maxHp = (float)(double)data["maxHp"];
+        attributes[(int)CommonAttribute.ATK] = (float)(double)data["atk"];
+        attributes[(int)CommonAttribute.DEF] = (float)(double)data["def"];
+        attributes[(int)CommonAttribute.Speed] = (float)(double)data["speed"];
+        attributes[(int)CommonAttribute.MaxHP] = (float)(double)data["maxHp"];
         maxEnergy = (float)(double)data["maxEnergy"];
         element = (Element)(int)data["element"];
+        attackGainEnergy = (float)(double)data["attackGainEnergy"];
+        skillGainEnergy = (float)(double)data["skillGainEnergy"];
+        takeDmgGainEnergy = (float)(double)data["takeDmgGainEnergy"];
 
         for (int i = 0; i < (int)Element.Count; ++i)
         {
@@ -118,25 +126,23 @@ public class Character : Creature
 
 
         // 也许之后人物的技能要改成 Lua 脚本，就不用 switch 了。
-        energy = maxEnergy;
         switch (dbN)
         {
             case "kazuha":
-                attackTalents = new Kazuha(this);
+                talents = new Kazuha(this);
                 break;
             case "ganyu":
-                attackTalents = new Ganyu(this);
-                energy = maxEnergy;
+                talents = new Ganyu(this);
                 break;
             case "shenhe":
-                attackTalents = new Shenhe(this);
+                talents = new Shenhe(this);
                 break;
             case "kokomi":
-                attackTalents = new Kokomi(this);
+                talents = new Kokomi(this);
                 break;
         }
         base.Initialize(dbN, id);
-        selected.sprite = selectedCard;
+        selectedSR.sprite = selectedCard;
         burstImage.sprite = burstIcon;
         UpdateEnergyIcon();
     }
@@ -155,11 +161,11 @@ public class Character : Creature
         UpdateEnergyIcon();
     }
 
-    public override void TakeDamage(float value, Creature source, Element element, Then then = null)
+    public override void TakeDamage(Creature source, float value, Element element, DamageType type, Then then = null)
     {
         PlayAudio(AudioType.TakeDamage);
-        attackTalents.OnTakingDamage(source, value, element);
-        base.TakeDamage(value, source, element, then);
+        talents.OnTakingDamage(source, value, element, type);
+        base.TakeDamage(source, value, element, type, then);
     }
 
     private void UpdateEnergyIcon()
@@ -217,8 +223,32 @@ public class Character : Creature
         }
     }
 
-    public void BurstEnd()
+    public override bool StartMyTurn()
     {
+        isMyTurn = true;
+        alpha = 1;
+        if (!isInterrupted)
+            TriggerBuffsAtMoment(BuffTriggerMoment.OnTurnBegin);
+        else
+            isInterrupted = false;
+        if (elementBuff == ElementBuff.Frozen)
+        {
+            elementBuff = ElementBuff.Count;
+            cardSR.color = Color.white;
+            return true;
+        }
+        return false;
+    }
+
+    public void StartBurstTurn()
+    {
+        isMyTurn = true;
+        alpha = 1;
+    }
+
+    public void EndBurstTurn()
+    {
+        isMyTurn = false;
         isBurstActivated = false;
         StopCoroutine(BurstActivateAnim());
         Color c = ElementColors[(int)element];
@@ -226,11 +256,18 @@ public class Character : Creature
         burstFillingImage.color = c;
     }
 
+    public void InterruptedByBurst()
+    {
+        isMyTurn = false;
+        isInterrupted = true;
+        alpha = 0;
+        selectedSR.color = new Color(0, 0, 0, 0);
+    }
+
     protected override void OnDying()
     {
-        Debug.Log(this);
         cardSR.color = new Color(.25f, .25f, .25f, .25f);
-        attackTalents.OnDying();
+        talents.OnDying();
         BattleManager.Instance.RemoveCharacter(this);
         base.OnDying();
     }

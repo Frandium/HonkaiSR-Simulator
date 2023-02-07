@@ -7,7 +7,7 @@ using LitJson;
 
 public class Enemy : Creature
 {
-    public IEnemyAction enemyAction;
+    public AEnemyTalents enemyTalents { get { return (AEnemyTalents)talents; } }
 
     private void Update()
     {
@@ -16,8 +16,8 @@ public class Enemy : Creature
             alpha += Time.deltaTime * alphaSpeed * alphaDirection;
             if (alpha > 1) alphaDirection = -1;
             else if (alpha < 0) alphaDirection = 1;
-            if (isSelected) selected.color = new Color(1, 0, 0, alpha);
-            else if (isMyTurn) selected.color = new Color(0, 0, 1, alpha);
+            if (isSelected) selectedSR.color = new Color(1, 0, 0, alpha);
+            else if (isMyTurn) selectedSR.color = new Color(0, 0, 1, alpha);
         }
     }
 
@@ -29,11 +29,11 @@ public class Enemy : Creature
         // set character template
         databaseName = (string)data["dbname"];
         displayName = (string)data["disname"];
-        atk = (float)(double)data["atk"];
-        def = (float)(double)data["def"];
-        speed = (float)(double)data["speed"];
-        maxHp = (float)(double)data["maxHp"];
-       
+        attributes[(int)CommonAttribute.ATK] = (float)(double)data["atk"];
+        attributes[(int)CommonAttribute.DEF] = (float)(double)data["def"];
+        attributes[(int)CommonAttribute.Speed] = (float)(double)data["speed"];
+        attributes[(int)CommonAttribute.MaxHP] = (float)(double)data["maxHp"];
+
         for (int i = 0; i < (int)Element.Count; ++i)
         {
             attributes[(int)CommonAttribute.AnemoResist + i] = (float)(double)data["elementalResist"][i];
@@ -42,7 +42,7 @@ public class Enemy : Creature
         switch (databaseName)
         {
             case "hilichurl":
-                enemyAction = new Hilichurl(this);
+                talents = new Hilichurl(this);
                 break;
             default:
                 break;
