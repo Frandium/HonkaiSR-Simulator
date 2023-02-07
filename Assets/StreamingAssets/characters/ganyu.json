@@ -33,10 +33,11 @@
     "attackGainPointCount": 1,
     "attackAction":[
         {
-            "actionType": 1,
-            "valueBase": 0,
+            "actionType": 0.0,
+            "valueBase": 0.0,
             "rate": 89.9,
-            "element": 4
+            "element": 4.0,
+            "offset": 0.0
         }
     ],
     "isSkillTargetEnemy": true,
@@ -45,28 +46,30 @@
     "skillGainEnergy": 10.0,
     "skillAction":[
         {
-            "actionType": 1,
-            "valueBase": 0,
-            "rate": 238,
-            "element": 4
+            "actionType": 0.0,
+            "valueBase": 0.0,
+            "rate": 238.0,
+            "element": 4.0,
+            "offset": 0.0
         },
         {
-            "actionType": 3,
-            "buffType": 1,
-            "attribute": 27,
-            "valueType": 1,
-            "value": -20,
-            "duration": 2
+            "actionType": 3.0,
+            "buffType": 1.0,
+            "attribute": 27.0,
+            "valueType": 1.0,
+            "value": -20.0,
+            "duration": 2.0
         }
     ],
     "isBurstTargetEnemy": true,
     "burstSelectionType": 3,
     "burstAction":[
         {
-            "actionType": 1,
-            "valueBase": 0,
-            "rate": 504,
-            "element": 4
+            "actionType": 0.0,
+            "valueBase": 0.0,
+            "rate": 504.0,
+            "element": 4.0,
+            "offset": 0.0
         }
     ],
     "takeDmgGainEnergy": 5.0

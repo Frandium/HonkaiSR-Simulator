@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class DamageCal
 {
-    public static float ATKDamageCharacter(Character source, Element element, float rate)
+    public static float DamageCharacter(Character source, CommonAttribute attr, Element element, float rate, float offset = 0)
     {
-        float dmgBase = source.GetFinalAttr((int)CommonAttribute.ATK) * rate / 100.0f;
+        float dmgBase = source.GetFinalAttr(attr) * rate / 100.0f + offset;
         float elebonus = source.GetFinalAttr((int)CharacterAttribute.AnemoBonus + (int)element);
-        float genebonus = source.GetFinalAttr((int)CharacterAttribute.GeneralBonus);
+        float genebonus = source.GetFinalAttr(CharacterAttribute.GeneralBonus);
         float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限
         float dmg = dmgBase * overallBonus;
         if (Random.Range(0, 1000) < source.GetFinalAttr((int)CharacterAttribute.CriticalRate) * 1000)
@@ -41,9 +41,9 @@ public class DamageCal
         return value;
     }
 
-    public static float MaxHPHeal(Creature source, float rate, float offset)
+    public static float Heal(Creature source, CommonAttribute attr, float rate, float offset)
     {
-        float heal_base = source.GetFinalAttr((int)CommonAttribute.MaxHP) * rate / 100 + offset;
+        float heal_base = source.GetFinalAttr(attr) * rate / 100 + offset;
         // 治疗加成
         return heal_base;
     }

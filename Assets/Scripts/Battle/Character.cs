@@ -57,9 +57,9 @@ public class Character : Creature
 
     public ACharacterTalents characterTalents { get { return (ACharacterTalents)talents; } }
 
-    public Dictionary<string, float> attackActionSeries;
-    public Dictionary<string, float> skillActionSeries;
-    public Dictionary<string, float> BurstActionSeries;
+    public List<Dictionary<string, float>> attackActionSeries = new List<Dictionary<string, float>>();
+    public List<Dictionary<string, float>> skillActionSeries= new List<Dictionary<string, float>>();
+    public List<Dictionary<string, float>> BurstActionSeries = new List<Dictionary<string, float>>();
 
 
     public Character()
@@ -104,6 +104,38 @@ public class Character : Creature
         attackGainEnergy = (float)(double)data["attackGainEnergy"];
         skillGainEnergy = (float)(double)data["skillGainEnergy"];
         takeDmgGainEnergy = (float)(double)data["takeDmgGainEnergy"];
+        if(data.ContainsKey("attackAction"))
+            foreach(JsonData action in data["attackAction"])
+            {
+                Dictionary<string, float> dict = new Dictionary<string, float>();
+                foreach(string s in action.Keys)
+                {
+                    Debug.Log(s);
+                    dict[s] = (float)(double)action[s];
+                }
+                attackActionSeries.Add(dict);
+            }
+
+        if (data.ContainsKey("skillAction"))
+            foreach (JsonData action in data["skillAction"])
+            {
+                Dictionary<string, float> dict = new Dictionary<string, float>();
+                foreach (string s in action.Keys)
+                {
+                    dict[s] = (float)(double)action[s];
+                }
+                skillActionSeries.Add(dict);
+            }
+        if (data.ContainsKey("burstAction"))
+            foreach (JsonData action in data["burstAction"])
+            {
+                Dictionary<string, float> dict = new Dictionary<string, float>();
+                foreach (string s in action.Keys)
+                {
+                    dict[s] = (float)(double)action[s];
+                }
+                BurstActionSeries.Add(dict);
+            }
 
         for (int i = 0; i < (int)Element.Count; ++i)
         {
@@ -132,7 +164,7 @@ public class Character : Creature
                 talents = new Kazuha(this);
                 break;
             case "ganyu":
-                talents = new Ganyu(this);
+                talents = new JSONCharacterTalents(this);//new Ganyu(this);
                 break;
             case "shenhe":
                 talents = new Shenhe(this);

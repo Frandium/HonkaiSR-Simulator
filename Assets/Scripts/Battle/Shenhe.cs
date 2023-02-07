@@ -11,14 +11,14 @@ public class Shenhe : ACharacterTalents
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamageCharacter(self, Element.Physical, 35.2f);
+        float dmg = DamageCal.DamageCharacter(self, CommonAttribute.ATK, Element.Physical, 35.2f);
         BattleManager.Instance.DealDamage(self, enemies[0], Element.Physical, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
     public override void BurstEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.ATKDamageCharacter(self, Element.Cryo, 80.5f);
+        float dmg = DamageCal.DamageCharacter(self, CommonAttribute.ATK, Element.Cryo, 80.5f);
         for (int i = 0; i < enemies.Count; ++i)
         {
             BattleManager.Instance.DealDamage(self, enemies[i], Element.Cryo, DamageType.Burst, dmg);
