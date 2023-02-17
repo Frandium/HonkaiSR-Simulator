@@ -4,14 +4,25 @@ using UnityEngine;
 
 public enum Element
 {
-    Anemo, // 风 = 0
-    Geo, // 岩 = 1
-    Hydro, // 水 = 2
-    Pyro, //火 = 3
-    Cryo, // 冰 = 4
-    Electro, //雷 = 6
-    Dendro, // 草 = 6
-    Physical, // 物理 = 7
+    Physical, // 物理 = 0
+    Pyro, //火 = 1
+    Cryo, // 冰 = 2
+    Electro, //雷 = 3
+    Anemo, // 风 = 4
+    Quantus,  // 量子 = 5
+    Imaginary,  // 虚数 = 6
+    Count
+}
+
+public enum Career
+{
+    Destroy, // 毁灭
+    Hunter,  // 巡猎
+    Wisdom,  // 智识
+    Resonate,  // 同谐
+    Void,  // 虚无
+    Shield,  // 存护
+    Fertile,  // 丰饶
     Count
 }
 
@@ -22,24 +33,20 @@ public enum ElementBuff
     Count
 }
 
+public enum ArtifactPosition
+{
+    Head,
+    Hand,
+    Body,
+    Foot,
+    Neck,
+    Stuff,
+    Count
+}
+
 public enum CharacterAttribute
 {
-    CriticalRate = CommonAttribute.Count,
-    CriticalDmg,
-    HealBonus,
-    HealedBonus,
-    EnergyRecharge,
-    GeneralBonus,
-    AnemoBonus,
-    GeoBonus,
-    HydroBonus,
-    PyroBonus,
-    CryoBonus,
-    ElectroBonus,
-    DendroBonus,
-    PhysicalBonus,
-    Taunt,
-    Count
+    Count = CommonAttribute.Count
 }
 
 public enum CommonAttribute
@@ -48,15 +55,30 @@ public enum CommonAttribute
     DEF,
     MaxHP,
     Speed,
+    CriticalRate,
+    CriticalDamage,
+    HealBonus,
+    HealedBonus,
+    EnergyRecharge,
+    Taunt,
+    BuffHit,
+    BuffResist,
+    GeneralBonus,
+    PhysicalBonus,
+    PyroBonus,
+    CryoBonus,
+    ElectroBonus,
+    AnemoBonus,
+    QuantusBonus,
+    ImaginaryBonus,
     GeneralResist,
-    AnemoResist,
-    GeoResist,
-    HydroResist,
+    PhysicalResist,
     PyroResist,
     CryoResist,
     ElectroResist,
-    DendroResist,
-    PhysicalResist,
+    AnemoResist,
+    QuantusResist,
+    ImaginaryResist,
     Count
 }
 

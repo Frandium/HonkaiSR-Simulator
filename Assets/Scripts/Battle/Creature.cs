@@ -94,35 +94,35 @@ public class Creature : MonoBehaviour
         return GetBaseAttr((int)attr);
     }
 
-    public float GetFinalAttr(int attr)
-    {
-        float b = attributes[attr];
-        float p = 1, n = 0;
-        foreach(ValueBuff buff in valueBuffs)
-        {
-            if (buff.attributeType != (int)attr)
-                continue;
-            if (buff.valueType == ValueType.Percentage)
-                p += buff.value;
-            else
-                n += buff.value;
-        }
-        return b * p + n;
-    }
-
     public float GetFinalAttr(CommonAttribute attr)
     {
-        return GetFinalAttr((int)attr);
+        return GetFinalAttr(this, this, attr);
     }
 
-    public float GetFinalAttr(CharacterAttribute attr)
+    public float GetFinalAttr(Creature source, Creature target, int attr)
     {
-        return GetFinalAttr((int)attr);
+        float b = attributes[attr];
+        float n = 0;
+        foreach(ValueBuff buff in valueBuffs)
+        {
+            n += buff.CalBuffValue(source, target, attr);
+        }
+        return b + n;
     }
 
-    public float GetFinalAttr(EnemyAttribute attr)
+    public float GetFinalAttr(Creature source, Creature target, CommonAttribute attr)
     {
-        return GetFinalAttr((int)attr);
+        return GetFinalAttr(source, target, (int)attr);
+    }
+
+    public float GetFinalAttr(Creature source, Creature target, CharacterAttribute attr)
+    {
+        return GetFinalAttr(source, target, (int)attr);
+    }
+
+    public float GetFinalAttr(Creature source, Creature target, EnemyAttribute attr)
+    {
+        return GetFinalAttr(source, target, (int)attr);
     }
 
     public delegate void Then();
@@ -132,7 +132,7 @@ public class Creature : MonoBehaviour
     public virtual void TakeDamage(Creature source, float value, Element element, DamageType type, Then then = null)
     {
         talents.OnTakingDamage(source, value, element, type);
-        value = DamageCal.ResistDamage(value, element, this);
+        //value = DamageCal.ResistDamage(value, element, this);
         hp -= value;
         hpLine.fillAmount = hpPercentage;
         ElementalReaction(element);
@@ -178,10 +178,10 @@ public class Creature : MonoBehaviour
 
     public virtual void TakeHeal(float  value, Creature source, Then then = null)
     {
-        if (hp + value > GetFinalAttr(CommonAttribute.MaxHP))
+        if (hp + value > GetFinalAttr(this, this, CommonAttribute.MaxHP))
         {
-            value = GetFinalAttr(CommonAttribute.MaxHP) - hp;
-            hp = GetFinalAttr(CommonAttribute.MaxHP);
+            value = GetFinalAttr(this, this, CommonAttribute.MaxHP) - hp;
+            hp = GetFinalAttr(this, this, CommonAttribute.MaxHP);
         }
         else
         {
@@ -254,11 +254,11 @@ public class Creature : MonoBehaviour
         for (int i = valueBuffs.Count - 1; i >= 0; --i)
         {
             ValueBuff b = valueBuffs[i];
-            if (b.Progress())
-            {
-                valueBuffs.Remove(b);
-                BattleManager.Instance.valueBuffPool.ReturnOne(b);
-            }
+            //if (b.Progress())
+            //{
+            //    valueBuffs.Remove(b);
+            //    BattleManager.Instance.valueBuffPool.ReturnOne(b);
+            //}
         }
         UpdateBuffIcon();
     }
@@ -269,13 +269,14 @@ public class Creature : MonoBehaviour
         BattleManager.Instance.runway.AddCreature(this);
         uniqueID = id;
         databaseName = dbN;
-        hp = GetFinalAttr(CommonAttribute.MaxHP);
-        hpLine.fillAmount = hp / GetFinalAttr(CommonAttribute.MaxHP);
+        hp = GetFinalAttr(this, this, CommonAttribute.MaxHP);
+        hpLine.fillAmount = hp / GetFinalAttr(this, this, CommonAttribute.MaxHP);
     }
 
     public virtual void AddBuff(ValueBuff buff, Then then = null)
     {
         valueBuffs.Add(buff);
+        buff.OnAdded(this);
         if (buff.buffType == BuffType.Debuff) {
             buffImage.sprite = BattleManager.Instance.debuffSprite;
         } 
@@ -284,6 +285,12 @@ public class Creature : MonoBehaviour
         }
         hpLine.fillAmount = hpPercentage;
         StartCoroutine(InvokeNextFrame(then));
+    }
+
+    public virtual void RemoveBuff(ValueBuff buff)
+    {
+        valueBuffs.Remove(buff);
+        UpdateBuffIcon();
     }
 
     IEnumerator InvokeNextFrame(Then then)

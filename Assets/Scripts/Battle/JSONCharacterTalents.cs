@@ -22,20 +22,20 @@ public class JSONCharacterTalents : ACharacterTalents
                     float rate = action["rate"];
                     float offset = action["offset"];
                     Element e = (Element)(int)action["element"];
-                    float dmg = DamageCal.DamageCharacter(self, (CommonAttribute)attr, e, rate);
+                    //float dmg = DamageCal.DamageCharacter(self, (CommonAttribute)attr, e, rate);
                     foreach (Creature c in creatures)
                     {
-                        BattleManager.Instance.DealDamage(self, c, e, dt, dmg);
+                       // BattleManager.Instance.DealDamage(self, c, e, dt, dmg);
                     }
                     break;
                 case ActionType.DealHeal:
                     attr = (int)action["valueBase"];
                     rate = action["rate"];
                     offset = action["offset"];
-                    dmg = DamageCal.Heal(self, (CommonAttribute)attr, rate, offset);
+                    //dmg = DamageCal.Heal(self, (CommonAttribute)attr, rate, offset);
                     foreach (Creature c in creatures)
                     {
-                        c.TakeHeal(dmg, self);
+                        //c.TakeHeal(dmg, self);
                     }
                     break;
                 case ActionType.DealElement:
@@ -53,7 +53,7 @@ public class JSONCharacterTalents : ACharacterTalents
                     int duration = (int)action["duration"];
                     foreach (Creature c in creatures)
                     {
-                        c.AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(b, vt, attr, value, duration));
+                        //c.AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(b, vt, attr, value, duration));
                     }
                     break;
             }

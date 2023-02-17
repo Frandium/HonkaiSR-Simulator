@@ -309,16 +309,6 @@ public class Character : Creature
         base.OnDying();
     }
 
-    public override void AddBuff(ValueBuff buff, Then then = null)
-    {
-        switch (buff.attributeType)
-        {
-            case (int)CharacterAttribute.Taunt:
-                tauntWeight -= (int)buff.value;
-                break;
-        }
-        base.AddBuff(buff, then);
-    }
 
     public override void PlayAudio(AudioType audioType)
     {

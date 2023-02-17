@@ -83,11 +83,11 @@ public class Runway : MonoBehaviour
         float fastest_time = 100;
         for(int i = 0; i < creatures.Count; ++i)
         {
-            fastest_time = Mathf.Min((len - creatures[i].location) / creatures[i].GetFinalAttr((int)CommonAttribute.Speed), fastest_time);
+            fastest_time = Mathf.Min((len - creatures[i].location) / creatures[i].GetFinalAttr(CommonAttribute.Speed), fastest_time);
         }
         foreach(Creature c in creatures)
         {
-            c.SetLocation(c.location + fastest_time * c.GetFinalAttr((int)CommonAttribute.Speed));
+            c.SetLocation(c.location + fastest_time * c.GetFinalAttr(CommonAttribute.Speed));
         }
         creatures.Sort((c1, c2) =>
         {

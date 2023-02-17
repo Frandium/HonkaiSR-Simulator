@@ -10,36 +10,66 @@ public class EditCharacterUI : MonoBehaviour
 {
     public Dropdown chaList;
 
-    CharacterTemplate temp;
+    DisplayCharacter character;
+
+    public GameObject headButtonGO;
+    public GameObject scrollContent;
+
+    public Sprite defaultAvatar;
+
+    public 
 
     string jsonPath { get {
-            return GlobalInfoHolder.Instance.characterDir + "/" + temp.dbname + ".json";
+            return GlobalInfoHolder.Instance.characterDir + "/" + character.dbname + ".json";
         } }
     List<string> files;
 
     // Start is called before the first frame update
     void Start()
     {
-        temp = new CharacterTemplate();
-        ListAllJson();
-        chaList.onValueChanged.AddListener(OptionChange);
+       // temp = new CharacterTemplate();
+        ScanCharacters();
+//        chaList.onValueChanged.AddListener(OptionChange);
     }
 
-    public void ListAllJson()
+    public void ScanCharacters()
     {
         files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.characterDir));
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         if (files.Count == 0)
             return;
-        chaList.ClearOptions();
-        List<Dropdown.OptionData> data = new List<Dropdown.OptionData>();
-        foreach(string s in files)
+        scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(70 * files.Count, 0);
+        // 对所有的角色，在上方的滚动条里 add 一个选项，然后找 Resources 里有没有他的照片，有就add，没有就 fall back 到默认图片
+        for(int i = 0; i < files.Count; ++i)
         {
-            data.Add(new Dropdown.OptionData(Path.GetFileNameWithoutExtension(s)));
+            string s = files[i];
+            string dbname = Path.GetFileNameWithoutExtension(s);
+            string avatarPath = dbname + "/runway_avatar";
+            Sprite avatar = Resources.Load<Sprite>(avatarPath);
+            if (avatar == null)
+                avatar = defaultAvatar;
+            GameObject go = Instantiate(headButtonGO, scrollContent.transform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(35 + 70 * i, 0);
+            go.GetComponent<Image>().sprite = avatar;
+            go.name = dbname;
+            go.GetComponent<Button>().onClick.AddListener(() => OnHeadClick(dbname));
         }
-        chaList.AddOptions(data);
-        chaList.SetValueWithoutNotify(0);
-        OptionChange(0);
+        OnHeadClick(Path.GetFileNameWithoutExtension(files[0]));
+     }
+
+    public void OnHeadClick(string dbname)
+    {
+        // Load json 获得角色基本数据
+        // Load json 获得角色配装，包括光锥、命座等级、天赋等级、圣遗物
+        // Load json 获得光锥属性、圣遗物属性、天赋属性
+        // 刷新当前页面
+        character.LoadJson(dbname);
+        Debug.Log(dbname);
+    }
+
+    public void FastTest()
+    {
+        Debug.Log("123");
     }
 
     public void OptionChange(int v)
@@ -59,33 +89,6 @@ public class EditCharacterUI : MonoBehaviour
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // set character template
-        temp.dbname = (string)data["dbname"];
-        temp.disname = (string)data["disname"];
-        temp.atk = (double)data["atk"];
-        temp.def = (double)data["def"];
-        temp.speed = (double)data["speed"];
-        temp.maxHp = (double)data["maxHp"];
-        temp.maxEnergy = (double)data["maxEnergy"];
-        temp.element = (Element)(int)data["element"];
-        
-        for(int i = 0; i < (int)Element.Count; ++i)
-        {
-            temp.elementalBonus[i] = (double)data["elementalBonus"][i];
-        }
-
-        for (int i = 0; i < (int)Element.Count; ++i)
-        {
-            temp.elementalResist[i] = (double)data["elementalResist"][i];
-        }
-
-        temp.isAttackTargetEnemy = (bool)data["isAttackTargetEnemy"];
-        temp.attackSelectionType = (SelectionType)(int)data["attackSelectionType"];
-        temp.isSkillTargetEnemy = (bool)data["isSkillTargetEnemy"];
-        temp.skillSelectionType = (SelectionType)(int)data["skillSelectionType"];
-        temp.isBurstTargetEnemy = (bool)data["isBurstTargetEnemy"];
-        temp.burstSelectionType = (SelectionType)(int)data["burstSelectionType"];
-        temp.attackGainPointCount = (int)data["attackGainPointCount"];
-        temp.skillConsumePointCount = (int)data["skillConsumePointCount"];
 
         // refresh UI
     }
@@ -98,6 +101,6 @@ public class EditCharacterUI : MonoBehaviour
         string content = JsonMapper.ToJson(bt);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();
-        ListAllJson();
+        ScanCharacters();
     }
 }
