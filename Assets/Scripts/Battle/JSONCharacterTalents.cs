@@ -25,7 +25,7 @@ public class JSONCharacterTalents : ACharacterTalents
                     //float dmg = DamageCal.DamageCharacter(self, (CommonAttribute)attr, e, rate);
                     foreach (Creature c in creatures)
                     {
-                       // BattleManager.Instance.DealDamage(self, c, e, dt, dmg);
+                       // self.DealDamage(c, e, dt, dmg);
                     }
                     break;
                 case ActionType.DealHeal:
@@ -53,7 +53,7 @@ public class JSONCharacterTalents : ACharacterTalents
                     int duration = (int)action["duration"];
                     foreach (Creature c in creatures)
                     {
-                        //c.AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(b, vt, attr, value, duration));
+                        //c.AddBuff(valueBuffPool.GetOne().Set(b, vt, attr, value, duration));
                     }
                     break;
             }

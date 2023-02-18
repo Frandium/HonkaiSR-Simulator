@@ -12,7 +12,7 @@ public class Kazuha : ACharacterTalents
     {
         if (element != Element.Anemo)
             return;
-        if(target.elementState == Element.Hydro || target.elementState == Element.Pyro || target.elementState == Element.Cryo || target.elementState == Element.Electro)
+        if(target.elementState == Element.Pyro || target.elementState == Element.Cryo || target.elementState == Element.Electro)
         {
             //target.AddBuff(new ValueBuff(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.AnemoResist + (int)target.elementState, -.2f, 2));
         }
@@ -22,7 +22,7 @@ public class Kazuha : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Physical, 88.9f);
-        BattleManager.Instance.DealDamage(self, enemies[0], Element.Physical, DamageType.Attack, dmg);
+        self.DealDamage(enemies[0], Element.Physical, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -31,7 +31,7 @@ public class Kazuha : ACharacterTalents
         float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Anemo, 472);
         for (int i = 0; i < enemies.Count; ++i)
         {
-            BattleManager.Instance.DealDamage(self, enemies[i], Element.Anemo, DamageType.Burst, dmg);
+            self.DealDamage(enemies[i], Element.Anemo, DamageType.Burst, dmg);
         }
         base.BurstEnemyAction(enemies);
     }
@@ -39,7 +39,7 @@ public class Kazuha : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Anemo, 346) ;
-        BattleManager.Instance.DealDamage(self, enemies[0], Element.Anemo, DamageType.Skill, dmg);
+        self.DealDamage(enemies[0], Element.Anemo, DamageType.Skill, dmg);
         base.SkillEnemyAction(enemies);
     }
 }

@@ -12,7 +12,7 @@ public class Shenhe : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Physical, 35.2f);
-        BattleManager.Instance.DealDamage(self, enemies[0], Element.Physical, DamageType.Attack, dmg);
+        self.DealDamage(enemies[0], Element.Physical, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -21,9 +21,9 @@ public class Shenhe : ACharacterTalents
         float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Cryo, 80.5f);
         for (int i = 0; i < enemies.Count; ++i)
         {
-            BattleManager.Instance.DealDamage(self, enemies[i], Element.Cryo, DamageType.Burst, dmg);
-            //enemies[i].AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.CryoResist, -.15f, 1));
-            //enemies[i].AddBuff(BattleManager.Instance.valueBuffPool.GetOne().Set(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.PhysicalResist, -.15f, 1));
+            self.DealDamage(enemies[i], Element.Cryo, DamageType.Burst, dmg);
+            //enemies[i].AddBuff(valueBuffPool.GetOne().Set(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.CryoResist, -.15f, 1));
+            //enemies[i].AddBuff(valueBuffPool.GetOne().Set(BuffType.Debuff, ValueType.InstantNumber, (int)CommonAttribute.PhysicalResist, -.15f, 1));
         }
         base.BurstEnemyAction(enemies);
     }

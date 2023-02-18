@@ -53,7 +53,7 @@ public class Creature : MonoBehaviour
     {
         get
         {
-            return hp / GetFinalAttr(CommonAttribute.MaxHP);
+            return hp / GetFinalAttr(this, this, CommonAttribute.MaxHP);
         }
     }
     public bool isAlive
@@ -84,21 +84,6 @@ public class Creature : MonoBehaviour
         return GetBaseAttr((int)attr);
     }
 
-    public float GetBaseAttr(CharacterAttribute attr)
-    {
-        return GetBaseAttr((int)attr);
-    }
-
-    public float GetBaseAttr(EnemyAttribute attr)
-    {
-        return GetBaseAttr((int)attr);
-    }
-
-    public float GetFinalAttr(CommonAttribute attr)
-    {
-        return GetFinalAttr(this, this, attr);
-    }
-
     public float GetFinalAttr(Creature source, Creature target, int attr)
     {
         float b = attributes[attr];
@@ -115,17 +100,15 @@ public class Creature : MonoBehaviour
         return GetFinalAttr(source, target, (int)attr);
     }
 
-    public float GetFinalAttr(Creature source, Creature target, CharacterAttribute attr)
-    {
-        return GetFinalAttr(source, target, (int)attr);
-    }
-
-    public float GetFinalAttr(Creature source, Creature target, EnemyAttribute attr)
-    {
-        return GetFinalAttr(source, target, (int)attr);
-    }
 
     public delegate void Then();
+
+
+    public void DealDamage(Creature target, Element element, DamageType type, float value)
+    {
+        talents.OnDealingDamage(target, value, element, type);
+        target.TakeDamage(this, value, element, type);
+    }
 
 
     //Battle functions
@@ -151,7 +134,7 @@ public class Creature : MonoBehaviour
         // 物理不反应
         if (e == Element.Physical) return; 
         // 当前无元素，不反应，但是可以挂上风岩之外的元素
-        if (elementState == Element.Count && e != Element.Anemo && e != Element.Geo)
+        if (elementState == Element.Count && e != Element.Anemo && e != Element.Physical)
         {
             elementState = e;
         }
@@ -161,8 +144,8 @@ public class Creature : MonoBehaviour
         }
         else // 发生反应，清空元素附着
         {
-            if ((elementState == Element.Hydro && e == Element.Cryo) ||
-                 (elementState == Element.Cryo && e == Element.Hydro))
+            if ((elementState == Element.Anemo && e == Element.Cryo) ||
+                 (elementState == Element.Cryo && e == Element.Anemo))
             { // 冻结
                 elementBuff = ElementBuff.Frozen;
                 cardSR.color = Color.blue;
@@ -173,7 +156,7 @@ public class Creature : MonoBehaviour
             }
             elementState = Element.Count;
         }
-        eleImage.sprite = BattleManager.Instance.elementSymbols[(int)elementState];
+        eleImage.sprite = elementSymbols[(int)elementState];
     }
 
     public virtual void TakeHeal(float  value, Creature source, Then then = null)
@@ -199,7 +182,7 @@ public class Creature : MonoBehaviour
 
     protected virtual void OnDying()
     {
-        BattleManager.Instance.runway.RemoveCreature(this);
+        runway.RemoveCreature(this);
         gameObject.SetActive(false);
     }
 
@@ -257,7 +240,7 @@ public class Creature : MonoBehaviour
             //if (b.Progress())
             //{
             //    valueBuffs.Remove(b);
-            //    BattleManager.Instance.valueBuffPool.ReturnOne(b);
+            //    valueBuffPool.ReturnOne(b);
             //}
         }
         UpdateBuffIcon();
@@ -266,7 +249,7 @@ public class Creature : MonoBehaviour
     public virtual void Initialize(string dbN, int id)
     {
         location = 0;
-        BattleManager.Instance.runway.AddCreature(this);
+        runway.AddCreature(this);
         uniqueID = id;
         databaseName = dbN;
         hp = GetFinalAttr(this, this, CommonAttribute.MaxHP);
@@ -278,10 +261,10 @@ public class Creature : MonoBehaviour
         valueBuffs.Add(buff);
         buff.OnAdded(this);
         if (buff.buffType == BuffType.Debuff) {
-            buffImage.sprite = BattleManager.Instance.debuffSprite;
+            buffImage.sprite = debuffSprite;
         } 
-        else if (buffImage.sprite = BattleManager.Instance.nullBuffSprite) {
-            buffImage.sprite = BattleManager.Instance.buffSprite;
+        else if (buffImage.sprite = nullBuffSprite) {
+            buffImage.sprite = buffSprite;
         }
         hpLine.fillAmount = hpPercentage;
         StartCoroutine(InvokeNextFrame(then));
@@ -312,7 +295,7 @@ public class Creature : MonoBehaviour
             TriggerBuff b = triggerBuffs[i];
             if (b.triggerMoment == moment && b.Trigger(this)){
                 triggerBuffs.Remove(b);
-                BattleManager.Instance.triggerBuffPool.ReturnOne(b);
+                triggerBuffPool.ReturnOne(b);
             }
         }
     }
@@ -336,15 +319,15 @@ public class Creature : MonoBehaviour
     {
         if (valueBuffs.Count == 0)
         {
-            buffImage.sprite = BattleManager.Instance.nullBuffSprite;
+            buffImage.sprite = nullBuffSprite;
             return;
         }
-        buffImage.sprite = BattleManager.Instance.buffSprite;
+        buffImage.sprite = buffSprite;
         foreach (ValueBuff b in valueBuffs)
         {
             if (b.buffType == BuffType.Debuff)
             {
-                buffImage.sprite = BattleManager.Instance.debuffSprite;
+                buffImage.sprite = debuffSprite;
                 return;
             }
         }

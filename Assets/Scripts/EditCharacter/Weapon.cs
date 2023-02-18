@@ -18,10 +18,9 @@ public class Weapon: Equipment
     string effectName;
     string effectDescription;
 
-    public override float CalBuffValue(Creature source, Creature target, CharacterAttribute a)
+    public Weapon(string _dbname, int level)
     {
-        float res = 0;
-        return res + base.CalBuffValue(source, target, a);
+        LoadJson(_dbname, level);
     }
 
     public override float CalBuffValue(Creature source, Creature target, CommonAttribute a)
@@ -36,7 +35,7 @@ public class Weapon: Equipment
         return res + base.CalBuffValue(source, target, a);
     }
 
-    public void LoadJson(string _dbname)
+    public void LoadJson(string _dbname, int level)
     {
         dbName = _dbname;
 

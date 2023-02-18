@@ -31,7 +31,8 @@ public class Hilichurl : AEnemyTalents
             return;
         }
         float dmg = DamageCal.ATKDamageEnemy(self, characters[i], Element.Physical, 150);
-        BattleManager.Instance.DealDamage(self, characters[i], Element.Physical, DamageType.Attack, dmg);
+        self.DealDamage(characters[i], Element.Physical, DamageType.Attack, dmg);
+        self.DealDamage(characters[i], Element.Physical, DamageType.Attack, dmg);
         self.PlayAudio(AudioType.Attack);
     }
 }

@@ -56,16 +56,6 @@ public class ValueBuff
         buffAdded?.Invoke(c);
     }
 
-    public ValueBuff Set(BuffType type, CharacterAttribute attr, int _duration, BuffContent c, BuffAdded b)
-    {
-        return Set(type, (int)attr, _duration, c, b);
-    }
-
-    public ValueBuff Set(BuffType type, EnemyAttribute attr, int _duration, BuffContent c, BuffAdded b)
-    {
-        return Set(type, (int)attr, _duration, c, b);
-    }
-
     public ValueBuff Set(BuffType type, CommonAttribute attr, int _duration, BuffContent c, BuffAdded b)
     {
         return Set(type, (int)attr, _duration, c, b);
@@ -90,15 +80,6 @@ public class ValueBuff
         return content(source, target);
     }
 
-    public float CalBuffValue(Creature source, Creature target, CharacterAttribute a)
-    {
-        return CalBuffValue(source, target, (int)a);
-    }
-
-    public float CalBuffValue(Creature source, Creature target, EnemyAttribute a)
-    {
-        return CalBuffValue(source, target, (int)a);
-    }
     public float CalBuffValue(Creature source, Creature target, CommonAttribute a)
     {
         return CalBuffValue(source, target, (int)a);

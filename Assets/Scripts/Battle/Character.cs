@@ -64,7 +64,7 @@ public class Character : Creature
 
     public Character()
     {
-        attributes = new float[(int)CharacterAttribute.Count];
+        attributes = new float[(int)CommonAttribute.Count];
     }
  
 
@@ -139,7 +139,7 @@ public class Character : Creature
 
         for (int i = 0; i < (int)Element.Count; ++i)
         {
-            attributes[(int)CharacterAttribute.AnemoBonus + i] = (float)(double)data["elementalBonus"][i];
+            attributes[(int)CommonAttribute.AnemoBonus + i] = (float)(double)data["elementalBonus"][i];
         }
 
         for (int i = 0; i < (int)Element.Count; ++i)

@@ -7,14 +7,11 @@ public class DisplayCharacter
     public string dbname = "test";
     public string disname = "测试角色";
 
-    public double[] attrs = new double[(int)CharacterAttribute.Count];
+    public double[] attrs = new double[(int)CommonAttribute.Count];
     public Weapon weapon;
-    public Artifact[] artifacts;
+    public Artifact[] artifacts = new Artifact[(int)ArtifactPosition.Count];
 
     public DisplayArtifact[] disArtifacts;
-
-    
-    
 
     public bool isAttackTargetEnemy  = true;
     public SelectionType attackSelectionType  = SelectionType.One;
@@ -39,7 +36,7 @@ public class DisplayCharacter
         // set character template
         dbname = name;
         disname = (string)data["disname"];
-        for(int i = 0; i < (int)CharacterAttribute.Count; ++i)
+        for(int i = 0; i < (int)CommonAttribute.Count; ++i)
         {
             attrs[i] = (double)data["attrs"][i];
         }
@@ -57,6 +54,7 @@ public class DisplayCharacter
         JsonData weaponData = data["weapon"];
         string weaponName = (string)weaponData["name"];
         int wLevel = (int)weaponData["level"];
+        weapon = new Weapon(weaponName, wLevel);
         // 从光锥文件夹里 load 这个光锥的名字，属性-等级成长信息，技能特效内容，显示出来
 
         // Load 角色圣遗物
@@ -70,18 +68,17 @@ public class DisplayCharacter
             // 主属性
             SimpleValueBuff b = new SimpleValueBuff((int)artJson["main"]["attr"], (float)(double)artJson["main"]["value"], (ValueType)(int)artJson["main"]["type"]);
             // 副属性
-
         }
 
         // Load 角色命座等级
     }
 
-    public double GetBaseAttribute(CharacterAttribute attr)
+    public double GetBaseAttribute(CommonAttribute attr)
     {
         return attrs[(int)attr];
     }
 
-    public double GetFinalAttribute(CharacterAttribute attr)
+    public double GetFinalAttribute(CommonAttribute attr)
     {
         return 0;
     }

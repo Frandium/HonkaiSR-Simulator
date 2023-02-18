@@ -99,7 +99,7 @@ public class BattleManager : MonoBehaviour
         Application.targetFrameRate = 60;
 
         LoadBattle();
-        skillPoint.GainPoint(2);
+        BattleManager.Instance.skillPoint.GainPoint(2);
         NextTurn();
     }
 
@@ -113,11 +113,11 @@ public class BattleManager : MonoBehaviour
             case TurnStage.Instruction:
                 if (Input.GetKeyDown(KeyCode.E) && isAttackOrSkill)
                 {
-                    if (skillPoint.IsPointEnough(curCharacter.skillConsumePointCount))
+                    if (BattleManager.Instance.skillPoint.IsPointEnough(curCharacter.skillConsumePointCount))
                     {
                         audioSource.clip = EAudio;
                         audioSource.Play();
-                        skillPoint.StartConsumePointAnim(curCharacter.skillConsumePointCount);
+                        BattleManager.Instance.skillPoint.StartConsumePointAnim(curCharacter.skillConsumePointCount);
                         StartCoroutine(ChangeLocalScale(attackRecttrans, Vector3.one, animTime));
                         StartCoroutine(ChangeLocalScale(skillRecttrans, Vector3.one * 1.2f, animTime));
 
@@ -318,7 +318,7 @@ public class BattleManager : MonoBehaviour
 
     protected void SelectTarget()
     {
-        skillPoint.StartGainPointAnim(curCharacter.attackGainPointCount);
+        BattleManager.Instance.skillPoint.StartGainPointAnim(curCharacter.attackGainPointCount);
         StartCoroutine(ChangeLocalScale(attackRecttrans, Vector3.one * 1.2f, animTime));
         StartCoroutine(ChangeLocalScale(skillRecttrans, Vector3.one, animTime));
         isAttackOrSkill = true;
@@ -365,11 +365,6 @@ public class BattleManager : MonoBehaviour
         characters.Remove(c);
     }
 
-    public void DealDamage(Creature source, Creature target, Element element, DamageType type, float value)
-    {
-        source.talents.OnDealingDamage(target, value, element, type);
-        target.TakeDamage(source, value, element, type);
-    }
 
     // Animation Settings
     float burstSplashSpeed = .01f;

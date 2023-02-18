@@ -11,8 +11,8 @@ public class Kokomi : ACharacterTalents
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Hydro, 62);
-        BattleManager.Instance.DealDamage(self, enemies[0], Element.Hydro, DamageType.Attack, dmg);
+        float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Physical, 62);
+        self.DealDamage(enemies[0], Element.Physical, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -32,7 +32,7 @@ public class Kokomi : ACharacterTalents
         {
             float heal = DamageCal.Heal(self, c, CommonAttribute.MaxHP, 7.5f, 862);
             c.TakeHeal(heal, self);
-            c.TakeElementOnly(self, Element.Hydro);
+            c.TakeElementOnly(self, Element.Physical);
         }
         base.SkillCharacterAction(characters);
     }
