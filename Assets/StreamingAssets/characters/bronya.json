@@ -48,8 +48,8 @@
     "burstSelectionType": 3,
     "takeDmgGainEnergy": 5.0,
     "weapon": {
-        "name": "bronya",
-        "level": 1,
+        "name": "battleNotEnd",
+        "level": 44,
         "refine": 1
     },
     "artifacts": [

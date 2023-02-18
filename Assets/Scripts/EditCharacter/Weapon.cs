@@ -19,6 +19,9 @@ public class Weapon: Equipment
     string effectDescription;
     int refine = 1;
 
+
+    AEquipmentTalents talents;
+
     public Weapon(string _dbname, int level, int refineLevel)
     {
         LoadJson(_dbname, level, refineLevel);
@@ -54,5 +57,19 @@ public class Weapon: Equipment
 
         effectName = (string)data["effect"]["name"];
         effectDescription = (string)data["effect"]["description"][refineLevel];
+
+        switch (_dbname)
+        {
+            case "battleNotEnd":
+                talents = new BattleNotEnd(data, refine);
+                break;
+            default:
+                break;
+        }
+    }
+
+    public void OnEquipping(CharacterBase character)
+    {
+        talents.OnEquiping(character);
     }
 }

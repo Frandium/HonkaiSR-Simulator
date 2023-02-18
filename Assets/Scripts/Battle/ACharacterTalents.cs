@@ -2,52 +2,56 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ACharacterTalents: ACommomBattleTalents
+public abstract class ACharacterTalents
 {
-    protected Character self;
+    protected CharacterBase self;
 
-    public ACharacterTalents(Character _self)
+    public ACharacterTalents(CharacterBase _self)
     {
         self = _self;
     }
 
-    public virtual void AttackCharacterAction(List<Character> characters)
+    public virtual void OnEquipping()
+    {
+
+    }
+
+    public virtual void AttackCharacterAction(List<CharacterBase> characters)
     {
         BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
-        self.ChargeEnergy(self.attackGainEnergy);
+        self.ChangeEnergy(self.attackGainEnergy);
     }
 
-    public virtual void AttackEnemyAction(List<Enemy> enemies)
+    public virtual void AttackEnemyAction(List<EnemyBase> enemies)
     {
         BattleManager.Instance.skillPoint.GainPoint(self.attackGainPointCount);
-        self.ChargeEnergy(self.attackGainEnergy);
+        self.ChangeEnergy(self.attackGainEnergy);
     }
 
-    public virtual void SkillCharacterAction(List<Character> characters)
+    public virtual void SkillCharacterAction(List<CharacterBase> characters)
     {
         BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
-        self.ChargeEnergy(self.skillGainEnergy);
+        self.ChangeEnergy(self.skillGainEnergy);
     }
 
-    public virtual void SkillEnemyAction(List<Enemy> enemies)
+    public virtual void SkillEnemyAction(List<EnemyBase> enemies)
     {
         BattleManager.Instance.skillPoint.ConsumePoint(self.skillConsumePointCount);
-        self.ChargeEnergy(self.skillGainEnergy);
+        self.ChangeEnergy(self.skillGainEnergy);
     }
 
-    public virtual void BurstCharacterAction(List<Character> characters)
+    public virtual void BurstCharacterAction(List<CharacterBase> characters)
     {
-        self.ClearEnergy();
+        self.ChangeEnergy(-100);
     }
 
-    public virtual void BurstEnemyAction(List<Enemy> enemies)
+    public virtual void BurstEnemyAction(List<EnemyBase> enemies)
     {
-        self.ClearEnergy();
+        self.ChangeEnergy(-100);
     }
 
-    public override void OnTakingDamage(Creature source, float value, Element element, DamageType type)
+    public virtual void Mystery(List<CharacterBase> characters, List<EnemyBase> enemies)
     {
-        self.ChargeEnergy(self.takeDmgGainEnergy);
-        base.OnTakingDamage(source, value, element, type);
+
     }
 }

@@ -21,7 +21,7 @@ public class Selection : MonoBehaviour
     {
         if (isTargetEnemy)
         {
-            List<Enemy> selectedEnemies = new List<Enemy>();
+            List<EnemyBase> selectedEnemies = new List<EnemyBase>();
             foreach (int i in selectedCreatures)
             {
                 selectedEnemies.Add(battleManager.enemies[i]);
@@ -30,7 +30,7 @@ public class Selection : MonoBehaviour
         }
         else
         {
-            List<Character> selectedCharacters = new List<Character>();
+            List<CharacterBase> selectedCharacters = new List<CharacterBase>();
             foreach (int i in selectedCreatures)
             {
                 selectedCharacters.Add(battleManager.characters[i]);
@@ -45,17 +45,17 @@ public class Selection : MonoBehaviour
 
     public BattleManager battleManager;
 
-    public delegate void ActionUponCharacter(List<Character> characters);
-    public delegate void ActionUponEnemy( List<Enemy> enemies);
+    public delegate void ActionUponCharacter(List<CharacterBase> characters);
+    public delegate void ActionUponEnemy(List<EnemyBase> enemies);
 
     ActionUponCharacter characterAction;
     ActionUponEnemy enemyAction;
     bool isTargetEnemy = false;
     SelectionType selectionType;
     int curCharacterIndex = 0;
-    Character curCharacter;
+    CharacterMono curCharacter;
 
-    public void StartNewTurn(Character curC)
+    public void StartNewTurn(CharacterMono curC)
     {
         curCharacter = curC;
     }
@@ -68,7 +68,7 @@ public class Selection : MonoBehaviour
         characterAction = action;
         enemyAction = null;
         isDuringSelection = true;
-        List<Character> characters = battleManager.characters;
+        List<CharacterMono> characters = battleManager.cMonos;
         curCharacterIndex = characters.FindIndex(c => c == curCharacter);
         switch (type)
         {
@@ -83,7 +83,7 @@ public class Selection : MonoBehaviour
             case SelectionType.OneExceptSelf:
                 for(int i = 0;i<characters.Count; ++i)
                 {
-                    Character c = characters[i];
+                    CharacterMono c = characters[i];
                     if(c != curCharacter)
                     {
                         c.SetSelected();
@@ -95,7 +95,7 @@ public class Selection : MonoBehaviour
             case SelectionType.All:
                 for (int i = 0; i < characters.Count; ++i)
                 {
-                    Character c = characters[i];
+                    CharacterMono c = characters[i];
                     c.SetSelected();
                     selectedCreatures.Add(i);
                 }
@@ -103,7 +103,7 @@ public class Selection : MonoBehaviour
             case SelectionType.AllExceptSelf:
                 for (int i = 0; i < characters.Count; ++i)
                 {
-                    Character c = characters[i];
+                    CharacterMono c = characters[i];
                     if (c != curCharacter)
                     {
                         c.SetSelected();
@@ -122,7 +122,7 @@ public class Selection : MonoBehaviour
         selectionType = type;
         characterAction = null;
         isDuringSelection = true;
-        List<Enemy> enemies = battleManager.enemies;
+        List<EnemyMono> enemies = battleManager.eMonos;
         switch (type)
         {
             case SelectionType.Self:
@@ -146,11 +146,11 @@ public class Selection : MonoBehaviour
 
     void ClearSelection()
     {
-        foreach (Character c in battleManager.characters)
+        foreach (CharacterMono c in battleManager.cMonos)
         {
             c.SetUnselected();
         }
-        foreach (Enemy e in battleManager.enemies)
+        foreach (EnemyMono e in battleManager.eMonos)
         {
             e.SetUnselected();
         }
@@ -164,7 +164,7 @@ public class Selection : MonoBehaviour
         {
             if (isTargetEnemy)
             {
-                List<Enemy> enemies = battleManager.enemies;
+                List<EnemyMono> enemies = battleManager.eMonos;
                 int curSelected = selectedCreatures[0];
                 if (Input.GetKeyDown(KeyCode.A))
                 {
@@ -194,7 +194,7 @@ public class Selection : MonoBehaviour
             }
             else
             {
-                List<Character> characters = battleManager.characters;
+                List<CharacterMono> characters = battleManager.cMonos;
                 int curSelected = selectedCreatures[0];
                 if (Input.GetKeyDown(KeyCode.D))
                 {
@@ -224,7 +224,7 @@ public class Selection : MonoBehaviour
         }
         else if (selectionType == SelectionType.OneExceptSelf)
         {
-            List<Character> characters = battleManager.characters;
+            List<CharacterMono> characters = battleManager.cMonos;
             int curSelected = selectedCreatures[0];
             if (Input.GetKeyDown(KeyCode.A))
             {

@@ -8,17 +8,17 @@ public class RunwayAvatar : MonoBehaviour
     public RectTransform rect;
     public Image avatarImage;
 
-    public Creature creature { get; private set; }
+    public CreatureBase creature { get; private set; }
     public bool IsBurst { get; private set; }
     private bool firstMove = true;
     
     public delegate void AnyAction();
 
-    public void SetCreature(Creature _c, bool isBurst)
+    public void SetCreature(CreatureBase _c, bool isBurst)
     {
         creature = _c;
         IsBurst = isBurst;
-        avatarImage.sprite = creature.runwayAvatar;
+        avatarImage.sprite = creature.mono.runwayAvatar;
     }
 
     public void MoveTowards(Vector3 pos, AnyAction nextToDo = null)

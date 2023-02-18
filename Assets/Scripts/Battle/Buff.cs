@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class ValueBuff
+public class Buff
 {
     // 可以做到高度可配置，一个 value buff 应该包含 收益属性、源属性、收益数值、源 min、源 max，目标 min，目标 max，过滤器、持续回合。
     public CommonAttribute targetAttribute { get; protected set; } = CommonAttribute.Count; // 收益属性
@@ -13,20 +13,16 @@ public class ValueBuff
 
     public BuffContent content;
 
-    public BuffAdded buffAdded;
-
-    public Creature host { get; protected set; }
+    public CreatureBase host { get; protected set; }
 
     public delegate float BuffContent(CreatureBase source, CreatureBase target);
 
-    public delegate void BuffAdded(Creature c);
-
-    public ValueBuff()
+    public Buff()
     {
 
     }
 
-    public ValueBuff Set(SimpleValueBuff s)
+    public Buff Set(SimpleValueBuff s)
     {
         buffType = BuffType.Buff;
         targetAttribute = s.attribute;
@@ -41,23 +37,17 @@ public class ValueBuff
         return this;
     }
 
-    public ValueBuff Set(BuffType type, CommonAttribute target_att, int _duration, BuffContent c, BuffAdded b)
+    public Buff Set(BuffType type, CommonAttribute target_att, int _duration, BuffContent c)
     {
         buffType = type;
         targetAttribute = target_att;
         duration = _duration;
         content = c;
-        buffAdded = b;
         return this;
     }
 
-    public void OnAdded(Creature c)
-    {
-        buffAdded?.Invoke(c);
-    }
 
-
-    public void Progress()
+    public virtual void CountDown()
     {
         duration -= 1;
         if (duration <= 0)
@@ -66,7 +56,7 @@ public class ValueBuff
 
     void RemoveMe()
     {
-        host.RemoveBuff(this);
+//        host.RemoveBuff(this);
     }
 
     public float CalBuffValue(CreatureBase source, CreatureBase target, CommonAttribute attr)

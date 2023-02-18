@@ -24,9 +24,6 @@ public class EditCharacterUI : MonoBehaviour
     public Text crtRateText;
     public Text crtDmgText;
 
-    public string jsonPath { get {
-            return GlobalInfoHolder.Instance.characterDir + "/" + character.dbname + ".json";
-        } }
     List<string> files;
 
     // Start is called before the first frame update

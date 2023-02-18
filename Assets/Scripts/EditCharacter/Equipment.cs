@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Equipment
 {
-    public virtual void OnBattleStart(Character c)
+    public virtual void OnBattleStart(CharacterMono c)
     {
         // 加一些 buff，给装备者加。
         // 如果给我方全体加，就找 BattleManager
@@ -13,7 +13,7 @@ public class Equipment
     public virtual float CalBuffValue(CreatureBase source, CreatureBase target,  CommonAttribute a)
     {
         float res = 0;
-        foreach(ValueBuff b in buffs)
+        foreach(Buff b in buffs)
         {
             res += b.CalBuffValue(source, target, a);
         }
@@ -22,5 +22,5 @@ public class Equipment
 
 
     // 自身能提供的 buff。
-    protected List<ValueBuff> buffs = new List<ValueBuff>();
+    protected List<Buff> buffs = new List<Buff>();
 }

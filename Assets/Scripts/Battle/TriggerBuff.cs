@@ -52,11 +52,11 @@ public class TriggerBuff
     public int duration;
     public int times;
 
-    public delegate void BuffAction(Creature c);
+    public delegate void BuffAction(CreatureMono c);
     
     BuffAction action;
 
-    public bool Trigger(Creature c)
+    public bool Trigger(CreatureMono c)
     {
         action(c);
         times -= 1;

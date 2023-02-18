@@ -5,9 +5,8 @@ using UnityEngine.UI;
 using System.IO;
 using LitJson;
 
-public class Enemy : Creature
+public class EnemyMono : CreatureMono
 {
-    public AEnemyTalents enemyTalents { get { return (AEnemyTalents)talents; } }
 
     private void Update()
     {
@@ -23,30 +22,6 @@ public class Enemy : Creature
 
     public override void Initialize(string dbN, int id)
     {
-        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.enemyDir + "/" + dbN + ".json");
-        JsonData data = JsonMapper.ToObject(jsonString);
-
-        // set character template
-        databaseName = (string)data["dbname"];
-        displayName = (string)data["disname"];
-        attributes[(int)CommonAttribute.ATK] = (float)(double)data["atk"];
-        attributes[(int)CommonAttribute.DEF] = (float)(double)data["def"];
-        attributes[(int)CommonAttribute.Speed] = (float)(double)data["speed"];
-        attributes[(int)CommonAttribute.MaxHP] = (float)(double)data["maxHp"];
-
-        for (int i = 0; i < (int)Element.Count; ++i)
-        {
-            attributes[(int)CommonAttribute.AnemoResist + i] = (float)(double)data["elementalResist"][i];
-        }
-
-        switch (databaseName)
-        {
-            case "hilichurl":
-                talents = new Hilichurl(this);
-                break;
-            default:
-                break;
-        }
         base.Initialize(dbN, id);
     }
 
@@ -79,7 +54,6 @@ public class Enemy : Creature
 
     protected override void OnDying()
     {
-        BattleManager.Instance.RemoveEnemy(this);
         base.OnDying();
     }
 }

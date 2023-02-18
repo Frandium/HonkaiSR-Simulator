@@ -4,26 +4,26 @@ using UnityEngine;
 
 public class Hilichurl : AEnemyTalents
 {
-    public Hilichurl(Enemy _self): base(_self)
+    public Hilichurl(EnemyBase _self): base(_self)
     {
 
     }
 
     public override void MyTurn()
     {
-        List<Character> characters = BattleManager.Instance.characters;
-        int tauntWeight = 0;
-        foreach(Character c in characters)
+        List<CharacterBase> characters = BattleManager.Instance.characters;
+        float tauntWeight = 0;
+        foreach(CharacterBase c in characters)
         {
-            tauntWeight += c.tauntWeight;
+            tauntWeight += c.GetFinalAttr(CommonAttribute.Taunt);
         }
-        int rand = Random.Range(0, tauntWeight);
+        float rand = Random.Range(0, tauntWeight);
         int i = 0;
         for(; i < characters.Count; ++i)
         {
-            if (rand < characters[i].tauntWeight)
+            if (rand < characters[i].GetFinalAttr(CommonAttribute.Taunt))
                 break;
-            rand -= characters[i].tauntWeight;
+            rand -= characters[i].GetFinalAttr(CommonAttribute.Taunt);
         }
         if(i >= characters.Count)
         {
@@ -33,6 +33,6 @@ public class Hilichurl : AEnemyTalents
         float dmg = DamageCal.ATKDamageEnemy(self, characters[i], Element.Physical, 150);
         self.DealDamage(characters[i], Element.Physical, DamageType.Attack, dmg);
         self.DealDamage(characters[i], Element.Physical, DamageType.Attack, dmg);
-        self.PlayAudio(AudioType.Attack);
+        self.mono.PlayAudio(AudioType.Attack);
     }
 }

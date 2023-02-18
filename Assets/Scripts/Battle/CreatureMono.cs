@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Creature : MonoBehaviour
+public class CreatureMono : MonoBehaviour
 {
     public readonly static Color[] ElementColors = { new Color(.25f, .875f, .625f, 1), new Color(.875f, .75f, 0, 1), new Color(0, .25f, 1, 1), new Color(1, 0, 0, 1), new Color(0, .875f, .875f, 1), new Color(.5f, 0, 1, 1), new Color(0, .625f, .625f, 0), new Color(.375f, .375f, .375f, 1) };
 
-    public Creature()
+    public CreatureMono()
     {
         attributes = new float[(int)CommonAttribute.Count];
     }
 
     public int uniqueID { get; protected set; } = -1;
-    public float location { get; protected set; } = 0;
-    public ACommomBattleTalents talents { get; protected set; }
+    protected CreatureBase self;
 
     // UI Binding
     public Sprite runwayAvatar;
@@ -46,79 +45,34 @@ public class Creature : MonoBehaviour
     protected bool isAudioFinished = true;
 
     // Battle Attributes
-    public string databaseName { get; protected set; } = "default";
-    public string displayName { get; protected set; } = "Ä¬ÈÏÃû×Ö";
-    public float hp { get; protected set; }
     public float hpPercentage
     {
         get
         {
-            return 1;// hp / GetFinalAttr(this, this, CommonAttribute.MaxHP);
+            return self.hp / self.GetFinalAttr(CommonAttribute.MaxHP);
         }
     }
-    public bool isAlive
-    {
-        get
-        {
-            return hp > 0;
-        }
-    }
+
     protected float[] attributes;
     public Element elementState { get; protected set; } = Element.Count;
     public ElementBuff elementBuff { get; protected set; } = ElementBuff.Count;
     List<TriggerBuff> triggerBuffs = new List<TriggerBuff>();
-    List<ValueBuff> valueBuffs = new List<ValueBuff>();
-
-    public void SetLocation(float new_location)
-    {
-        location = new_location;
-    }
-
-    public float GetBaseAttr(int attr)
-    {
-        return attributes[attr];
-    }
-
-    public float GetBaseAttr(CommonAttribute attr)
-    {
-        return GetBaseAttr((int)attr);
-    }
-
-    public float GetFinalAttr(CreatureBase source, CreatureBase target, CommonAttribute attr)
-    {
-        float b = attributes[(int)attr];
-        float n = 0;
-        foreach(ValueBuff buff in valueBuffs)
-        {
-            n += buff.CalBuffValue(source, target, attr);
-        }
-        return b + n;
-    }
-
+    List<Buff> valueBuffs = new List<Buff>();
 
 
     public delegate void Then();
 
 
-    public void DealDamage(Creature target, Element element, DamageType type, float value)
-    {
-        talents.OnDealingDamage(target, value, element, type);
-        target.TakeDamage(this, value, element, type);
-    }
+
 
 
     //Battle functions
-    public virtual void TakeDamage(Creature source, float value, Element element, DamageType type, Then then = null)
+    public virtual void TakeDamage(CreatureBase source, float value, Element element, DamageType type)
     {
-        talents.OnTakingDamage(source, value, element, type);
-        //value = DamageCal.ResistDamage(value, element, this);
-        hp -= value;
         hpLine.fillAmount = hpPercentage;
-        ElementalReaction(element);
-        TriggerBuffsAtMoment(BuffTriggerMoment.OnTakingDamage);
         StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(-value), () =>
         {
-            if (hp < 0)
+            if (self.hp < 0)
             {
                 OnDying();
             }
@@ -155,30 +109,19 @@ public class Creature : MonoBehaviour
         eleImage.sprite = BattleManager.Instance.elementSymbols[(int)elementState];
     }
 
-    public virtual void TakeHeal(float value, Creature source, Then then = null)
+    public virtual void TakeHeal(float value, CreatureMono source, Then then = null)
     {
-        //if (hp + value > GetFinalAttr(this, this, CommonAttribute.MaxHP))
-        //{
-        //    value = GetFinalAttr(this, this, CommonAttribute.MaxHP) - hp;
-        //    hp = GetFinalAttr(this, this, CommonAttribute.MaxHP);
-        //}
-        //else
-        //{
-        //    hp += value;
-        //}
         hpLine.fillAmount = hpPercentage;
-        TriggerBuffsAtMoment(BuffTriggerMoment.OnHealed);
         StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(value), then));
     }
 
-    public virtual void TakeElementOnly(Creature source, Element element)
+    public virtual void TakeElementOnly(CreatureMono source, Element element)
     {
         ElementalReaction(element);
     }
 
     protected virtual void OnDying()
     {
-        BattleManager.Instance.runway.RemoveCreature(this);
         gameObject.SetActive(false);
     }
 
@@ -214,14 +157,7 @@ public class Creature : MonoBehaviour
     {
         isMyTurn = true;
         alpha = 1;
-        TriggerBuffsAtMoment(BuffTriggerMoment.OnTurnBegin);
-        if(elementBuff == ElementBuff.Frozen)
-        {
-            elementBuff = ElementBuff.Count;
-            cardSR.color = Color.white;
-            return true;
-        }
-        return false;
+        return true;
     }
 
     public virtual void EndMyTurn()
@@ -229,72 +165,15 @@ public class Creature : MonoBehaviour
         isMyTurn = false;
         alpha = 0;
         selectedSR.color = new Color(0, 0, 0, 0);
-        TriggerBuffsAtMoment(BuffTriggerMoment.OnTurnEnd);
-        for (int i = valueBuffs.Count - 1; i >= 0; --i)
-        {
-            ValueBuff b = valueBuffs[i];
-            //if (b.Progress())
-            //{
-            //    valueBuffs.Remove(b);
-            //    valueBuffPool.ReturnOne(b);
-            //}
-        }
         UpdateBuffIcon();
     }
 
     public virtual void Initialize(string dbN, int id)
     {
-        location = 0;
-        BattleManager.Instance.runway.AddCreature(this);
         uniqueID = id;
-        databaseName = dbN;
-        //hp = GetFinalAttr(this, this, CommonAttribute.MaxHP);
-        //hpLine.fillAmount = hp / GetFinalAttr(this, this, CommonAttribute.MaxHP);
-    }
-
-    public virtual void AddBuff(ValueBuff buff, Then then = null)
-    {
-        valueBuffs.Add(buff);
-        buff.OnAdded(this);
-        if (buff.buffType == BuffType.Debuff) {
-            buffImage.sprite = BattleManager.Instance.debuffSprite;
-        } 
-        else if (buffImage.sprite = BattleManager.Instance.nullBuffSprite) {
-            buffImage.sprite = BattleManager.Instance.buffSprite;
-        }
         hpLine.fillAmount = hpPercentage;
-        StartCoroutine(InvokeNextFrame(then));
     }
 
-    public virtual void RemoveBuff(ValueBuff buff)
-    {
-        valueBuffs.Remove(buff);
-        UpdateBuffIcon();
-    }
-
-    IEnumerator InvokeNextFrame(Then then)
-    {
-        yield return new WaitForEndOfFrame();
-        then?.Invoke();
-    }
-
-    public void AddBuff(TriggerBuff buff, Then then = null)
-    {
-        triggerBuffs.Add(buff);
-        then?.Invoke();
-    }
-
-    protected void TriggerBuffsAtMoment(BuffTriggerMoment moment)
-    {
-        for (int i = triggerBuffs.Count - 1; i >= 0; --i)
-        {
-            TriggerBuff b = triggerBuffs[i];
-            if (b.triggerMoment == moment && b.Trigger(this)){
-                triggerBuffs.Remove(b);
-                Utils.triggerBuffPool.ReturnOne(b);
-            }
-        }
-    }
 
     // UI functions
     public void SetUnselected()
@@ -319,7 +198,7 @@ public class Creature : MonoBehaviour
             return;
         }
         buffImage.sprite = BattleManager.Instance.buffSprite;
-        foreach (ValueBuff b in valueBuffs)
+        foreach (Buff b in valueBuffs)
         {
             if (b.buffType == BuffType.Debuff)
             {
