@@ -5,11 +5,11 @@ using UnityEngine;
 
 public class SimpleValueBuff
 {
-    public int attribute { get; protected set; }
+    public CommonAttribute attribute { get; protected set; }
     public float value { get; protected set; }
     public ValueType type { get; protected set; }
 
-    public SimpleValueBuff(int a, float v, ValueType t)
+    public SimpleValueBuff(CommonAttribute a, float v, ValueType t)
     {
         attribute = a;
         value = v;
@@ -19,13 +19,12 @@ public class SimpleValueBuff
 
 public class Artifact: Equipment
 {
-    public Artifact(SimpleValueBuff _main, SimpleValueBuff[] _vices)
+    public Artifact(SimpleValueBuff _main, List<SimpleValueBuff> _vices)
     {
-        buffs = new ValueBuff[_vices.Length + 1];
-        buffs[0] = BattleManager.Instance.valueBuffPool.GetOne().Set(_main);
-        for(int i = 0; i < _vices.Length; ++i)
+        buffs.Add(Utils.valueBuffPool.GetOne().Set(_main));
+        for(int i = 0; i < _vices.Count; ++i)
         {
-            buffs[i + 1] = BattleManager.Instance.valueBuffPool.GetOne().Set(_vices[i]);
+            buffs.Add(Utils.valueBuffPool.GetOne().Set(_vices[i]));
         }
     }
 }
@@ -33,9 +32,9 @@ public class Artifact: Equipment
 public class DisplayArtifact
 {
     public SimpleValueBuff main;
-    public SimpleValueBuff[] vices;
+    public List<SimpleValueBuff> vices;
 
-    public DisplayArtifact(SimpleValueBuff m, SimpleValueBuff[] v)
+    public DisplayArtifact(SimpleValueBuff m, List<SimpleValueBuff> v)
     {
         main = m;
         vices = v;

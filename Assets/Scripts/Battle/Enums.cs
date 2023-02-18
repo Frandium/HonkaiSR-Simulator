@@ -47,34 +47,34 @@ public enum ArtifactPosition
 
 public enum CommonAttribute
 {
-    ATK, // = 0
-    DEF,
-    MaxHP,
-    Speed,
-    CriticalRate,
-    CriticalDamage,
-    HealBonus,
-    HealedBonus,
-    EnergyRecharge,
-    Taunt,
-    BuffHit, // = 10
-    BuffResist,
-    GeneralBonus,
-    PhysicalBonus,
-    PyroBonus,
-    CryoBonus,
-    ElectroBonus,
-    AnemoBonus,
-    QuantusBonus,
-    ImaginaryBonus,
-    GeneralResist, // = 20
-    PhysicalResist,
-    PyroResist,
-    CryoResist,
-    ElectroResist,
-    AnemoResist,
-    QuantusResist,
-    ImaginaryResist,
+    ATK, // 攻击 = 0
+    DEF, // 防御 = 1
+    MaxHP, // 生命上限 = 2
+    Speed, // 速度 = 3
+    CriticalRate, // 暴击率 = 4
+    CriticalDamage,  //暴击伤害 = 5
+    HealBonus,  // 治疗加成 = 6
+    HealedBonus, // 受治疗加成 = 7
+    EnergyRecharge, // 充能效率 = 8
+    Taunt, // 嘲讽权重 = 9
+    BuffHit, // 效果命中 = 10
+    BuffResist, // 效果抵抗 = 11
+    GeneralBonus, // 通用伤害加成 = 12
+    PhysicalBonus, // 物理伤害加成 = 13
+    PyroBonus, // 火元素伤害加成 = 14
+    CryoBonus, // 冰元素伤害加成 = 15
+    ElectroBonus, // 雷元素伤害加成 = 16
+    AnemoBonus, // 风元素伤害加成 = 17
+    QuantusBonus, // 量子伤害加成 = 18
+    ImaginaryBonus,  // 虚数伤害加成 = 19
+    GeneralResist, // 通用抗性 = 20
+    PhysicalResist, // 物理抗性 = 21
+    PyroResist, // 火抗性 = 22
+    CryoResist,  // 冰抗 = 23
+    ElectroResist,  // 雷抗 = 24
+    AnemoResist, // 风抗 = 25
+    QuantusResist, // 量子抗性 = 26
+    ImaginaryResist, // 虚数抗性 = 27
     Count // = 28
 }
 

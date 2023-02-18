@@ -10,34 +10,37 @@ public class Weapon: Equipment
 
     public string dbName;
     public string disName;
-    public float[] atk;
-    public float[] def;
-    public float[] maxHP;
+    public float atk;
+    public float def;
+    public float maxHP;
 
     int level;
     string effectName;
     string effectDescription;
+    int refine = 1;
 
-    public Weapon(string _dbname, int level)
+    public Weapon(string _dbname, int level, int refineLevel)
     {
-        LoadJson(_dbname, level);
+        LoadJson(_dbname, level, refineLevel);
     }
 
-    public override float CalBuffValue(Creature source, Creature target, CommonAttribute a)
+    public override float CalBuffValue(CreatureBase source, CreatureBase target, CommonAttribute a)
     {
         float res = 0;
         if (a == CommonAttribute.ATK)
-            res += atk[level];
+            res += atk;
         else if (a == CommonAttribute.DEF)
-            res += def[level];
+            res += def;
         else if (a == CommonAttribute.MaxHP)
-            res += maxHP[level];
+            res += maxHP;
         return res + base.CalBuffValue(source, target, a);
     }
 
-    public void LoadJson(string _dbname, int level)
+    public void LoadJson(string _dbname, int _level, int refineLevel)
     {
         dbName = _dbname;
+        level = _level;
+        refine = refineLevel;
 
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbName + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
@@ -45,17 +48,11 @@ public class Weapon: Equipment
         // set character template
         disName = (string)data["disname"];
         int maxLevel = data["atk"].Count;
-        atk = new float[maxLevel];
-        def = new float[maxLevel];
-        maxHP = new float[maxLevel];
-        for(int i = 0; i< maxLevel; ++i)
-        {
-            atk[i] = (float)(double)data["atk"][i];
-            def[i] = (float)(double)data["def"][i];
-            maxHP[i] = (float)(double)data["maxHp"][i];
-        }
+        atk = (float)((double)data["atk"][0] + ((double)data["atk"][1] - (double)data["atk"][0]) * (level - 1) / 79.0);
+        def = (float)((double)data["def"][0] + ((double)data["def"][1] - (double)data["def"][0]) * (level - 1) / 79.0);
+        maxHP = (float)((double)data["def"][0] + ((double)data["def"][1] - (double)data["def"][0]) * (level - 1) / 79.0);
 
-        effectName = (string)data["effectName"];
-        effectDescription = (string)data["effectDescription"];
+        effectName = (string)data["effect"]["name"];
+        effectDescription = (string)data["effect"]["description"][refineLevel];
     }
 }

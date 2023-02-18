@@ -10,16 +10,21 @@ public class EditCharacterUI : MonoBehaviour
 {
     public Dropdown chaList;
 
-    DisplayCharacter character;
+    CharacterBase character = new CharacterBase();
 
     public GameObject headButtonGO;
     public GameObject scrollContent;
 
     public Sprite defaultAvatar;
 
-    public 
+    public Text chaName;
+    public Text hpText;
+    public Text atkText;
+    public Text DefText;
+    public Text crtRateText;
+    public Text crtDmgText;
 
-    string jsonPath { get {
+    public string jsonPath { get {
             return GlobalInfoHolder.Instance.characterDir + "/" + character.dbname + ".json";
         } }
     List<string> files;
@@ -64,6 +69,14 @@ public class EditCharacterUI : MonoBehaviour
         // Load json 获得光锥属性、圣遗物属性、天赋属性
         // 刷新当前页面
         character.LoadJson(dbname);
+        chaName.text = character.disname;
+        hpText.text = character.GetFinalAttr(CommonAttribute.MaxHP).ToString();
+        atkText.text = character.GetFinalAttr(CommonAttribute.ATK).ToString();
+        DefText.text = character.GetFinalAttr(CommonAttribute.DEF).ToString();
+        crtRateText.text = character.GetFinalAttr(CommonAttribute.CriticalRate).ToString();
+        crtDmgText.text = character.GetFinalAttr(CommonAttribute.CriticalDamage).ToString();
+
+
         Debug.Log(dbname);
     }
 

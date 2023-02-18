@@ -30,7 +30,7 @@ public class Shenhe : ACharacterTalents
 
     public override void SkillCharacterAction(List<Character> characters)
     {
-        ValueBuff b = BattleManager.Instance.valueBuffPool.GetOne();
+        ValueBuff b = Utils.valueBuffPool.GetOne();
         b.Set(BuffType.Buff, CommonAttribute.ATK, 2,
             (c, e) =>
             {

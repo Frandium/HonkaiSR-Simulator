@@ -38,8 +38,6 @@ public class BattleManager : MonoBehaviour
         Instance = this;
     }
 
-    public ObjectPool<ValueBuff> valueBuffPool;
-    public ObjectPool<TriggerBuff> triggerBuffPool;
 
     // battle turn state
     public TurnStage curStage { get; protected set; } = TurnStage.Instruction;
@@ -94,8 +92,6 @@ public class BattleManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        valueBuffPool = new ObjectPool<ValueBuff>(30);
-        triggerBuffPool = new ObjectPool<TriggerBuff>(30);
         Application.targetFrameRate = 60;
 
         LoadBattle();

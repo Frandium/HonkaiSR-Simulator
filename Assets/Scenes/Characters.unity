@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657874, g: 0.49641258, b: 0.574817, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1644,6 +1644,12 @@ MonoBehaviour:
   headButtonGO: {fileID: 1811096325174905941, guid: 58a05d794fc75404093a4331560dcda9, type: 3}
   scrollContent: {fileID: 845459079}
   defaultAvatar: {fileID: 21300000, guid: 9d70ce049a748fb4eb44cfa865ac39aa, type: 3}
+  chaName: {fileID: 1873640767}
+  hpText: {fileID: 80367732}
+  atkText: {fileID: 1280536990}
+  DefText: {fileID: 2120042880}
+  crtRateText: {fileID: 1632132709}
+  crtDmgText: {fileID: 367999262}
 --- !u!4 &625744358
 Transform:
   m_ObjectHideFlags: 0
@@ -2523,7 +2529,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 819947835}
   m_Direction: 0
   m_Value: 0
-  m_Size: 0.7632653
+  m_Size: 0.82857144
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

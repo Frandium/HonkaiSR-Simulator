@@ -10,7 +10,7 @@ public class Equipment
         // 如果给我方全体加，就找 BattleManager
     }
 
-    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a)
+    public virtual float CalBuffValue(CreatureBase source, CreatureBase target,  CommonAttribute a)
     {
         float res = 0;
         foreach(ValueBuff b in buffs)
@@ -22,5 +22,5 @@ public class Equipment
 
 
     // 自身能提供的 buff。
-    protected ValueBuff[] buffs;
+    protected List<ValueBuff> buffs = new List<ValueBuff>();
 }
