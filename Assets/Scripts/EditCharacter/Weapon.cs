@@ -72,4 +72,9 @@ public class Weapon: Equipment
     {
         talents.OnEquiping(character);
     }
+
+    public void OnTakingOff(CharacterBase character)
+    {
+        talents.OnTakingOff(character);
+    }
 }

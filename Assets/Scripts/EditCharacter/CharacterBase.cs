@@ -24,6 +24,7 @@ public class CharacterBase: CreatureBase
     public ACharacterTalents talents { get; protected set; }
     public new CharacterMono mono { get; protected set; }
     public Weapon weapon;
+    public List<AEquipmentTalents> artifactsSuit = new List<AEquipmentTalents>();
     public Artifact[] artifacts = new Artifact[(int)ArtifactPosition.Count];
 
     public bool isAttackTargetEnemy { get; protected set; } = true;
@@ -51,6 +52,14 @@ public class CharacterBase: CreatureBase
 
     public void LoadJson(string name)
     {
+        // 先把之前的脱下来
+        weapon?.OnTakingOff(this);
+        foreach(AEquipmentTalents t in artifactsSuit)
+        {
+            t.OnTakingOff(this);
+        }
+        artifactsSuit.Clear();
+
         // Load 角色基本属性
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
