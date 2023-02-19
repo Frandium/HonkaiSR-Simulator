@@ -260,7 +260,6 @@ public class BattleManager : MonoBehaviour
             // 刚结束的回合是元素爆发回合
             if (isBurst && curCreature is Character)
             {
-                (curCreature as Character).EndNormalTurn();
                 (curCreature as Character).EndBurstTurn();
             }
             else

@@ -34,8 +34,14 @@ public class Bronya : ACharacterTalents
 
     public override void SkillCharacterAction(List<Character> characters)
     {
-        characters[0].ChangePercentageLocation(100);
-        characters[0].buffs.Add("bronyaSkill", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.GeneralBonus, 1,
+        Character c = characters[0];
+        if (c.buffs.ContainsKey("bronyaBurstATK"))
+        {
+            Utils.valueBuffPool.ReturnOne(c.buffs["bronyaBurstATK"]);
+            c.buffs.Remove("bronyaBurstATK");
+        }
+        c.ChangePercentageLocation(100);
+        c.buffs.Add("bronyaSkill", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.GeneralBonus, 1,
             (s, t) =>
             {
                 return 0.36f;
@@ -50,7 +56,7 @@ public class Bronya : ACharacterTalents
                 break;
             }
         }
-        characters[0].buffs.Remove(toRemove);
+        c.buffs.Remove(toRemove);
         base.SkillCharacterAction(characters);
     }
 
@@ -58,10 +64,20 @@ public class Bronya : ACharacterTalents
     {
         foreach(Character c in characters)
         {
+            if (c.buffs.ContainsKey("bronyaBurstATK"))
+            {
+                Utils.valueBuffPool.ReturnOne(c.buffs["bronyaBurstATK"]);
+                c.buffs.Remove("bronyaBurstATK");
+            }
             c.buffs.Add("bronyaBurstATK", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.ATK, 2, (s, t) =>
             {
                 return s.GetBaseAttr(CommonAttribute.ATK) * 0.36f;
             }));
+            if (c.buffs.ContainsKey("bronyaBurstCrtDmg"))
+            {
+                Utils.valueBuffPool.ReturnOne(c.buffs["bronyaBurstCrtDmg"]);
+                c.buffs.Remove("bronyaBurstCrtDmg");
+            }
             c.buffs.Add("bronyaBurstCrtDmg", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.CriticalDamage, 2, (s, t) =>
             {
                 return 0.12f + self.GetBaseAttr(CommonAttribute.CriticalDamage) * 0.12f;

@@ -111,7 +111,8 @@ public class Runway : MonoBehaviour
     {
         for(int i = 0; i < creatures.Count; ++i)
         {
-            creature2RunwayAvatar[creatures[i]].MoveTowards(firstRunwayAvatarPos + i * runwayAvatarInternal);
+            runwayAvatars[i] = creature2RunwayAvatar[creatures[i]];
+            runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + i * runwayAvatarInternal);
         }
     }
 

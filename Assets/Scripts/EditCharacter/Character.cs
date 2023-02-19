@@ -205,7 +205,7 @@ public class Character: Creature
         {
             b.CountDown();
         }
-        mono.EndMyTurn();
+        mono.EndBurstTurn();
     }
 
 }
