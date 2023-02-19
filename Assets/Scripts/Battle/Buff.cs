@@ -12,10 +12,8 @@ public class Buff
     public int stack { get; protected set; } = 0; // µþ¼Ó´ÎÊý
 
     public BuffContent content;
-
-    public CreatureBase host { get; protected set; }
-
-    public delegate float BuffContent(CreatureBase source, CreatureBase target);
+    
+    public delegate float BuffContent(Creature source, Creature target);
 
     public Buff()
     {
@@ -24,9 +22,9 @@ public class Buff
 
     public Buff Set(SimpleValueBuff s)
     {
-        buffType = BuffType.Buff;
+        buffType = BuffType.Permanent;
         targetAttribute = s.attribute;
-        duration = 2;
+        duration = 100000;
         content = (c, e) =>
         {
             if (s.type == ValueType.InstantNumber)
@@ -47,19 +45,16 @@ public class Buff
     }
 
 
-    public virtual void CountDown()
+    public virtual bool CountDown()
     {
+        if (buffType == BuffType.Permanent)
+            return false;
         duration -= 1;
-        if (duration <= 0)
-            RemoveMe();
+        return duration <= 0;
     }
 
-    void RemoveMe()
-    {
-//        host.RemoveBuff(this);
-    }
 
-    public float CalBuffValue(CreatureBase source, CreatureBase target, CommonAttribute attr)
+    public float CalBuffValue(Creature source, Creature target, CommonAttribute attr)
     {
         if (targetAttribute != attr)
             return 0;

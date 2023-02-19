@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Kokomi : ACharacterTalents
 {
-    public Kokomi(CharacterBase _self): base(_self)
+    public Kokomi(Character _self): base(_self)
     {
 
     }

@@ -19,22 +19,21 @@ public enum AudioType
 
 public class CharacterMono : CreatureMono
 {
+    public Sprite attackIcon { get; protected set; }
+    public Sprite skillIcon { get; protected set; }
+    public Sprite burstIcon { get; protected set; }
+    public Sprite selectedCard { get; protected set; }
+    public Sprite burstSplash { get; protected set; }
 
-    bool isInterrupted = false;
-
-    public Sprite attackIcon;
-    public Sprite skillIcon;
-    public Sprite burstIcon;
-    public Sprite selectedCard;
-    public Sprite burstSplash;
+    public Image face;
 
     public Image burstImage;
     public Image burstFillingImage;
 
-    public AudioClip[] skillAudios;
-    public AudioClip[] burstAudios;
-    public AudioClip[] changeAudios;
-    public AudioClip[] burstPrepareAudios;
+    List<AudioClip> skillAudios = new List<AudioClip>();
+    List<AudioClip> burstAudios = new List<AudioClip>();
+    List<AudioClip> changeAudios = new List<AudioClip>();
+    List<AudioClip> burstPrepareAudios = new List<AudioClip>();
 
     public VideoClip burstVideo;
 
@@ -42,17 +41,11 @@ public class CharacterMono : CreatureMono
     public List<Dictionary<string, float>> skillActionSeries = new List<Dictionary<string, float>>();
     public List<Dictionary<string, float>> BurstActionSeries = new List<Dictionary<string, float>>();
 
-    public new CharacterBase self;
+    public new Character self;
 
     public CharacterMono()
     {
 
-    }
-
-    public void SetCharacter(CharacterBase c)
-    {
-        self = c;
-        base.self = c;
     }
 
 
@@ -75,26 +68,62 @@ public class CharacterMono : CreatureMono
         selectedSR.color = Color.green;
     }
 
-    public override void Initialize(string dbN, int id)
+    public void Initialize(Character c)
     {
-        base.Initialize(dbN, id);
-        selectedSR.sprite = selectedCard;
-        burstImage.sprite = burstIcon;
+        base.Initialize(c);
+        self = c;
+        Debug.Log(c.dbname + "/splash");
+        attackIcon = Resources.Load<Sprite>(c.dbname + "/attack");
+        skillIcon = Resources.Load<Sprite>(c.dbname + "/skill");
+        burstIcon = Resources.Load<Sprite>(c.dbname + "/burst");
+        burstSplash = Resources.Load<Sprite>(c.dbname + "/splash");
+        face.sprite = Resources.Load<Sprite>(c.dbname + "/face");
+        burstVideo = Resources.Load<VideoClip>(c.dbname + "/burst_video");
+        int i = 1;
+        AudioClip a = Resources.Load<AudioClip>(c.dbname + "/skill" + i);
+        while(a != null)
+        {
+            skillAudios.Add(a);
+            attackAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(c.dbname + "/skill" + i);
+        }
+        i = 1;
+        a = Resources.Load<AudioClip>(c.dbname + "/burst" + i);
+        while (a != null)
+        {
+            burstAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(c.dbname + "/burst" + i);
+        }
+        i = 1;
+        a = Resources.Load<AudioClip>(c.dbname + "/change" + i);
+        while (a != null)
+        {
+            changeAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(c.dbname + "/change" + i);
+        }
+        i = 1;
+        a = Resources.Load<AudioClip>(c.dbname + "/burst_prepare" + i);
+        while (a != null)
+        {
+            burstPrepareAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(c.dbname + "/burst_prepare" + i);
+        }
+
         UpdateEnergyIcon();
+        base.Initialize(c);
     }
 
-    public void ChargeEnergy(float e)
-    {
-        UpdateEnergyIcon();
-    }
-
-    public override void TakeDamage(CreatureBase source, float value, Element element, DamageType type)
+    public override void TakeDamage(float value)
     {
         PlayAudio(AudioType.TakeDamage);
-        base.TakeDamage(source, value, element, type);
+        base.TakeDamage(value);
     }
 
-    private void UpdateEnergyIcon()
+    public void UpdateEnergyIcon()
     {
         burstFillingImage.fillAmount = self.energy / self.maxEnergy;
         Color elementColor = ElementColors[(int)self.element];
@@ -129,20 +158,11 @@ public class CharacterMono : CreatureMono
         }
     }
 
-    public override bool StartMyTurn()
-    {
-        isMyTurn = true;
-        alpha = 1;
-        if (isInterrupted)
-            isInterrupted = false;
-        return false;
-    }
-
-    public void StartBurstTurn()
-    {
-        isMyTurn = true;
-        alpha = 1;
-    }
+    //public override void StartMyTurn()
+    //{
+    //    isMyTurn = true;
+    //    alpha = 1;
+    //}
 
     public void EndBurstTurn()
     {
@@ -159,21 +179,20 @@ public class CharacterMono : CreatureMono
     public void InterruptedByBurst()
     {
         isMyTurn = false;
-        isInterrupted = true;
         alpha = 0;
         selectedSR.color = new Color(0, 0, 0, 0);
     }
 
-    protected override void OnDying()
+    public override void OnDying()
     {
         cardSR.color = new Color(.25f, .25f, .25f, .25f);
-        base.OnDying();
+        BattleManager.Instance.RemoveCharacter(self);
     }
 
 
     public override void PlayAudio(AudioType audioType)
     {
-        AudioClip[] audios = attackAudios;
+        List<AudioClip> audios = attackAudios;
         switch (audioType)
         {
             case AudioType.Attack:
@@ -197,9 +216,9 @@ public class CharacterMono : CreatureMono
             default:
                 break;
         }
-        if (audios.Length <= 0)
+        if (audios.Count <= 0)
             return;
-        AudioClip clip = audios[Random.Range(0, audios.Length)];
+        AudioClip clip = audios[Random.Range(0, audios.Count)];
         audioSource.clip = clip;
         audioSource.Play();
         StartCoroutine(SetAudioFinish(clip.length));

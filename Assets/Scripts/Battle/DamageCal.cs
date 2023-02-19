@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DamageCal
 {
-    public static float DamageCharacter(CharacterBase source, EnemyBase target, CommonAttribute attr, Element element, float rate, float offset = 0)
+    public static float DamageCharacter(Character source, Enemy target, CommonAttribute attr, Element element, float rate, float offset = 0)
     {
         float dmgBase = source.GetFinalAttr(source, target, attr) * rate / 100.0f + offset;
         float elebonus = source.GetFinalAttr(source, target, CommonAttribute.AnemoBonus + (int)element);
@@ -17,7 +17,7 @@ public class DamageCal
         }
         return dmg;
     }
-    public static float ATKDamageEnemy(EnemyBase source, CharacterBase target, Element element, float rate)
+    public static float ATKDamageEnemy(Enemy source, Character target, Element element, float rate)
     {
         return 0;
         //int type = (int)element;

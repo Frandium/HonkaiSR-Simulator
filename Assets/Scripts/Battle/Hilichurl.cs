@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Hilichurl : AEnemyTalents
 {
-    public Hilichurl(EnemyBase _self): base(_self)
+    public Hilichurl(Enemy _self): base(_self)
     {
 
     }
 
     public override void MyTurn()
     {
-        List<CharacterBase> characters = BattleManager.Instance.characters;
+        List<Character> characters = BattleManager.Instance.characters;
         float tauntWeight = 0;
-        foreach(CharacterBase c in characters)
+        foreach(Character c in characters)
         {
             tauntWeight += c.GetFinalAttr(CommonAttribute.Taunt);
         }

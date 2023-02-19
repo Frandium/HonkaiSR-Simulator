@@ -6,13 +6,13 @@ using UnityEngine.UI;
 public class Runway : MonoBehaviour
 {
 
-    float len = 100;
+    public static readonly float Length = 1000;
 
-    private Queue<CreatureBase> burstWaitingQueue;
+    private Queue<Creature> burstWaitingQueue;
     private List<RunwayAvatar> burstAvatars;
     private List<RunwayAvatar> runwayAvatars;
-    Dictionary<CreatureBase, RunwayAvatar> creature2RunwayAvatar;
-    private List<CreatureBase> creatures = new List<CreatureBase>();
+    Dictionary<Creature, RunwayAvatar> creature2RunwayAvatar;
+    private List<Creature> creatures = new List<Creature>();
 
 
     public GameObject[] burstAvatarGO;
@@ -28,18 +28,18 @@ public class Runway : MonoBehaviour
 
     void Start()
     {
-        burstWaitingQueue = new Queue<CreatureBase>();
+        burstWaitingQueue = new Queue<Creature>();
         burstAvatars = new List<RunwayAvatar>();
         runwayAvatars = new List<RunwayAvatar>();
-        creature2RunwayAvatar = new Dictionary<CreatureBase, RunwayAvatar>();
+        creature2RunwayAvatar = new Dictionary<Creature, RunwayAvatar>();
     }
 
     private bool firstTime = true;
 
-    public void AddCreature(CreatureBase c)
+    public void AddCreature(Creature c)
     {
         creatures.Add(c);
-        c.ChangeLocation(-100);
+        c.ChangePercentageLocation(-100);
         RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
         newOne.SetCreature(c, false);
         newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(10, -500, 0);
@@ -47,7 +47,7 @@ public class Runway : MonoBehaviour
         creature2RunwayAvatar[c] = newOne;
     }
 
-    public CreatureBase UpdateRunway(out bool isBurst)
+    public Creature UpdateRunway(out bool isBurst)
     {
         isBurst = burstWaitingQueue.Count > 0;
         if (!firstTime)
@@ -80,14 +80,14 @@ public class Runway : MonoBehaviour
         }
 
         // 非大招回合，update 所有人的进度，更新UI
-        float fastest_time = 100;
+        float fastest_time = Length;
         for(int i = 0; i < creatures.Count; ++i)
         {
-            fastest_time = Mathf.Min((len - creatures[i].location) / creatures[i].GetFinalAttr(null, null, CommonAttribute.Speed), fastest_time);
+            fastest_time = Mathf.Min((Length - Mathf.Min(creatures[i].location, Length)) / creatures[i].GetFinalAttr(CommonAttribute.Speed), fastest_time);
         }
-        foreach(CreatureBase c in creatures)
+        foreach(Creature c in creatures)
         {
-            c.ChangeLocation(c.location + fastest_time * c.GetFinalAttr(null, null, CommonAttribute.Speed));
+            c.ChangeAbsoluteLocation(fastest_time * c.GetFinalAttr(CommonAttribute.Speed));
         }
         creatures.Sort((c1, c2) =>
         {
@@ -96,25 +96,26 @@ public class Runway : MonoBehaviour
             return c1.location < c2.location ? 1 : -1;
         });
         RearrangeRunwayUI();
+# if UNITY_EDITOR
+        string pos = "";
+        foreach(Creature c in creatures)
+        {
+            pos += c.dbname + ":" + c.location + "|";
+        }
+        Debug.Log(pos);
+#endif
         return creatures[0];
     }
 
     private void RearrangeRunwayUI()
     {
-        runwayAvatars.Sort((ra1, ra2) =>
-       {
-           if (ra1.IsBurst) return 1;
-           if (ra2.IsBurst) return -1;
-           if (ra1.creature.location == ra2.creature.location) return 0;
-           return ra1.creature.location < ra2.creature.location ? 1 : -1;
-       });
-        for(int i = 0; i<runwayAvatars.Count; ++i)
+        for(int i = 0; i < creatures.Count; ++i)
         {
-            runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + i * runwayAvatarInternal);
+            creature2RunwayAvatar[creatures[i]].MoveTowards(firstRunwayAvatarPos + i * runwayAvatarInternal);
         }
     }
 
-    public void RemoveCreature(CreatureBase creature)
+    public void RemoveCreature(Creature creature)
     {
         creatures.Remove(creature);
         RunwayAvatar ra = runwayAvatars.Find(r =>
@@ -125,7 +126,7 @@ public class Runway : MonoBehaviour
         runwayAvatars.Remove(ra);
     }
 
-    public void InsertBurst(CreatureBase c, bool immediately = false)
+    public void InsertBurst(Creature c, bool immediately = false)
     {
         // 首先创建一个新的 avatar，设置它的 creature
         GameObject go = Instantiate(avatarPrefab, runwayTransform);
@@ -142,9 +143,9 @@ public class Runway : MonoBehaviour
         }
         else
         { // 如果现在不是 burst，那么当前插入的回合到 runway 头，其他人后退
-            for (int i = 0; i < runwayAvatars.Count; ++i)
+            for (int i = 0; i < creatures.Count; ++i)
             {
-                runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + (i + 1) * runwayAvatarInternal);
+                creature2RunwayAvatar[creatures[i]].MoveTowards(firstRunwayAvatarPos + (i + 1) * runwayAvatarInternal);
             }
             runwayAvatars.Insert(0, ra);
             ra.MoveTowards(firstRunwayAvatarPos);

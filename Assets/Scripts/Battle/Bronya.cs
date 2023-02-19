@@ -4,29 +4,37 @@ using UnityEngine;
 
 public class Bronya : ACharacterTalents
 {
-    public Bronya(CharacterBase _self): base(_self)
+    public Bronya(Character _self): base(_self)
     {
 
     }
-
+    bool talent_activated = false;
     public override void OnEquipping()
     {
         self.onNormalAttack.Add("talent", e =>
         {
-            self.ChangeLocation(15);
+            talent_activated = true;
+        });
+        self.onTurnEnd.Add("talent_inner", () =>
+        {
+            if (talent_activated)
+            {
+                self.ChangePercentageLocation(15.0f);
+                talent_activated = false;
+            }
         });
     }
 
-    public override void AttackEnemyAction(List<EnemyBase> enemies)
+    public override void AttackEnemyAction(List<Enemy> enemies)
     {
         float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Anemo, 50);
         self.DealDamage(enemies[0], Element.Anemo, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
-    public override void SkillCharacterAction(List<CharacterBase> characters)
+    public override void SkillCharacterAction(List<Character> characters)
     {
-        characters[0].ChangeLocation(100);
+        characters[0].ChangePercentageLocation(100);
         characters[0].buffs.Add("bronyaSkill", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.GeneralBonus, 1,
             (s, t) =>
             {
@@ -46,9 +54,9 @@ public class Bronya : ACharacterTalents
         base.SkillCharacterAction(characters);
     }
 
-    public override void BurstCharacterAction(List<CharacterBase> characters)
+    public override void BurstCharacterAction(List<Character> characters)
     {
-        foreach(CharacterBase c in characters)
+        foreach(Character c in characters)
         {
             c.buffs.Add("bronyaBurstATK", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.ATK, 2, (s, t) =>
             {
@@ -62,9 +70,9 @@ public class Bronya : ACharacterTalents
         base.BurstCharacterAction(characters);
     }
 
-    public override void Mystery(List<CharacterBase> characters, List<EnemyBase> enemies)
+    public override void Mystery(List<Character> characters, List<Enemy> enemies)
     {
-        foreach(CharacterBase c in characters)
+        foreach(Character c in characters)
         {
             c.buffs.Add("bronyaMystery", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.ATK, 2, (s, t) =>
             {

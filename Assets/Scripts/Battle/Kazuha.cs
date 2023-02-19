@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Kazuha : ACharacterTalents
-{    public Kazuha(CharacterBase _self): base(_self)
+{    public Kazuha(Character _self): base(_self)
     {
 
     }

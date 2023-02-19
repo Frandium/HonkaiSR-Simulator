@@ -10,7 +10,7 @@ public class EditCharacterUI : MonoBehaviour
 {
     public Dropdown chaList;
 
-    CharacterBase character = new CharacterBase();
+    Character character = new Character();
 
     public GameObject headButtonGO;
     public GameObject scrollContent;

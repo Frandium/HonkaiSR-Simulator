@@ -9,11 +9,11 @@ using UnityEngine.SceneManagement;
 
 public enum SelectionType
 {
-    Self,
-    One,
-    OneExceptSelf,
-    All,
-    AllExceptSelf,
+    Self, // 自身 = 0
+    One,  // 单体 = 1
+    OneExceptSelf, // 除自身外的一个 = 2
+    All, // 全体 = 3
+    AllExceptSelf, //除自身外全体 = 4
     Count
 }
 
@@ -47,10 +47,9 @@ public class BattleManager : MonoBehaviour
     float turnTime = 0;
     float minTurnTime = 3; // 每个回合最少 3 秒，防止操作输入太快出 bug
     private bool isBurst = false;
-    public List<CharacterBase> characters { get; protected set; } = new List<CharacterBase>();
-    public List<CharacterMono> cMonos { get; protected set; } = new List<CharacterMono>();
-    public List<EnemyBase> enemies { get; protected set; } = new List<EnemyBase>();
-    public List<EnemyMono> eMonos { get; private set; } = new List<EnemyMono>();
+    public List<Character> characters { get; protected set; } = new List<Character>();
+    public List<CharacterMono> cMonos = new List<CharacterMono>();
+    public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
     public GameObject enemyPrefab;
 
@@ -61,9 +60,8 @@ public class BattleManager : MonoBehaviour
     // characters & enemies
 
     // Other Monos
-    public CreatureBase curCreature { get; private set; }
-    private CharacterBase curCharacter;
-    private CharacterMono curCMono;
+    public Creature curCreature { get; private set; }
+    private Character curCharacter;
     public Selection selection;
     public Runway runway;
     public SkillPoint skillPoint;
@@ -91,6 +89,7 @@ public class BattleManager : MonoBehaviour
     public Sprite nullBuffSprite;
     Vector3 enmOriginal = new Vector3(147.2f, 8.1f, 99); // 第 0 个敌人的位置
     Vector3 enmInternal = new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
+    bool interrupted = false;
 
     // Start is called before the first frame update
     void Start()
@@ -143,20 +142,25 @@ public class BattleManager : MonoBehaviour
                     if (isBurst)
                     {
                         // 元素爆发回合，播放完 video 后才进 animation stage
-                        curCMono.PlayAudio(AudioType.Burst);
+                        curCharacter.mono.PlayAudio(AudioType.Burst);
                         videoPlayer.enabled = true;
-                        videoPlayer.clip = curCMono.burstVideo;
+                        videoPlayer.clip = curCharacter.mono.burstVideo;
                         videoPlayer.Play();
-                        StartCoroutine(CloseVideoAfterPlay(curCMono.burstVideo.length));
+                        StartCoroutine(CloseVideoAfterPlay(curCharacter.mono.burstVideo.length));
                     }
                     else
                     {
                         curStage = TurnStage.Animation;
-                        selection.ApplyAction();
                         if (isAttackOrSkill)
-                            curCMono.PlayAudio(AudioType.Attack);
+                        {
+                            curCharacter.mono.PlayAudio(AudioType.Attack);
+                            selection.ApplyAction(curCharacter.onNormalAttack);
+                        }
                         else
-                            curCMono.PlayAudio(AudioType.Skill);
+                        {
+                            curCharacter.mono.PlayAudio(AudioType.Skill);
+                            selection.ApplyAction(curCharacter.onSkill);
+                        }
                     }
                 }
                 break;
@@ -191,7 +195,7 @@ public class BattleManager : MonoBehaviour
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // load json
-       chaNames = new List<string>();
+        chaNames = new List<string>();
         for(int i = 0; i < data["characters"].Count; ++i)
         {
             chaNames.Add((string)data["characters"][i]);
@@ -207,9 +211,12 @@ public class BattleManager : MonoBehaviour
             enmNames.Add(enm);
         }
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < characters.Count; ++i)
+        for (int i = 0; i < chaNames.Count; ++i)
         {
-            characters[i].LoadJson(chaNames[i]);
+            Character c = new Character(chaNames[i]);
+            characters.Add(c);
+            c.SetMono(cMonos[i]);
+            runway.AddCreature(c);
         }
     }
 
@@ -231,18 +238,17 @@ public class BattleManager : MonoBehaviour
                 StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enmNames.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
                 for (int i = 0; i < enmNames[enmWave].Count; ++i)
                 {
-                    EnemyBase e = new EnemyBase();
                     EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -30, 0)).GetComponent<EnemyMono>();
-                    e.LoadJson(enmNames[enmWave][i]);
-                    e.SetMono(em);
+                    Enemy e = new Enemy(enmNames[enmWave][i]);
                     enemies.Add(e);
-                    eMonos.Add(em);
+                    e.SetMono(em);
+                    runway.AddCreature(e);
                 }
             }
         }
         if (characters.Count == 0)
         {
-            StartCoroutine(ShowBanner("挑 战 失败", new Color(1, .5f, 0, .875f), 1, true));
+            StartCoroutine(ShowBanner("挑 战 失 败", new Color(1, .5f, 0, .875f), 1, true));
             bgm.Stop();
             curStage = TurnStage.GameEnd;
             return;
@@ -252,14 +258,15 @@ public class BattleManager : MonoBehaviour
         if (curCharacter != null)
         {
             // 刚结束的回合是元素爆发回合
-            if (isBurst && curCreature is CharacterBase)
+            if (isBurst && curCreature is Character)
             {
-                (curCreature as CharacterBase).EndNormalTurn();
+                (curCreature as Character).EndNormalTurn();
+                (curCreature as Character).EndBurstTurn();
             }
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.ChangeLocation(-100);
+                curCreature.ChangePercentageLocation(-100);
                 curCreature.EndNormalTurn();
             }
         }
@@ -267,40 +274,49 @@ public class BattleManager : MonoBehaviour
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
         curCreature = runway.UpdateRunway(out isBurst);
-
-        if (curCreature is CharacterBase) // 玩家的回合
+        if (curCreature is Character) // 玩家的回合
         {
             curStage = TurnStage.Instruction;
-            curCharacter = curCreature as CharacterBase;
+            curCharacter = curCreature as Character;
             // 先进入输入指令阶段
             if (isBurst)
-            { // 元素爆发回合不触发 turn start hook
+            { // 元素爆发回合触发 burst start hook
                 BurstTurn();
             }
             else
             {
-                bool skip = false;// curCreature.StartNormalTurn();
-                curCMono.PlayAudio(AudioType.Change);
-                attackImage.sprite = curCharacter.mono.attackIcon;
-                skillImage.sprite = curCharacter.mono.skillIcon;
-                if (skip)
+                // 如果我这个回合是刚才被元素爆发打断的回合，不触发 start。
+                if (interrupted)
                 {
-                    curStage = TurnStage.Animation;
+                    curCharacter.mono.StartMyTurn();
+                    selection.StartNewTurn(curCharacter.mono);
+                    SelectTarget();
+                    interrupted = false;
                 }
                 else
                 {
-                    selection.StartNewTurn(curCMono);
-                    SelectTarget();
+                    bool skip = curCharacter.StartNormalTurn();
+                    if (skip)
+                    {
+                        curStage = TurnStage.Animation;
+                    }
+                    else
+                    {
+                        selection.StartNewTurn(curCharacter.mono);
+                        SelectTarget();
+                    }
                 }
+                curCreature.mono.PlayAudio(AudioType.Change);
+                attackImage.sprite = curCharacter.mono.attackIcon;
+                skillImage.sprite = curCharacter.mono.skillIcon;
             }
         }
-        else if (curCreature is EnemyBase)
+        else if (curCreature is Enemy)
         {
             // 敌人的回合直接进入结算动画阶段，插入的 burst 要等敌人行动完
-
-            bool skip = false; // curCreature.StartNormalTurn();
+            Enemy e = curCreature as Enemy;
+            bool skip = e.StartNormalTurn();
             curStage = TurnStage.Animation;
-            EnemyBase e = curCreature as EnemyBase;
             if(!skip)
                 e.talents.MyTurn();
         }
@@ -308,9 +324,9 @@ public class BattleManager : MonoBehaviour
 
     protected void BurstTurn()
     {
-//        curCharacter.StartBurstTurn();
-        BurstSplash(curCMono);
-        curCMono.PlayAudio(AudioType.BurstPrepare);
+        curCharacter.StartBurstTurn();
+        BurstSplash(curCharacter.mono);
+        curCharacter.mono.PlayAudio(AudioType.BurstPrepare);
         if (curCharacter.isBurstTargetEnemy)
             selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.talents.BurstEnemyAction);
         else
@@ -319,7 +335,7 @@ public class BattleManager : MonoBehaviour
 
     protected void SelectTarget()
     {
-        BattleManager.Instance.skillPoint.StartGainPointAnim(curCharacter.attackGainPointCount);
+        skillPoint.StartGainPointAnim(curCharacter.attackGainPointCount);
         StartCoroutine(ChangeLocalScale(attackRecttrans, Vector3.one * 1.2f, animTime));
         StartCoroutine(ChangeLocalScale(skillRecttrans, Vector3.one, animTime));
         isAttackOrSkill = true;
@@ -333,8 +349,8 @@ public class BattleManager : MonoBehaviour
 
     private void TestAndInsertBurst(int i)
     {
-        CharacterBase c = characters[i];
-        if (c.mono.isBurstActivated || !(c.hp > 0) || !(c.energy < c.maxEnergy))
+        Character c = characters[i];
+        if (c.mono.isBurstActivated || !(c.hp > 0) || c.energy < c.maxEnergy)
             return;
 
         c.mono.ActivateBurst();
@@ -343,9 +359,10 @@ public class BattleManager : MonoBehaviour
         // 只有在目前不是 burst 回合，且仍处于 instruction 阶段时，才能打断别人的行动
         if (!isBurst && curStage == TurnStage.Instruction)
         {
+            interrupted = true;
+            curCharacter.mono.InterruptedByBurst();
             runway.InsertBurst(c, true);
             isBurst = true;
-            curCharacter.mono.InterruptedByBurst();
             curCharacter = c;
             curCreature = c;
             BurstTurn();
@@ -356,16 +373,15 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void RemoveEnemy(EnemyBase e)
+    public void RemoveEnemy(Enemy e)
     {
         enemies.Remove(e);
-        eMonos.Remove(e.mono);
+        runway.RemoveCreature(e);
     }
 
-    public void RemoveCharacter(CharacterBase c)
+    public void RemoveCharacter(Character c)
     {
-        characters.Remove(c);
-        cMonos.Remove(c.mono);
+        runway.RemoveCreature(c);
     }
 
 
@@ -374,7 +390,7 @@ public class BattleManager : MonoBehaviour
     const float BURST_INIT_SPEED = 3f;
     const float BURST_FINAL_SPEED = .1f;
     const float BURST_IMAGE_HALF_DISTANCE = .48f; // 速度变化的长度
-    const float BURST_IMAGE_WIDTH = 1.5f;  // 图片宽度
+    const float BURST_IMAGE_WIDTH = 1f;  // 图片宽度
     const float ACCELERATION = (BURST_INIT_SPEED * BURST_INIT_SPEED - BURST_FINAL_SPEED * BURST_FINAL_SPEED) / (BURST_IMAGE_HALF_DISTANCE * (1 + BURST_IMAGE_WIDTH)) / 2; // 加速度
 
     IEnumerator ChangeLocalScale(RectTransform tran, Vector3 target, float time)
@@ -431,7 +447,7 @@ public class BattleManager : MonoBehaviour
     {
         yield return new WaitForSeconds((float)seconds);
         videoPlayer.enabled = false;
-        selection.ApplyAction();
+        selection.ApplyAction(curCharacter.onBurst);
         curStage = TurnStage.Animation;
     }
 

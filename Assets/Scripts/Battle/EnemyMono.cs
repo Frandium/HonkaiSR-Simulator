@@ -7,7 +7,7 @@ using LitJson;
 
 public class EnemyMono : CreatureMono
 {
-
+    new Enemy self;
     private void Update()
     {
         if (isMyTurn || isSelected)
@@ -20,40 +20,49 @@ public class EnemyMono : CreatureMono
         }
     }
 
-    public override void Initialize(string dbN, int id)
+    public void Initialize(Enemy e)
     {
-        base.Initialize(dbN, id);
-    }
-
-    protected override IEnumerator TakeDamangeAnim(int dmg, Then nextToDo)
-    {
-        isAnimFinished = false;
-        PlayAudio(AudioType.TakeDamage);
-        dmgGO.SetActive(true);
-        dmgText.text =  dmg.ToString();
-        RectTransform rect = dmgGO.GetComponent<RectTransform>();
-        Image dmgBgImg = dmgGO.GetComponent<Image>();
-        dmgBgImg.color = new Color(0, 0, 0, dmgBgBaseAlpha);
-        rect.localPosition = new Vector3(0, 0f, 0);
-        dmgText.color = Color.white;
-        float dmgAlpha = 1;
-        float alphaFadeSpeed = 1 / dmgAnimTime;
-        float dmgBgSpeed = (6 - 0f) / dmgAnimTime;
-        while (rect.localPosition.y < 6)
+        base.Initialize(e);
+        self = e;
+        int i = 1;
+        AudioClip a = Resources.Load<AudioClip>(e.dbname + "/attack" + i);
+        while (a != null)
         {
-            rect.localPosition += Vector3.up * dmgBgSpeed * Time.deltaTime;
-            dmgBgImg.color = new Color(0, 0, 0, dmgBgBaseAlpha * dmgAlpha);
-            dmgText.color = new Color(1, 1, 1, dmgAlpha);
-            dmgAlpha -= alphaFadeSpeed * Time.deltaTime;
-            yield return new WaitForEndOfFrame();
+            attackAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(e.dbname + "/attack" + i);
         }
-        dmgGO.SetActive(false);
-        isAnimFinished = true;
-        nextToDo?.Invoke();
     }
 
-    protected override void OnDying()
+    public override void OnDying()
     {
-        base.OnDying();
+        BattleManager.Instance.RemoveEnemy(self);
+        Destroy(gameObject);
     }
+
+    //protected override IEnumerator TakeDamangeAnim(int dmg)
+    //{
+    //    isAnimFinished = false;
+    //    PlayAudio(AudioType.TakeDamage);
+    //    dmgGO.SetActive(true);
+    //    dmgText.text =  dmg.ToString();
+    //    RectTransform rect = dmgGO.GetComponent<RectTransform>();
+    //    Image dmgBgImg = dmgGO.GetComponent<Image>();
+    //    dmgBgImg.color = new Color(0, 0, 0, dmgBgBaseAlpha);
+    //    rect.localPosition = new Vector3(0, 0f, 0);
+    //    dmgText.color = Color.white;
+    //    float dmgAlpha = 1;
+    //    float alphaFadeSpeed = 1 / dmgAnimTime;
+    //    float dmgBgSpeed = (6 - 0f) / dmgAnimTime;
+    //    while (rect.localPosition.y < 6)
+    //    {
+    //        rect.localPosition += Vector3.up * dmgBgSpeed * Time.deltaTime;
+    //        dmgBgImg.color = new Color(0, 0, 0, dmgBgBaseAlpha * dmgAlpha);
+    //        dmgText.color = new Color(1, 1, 1, dmgAlpha);
+    //        dmgAlpha -= alphaFadeSpeed * Time.deltaTime;
+    //        yield return new WaitForEndOfFrame();
+    //    }
+    //    dmgGO.SetActive(false);
+    //    isAnimFinished = true;
+    //}
 }

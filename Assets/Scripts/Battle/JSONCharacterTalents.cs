@@ -5,12 +5,12 @@ using LitJson;
 
 public class JSONCharacterTalents : ACharacterTalents
 {
-    public JSONCharacterTalents(CharacterBase _self): base(_self)
+    public JSONCharacterTalents(Character _self): base(_self)
     {
 
     }
 
-    public void ResolveJSON(List<Dictionary<string, float>> actions, DamageType dt, List<CreatureBase> creatures)
+    public void ResolveJSON(List<Dictionary<string, float>> actions, DamageType dt, List<Creature> creatures)
     {
         //foreach (Dictionary<string, float> action in actions)
         //{
@@ -60,42 +60,42 @@ public class JSONCharacterTalents : ACharacterTalents
         //}
     }
 
-    public override void AttackCharacterAction(List<CharacterBase> characters)
+    public override void AttackCharacterAction(List<Character> characters)
     {
         //List<CreatureBase> creatures = new List<CreatureBase>(characters);
         //ResolveJSON(self.attackActionSeries, DamageType.Attack, creatures);
         //base.AttackCharacterAction(characters);
     }
 
-    public override void AttackEnemyAction(List<EnemyBase> enemies)
+    public override void AttackEnemyAction(List<Enemy> enemies)
     {
         //List<CreatureBase> creatures = new List<CreatureBase>(enemies);
         //ResolveJSON(self.attackActionSeries, DamageType.Attack, creatures);
         //base.AttackEnemyAction(enemies);
     }
 
-    public override void SkillCharacterAction(List<CharacterBase> characters)
+    public override void SkillCharacterAction(List<Character> characters)
     {
         //List<CreatureBase> creatures = new List<CreatureBase>(characters);
         //ResolveJSON(self.skillActionSeries, DamageType.Skill, creatures);
         //base.SkillCharacterAction(characters);
     }
 
-    public override void SkillEnemyAction(List<EnemyBase> enemies)
+    public override void SkillEnemyAction(List<Enemy> enemies)
     {
         //List<CreatureBase> creatures = new List<CreatureBase>(enemies);
         //ResolveJSON(self.skillActionSeries, DamageType.Skill, creatures);
         //base.SkillEnemyAction(enemies);
     }
 
-    public override void BurstCharacterAction(List<CharacterBase> characters)
+    public override void BurstCharacterAction(List<Character> characters)
     {
         //List<CreatureBase> creatures = new List<CreatureBase>(characters);
         //ResolveJSON(self.BurstActionSeries, DamageType.Burst, creatures);
         //base.BurstCharacterAction(characters);
     }
 
-    public override void BurstEnemyAction(List<EnemyBase> enemies)
+    public override void BurstEnemyAction(List<Enemy> enemies)
     {
         //List<CreatureBase> creatures = new List<CreatureBase>(enemies);
         //ResolveJSON(self.BurstActionSeries, DamageType.Burst, creatures);

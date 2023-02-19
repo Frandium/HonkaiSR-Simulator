@@ -17,6 +17,7 @@ public enum BuffType
 {
     Debuff,
     Buff,
+    Permanent,
     Count
 }
 

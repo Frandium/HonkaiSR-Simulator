@@ -27,7 +27,7 @@ public class Weapon: Equipment
         LoadJson(_dbname, level, refineLevel);
     }
 
-    public override float CalBuffValue(CreatureBase source, CreatureBase target, CommonAttribute a)
+    public override float CalBuffValue(Creature source, Creature target, CommonAttribute a)
     {
         float res = 0;
         if (a == CommonAttribute.ATK)
@@ -68,12 +68,12 @@ public class Weapon: Equipment
         }
     }
 
-    public void OnEquipping(CharacterBase character)
+    public void OnEquipping(Character character)
     {
         talents.OnEquiping(character);
     }
 
-    public void OnTakingOff(CharacterBase character)
+    public void OnTakingOff(Character character)
     {
         talents.OnTakingOff(character);
     }

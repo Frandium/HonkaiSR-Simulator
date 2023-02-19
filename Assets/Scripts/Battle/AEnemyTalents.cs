@@ -4,8 +4,8 @@ using UnityEngine;
 
 public abstract class AEnemyTalents: ACommomBattleTalents
 {
-    protected EnemyBase self;
-    public AEnemyTalents(EnemyBase _self)
+    protected Enemy self;
+    public AEnemyTalents(Enemy _self)
     {
         self = _self;
     }

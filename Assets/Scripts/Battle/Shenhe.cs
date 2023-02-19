@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Shenhe : ACharacterTalents
 {
-    public Shenhe(CharacterBase _self): base(_self)
+    public Shenhe(Character _self): base(_self)
     {
 
     }

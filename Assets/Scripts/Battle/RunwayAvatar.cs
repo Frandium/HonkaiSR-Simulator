@@ -8,13 +8,13 @@ public class RunwayAvatar : MonoBehaviour
     public RectTransform rect;
     public Image avatarImage;
 
-    public CreatureBase creature { get; private set; }
+    public Creature creature { get; private set; }
     public bool IsBurst { get; private set; }
     private bool firstMove = true;
     
     public delegate void AnyAction();
 
-    public void SetCreature(CreatureBase _c, bool isBurst)
+    public void SetCreature(Creature _c, bool isBurst)
     {
         creature = _c;
         IsBurst = isBurst;

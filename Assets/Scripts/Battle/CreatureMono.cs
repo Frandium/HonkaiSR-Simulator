@@ -13,7 +13,7 @@ public class CreatureMono : MonoBehaviour
     }
 
     public int uniqueID { get; protected set; } = -1;
-    protected CreatureBase self;
+    protected Creature self;
 
     // UI Binding
     public Sprite runwayAvatar;
@@ -24,8 +24,8 @@ public class CreatureMono : MonoBehaviour
     public SpriteRenderer selectedSR;
     public Image eleImage;
     public Image buffImage;
-    public AudioClip[] attackAudios;
-    public AudioClip[] takeDamageAudios;
+    protected List<AudioClip> attackAudios = new List<AudioClip>();
+    protected List<AudioClip> takeDamageAudios = new List<AudioClip>();
     public AudioSource audioSource;
 
     // Animation
@@ -56,76 +56,27 @@ public class CreatureMono : MonoBehaviour
     protected float[] attributes;
     public Element elementState { get; protected set; } = Element.Count;
     public ElementBuff elementBuff { get; protected set; } = ElementBuff.Count;
-    List<TriggerBuff> triggerBuffs = new List<TriggerBuff>();
-    List<Buff> valueBuffs = new List<Buff>();
-
-
-    public delegate void Then();
-
-
-
-
 
     //Battle functions
-    public virtual void TakeDamage(CreatureBase source, float value, Element element, DamageType type)
+    public virtual void TakeDamage(float value)
     {
         hpLine.fillAmount = hpPercentage;
-        StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(-value), () =>
-        {
-            if (self.hp < 0)
-            {
-                OnDying();
-            }
-        }));
+        StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(-value)));
     }
 
-    void ElementalReaction(Element e)
-    {
-        // 物理不反应
-        if (e == Element.Physical) return; 
-        // 当前无元素，不反应，但是可以挂上风岩之外的元素
-        if (elementState == Element.Count && e != Element.Anemo && e != Element.Physical)
-        {
-            elementState = e;
-        }
-        else if (elementState == e)
-        {
-            // 同样的元素，不反应
-        }
-        else // 发生反应，清空元素附着
-        {
-            if ((elementState == Element.Anemo && e == Element.Cryo) ||
-                 (elementState == Element.Cryo && e == Element.Anemo))
-            { // 冻结
-                elementBuff = ElementBuff.Frozen;
-                cardSR.color = Color.blue;
-            }
-            else if (e == Element.Anemo)
-            {
-                // 扩散？
-            }
-            elementState = Element.Count;
-        }
-        eleImage.sprite = BattleManager.Instance.elementSymbols[(int)elementState];
-    }
-
-    public virtual void TakeHeal(float value, CreatureMono source, Then then = null)
+    public virtual void TakeHeal(float value)
     {
         hpLine.fillAmount = hpPercentage;
-        StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(value), then));
+        StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(value)));
     }
 
-    public virtual void TakeElementOnly(CreatureMono source, Element element)
+
+    public virtual void OnDying()
     {
-        ElementalReaction(element);
+
     }
 
-    protected virtual void OnDying()
-    {
-        gameObject.SetActive(false);
-    }
-
-    protected virtual IEnumerator TakeDamangeAnim(int dmg, Then then = null)
+    protected virtual IEnumerator TakeDamangeAnim(int dmg)
     {
         isAnimFinished = false;
         if (dmg < 0)
@@ -149,15 +100,17 @@ public class CreatureMono : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         dmgGO.SetActive(false);
+        if(self.hp <= 0)
+        {
+            OnDying();
+        }
         isAnimFinished = true;
-        then?.Invoke();
     }
 
-    public virtual bool StartMyTurn()
+    public virtual void StartMyTurn()
     {
         isMyTurn = true;
         alpha = 1;
-        return true;
     }
 
     public virtual void EndMyTurn()
@@ -165,13 +118,22 @@ public class CreatureMono : MonoBehaviour
         isMyTurn = false;
         alpha = 0;
         selectedSR.color = new Color(0, 0, 0, 0);
-        UpdateBuffIcon();
     }
 
-    public virtual void Initialize(string dbN, int id)
+    public virtual void Initialize(Creature c)
     {
-        uniqueID = id;
-        hpLine.fillAmount = hpPercentage;
+        self = c;
+        selectedSR.sprite = Resources.Load<Sprite>(c.dbname + "/card_selected");
+        cardSR.sprite = Resources.Load<Sprite>(c.dbname + "/card");
+        runwayAvatar = Resources.Load<Sprite>(c.dbname + "/runway_avatar");
+        int i = 1;
+        AudioClip a = Resources.Load<AudioClip>(c.dbname + "/takedmg" + i);
+        while (a != null)
+        {
+            takeDamageAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(c.dbname + "/takedmg" + i);
+        }
     }
 
 
@@ -190,7 +152,7 @@ public class CreatureMono : MonoBehaviour
         selectedSR.color = Color.red;
     }
 
-    void UpdateBuffIcon()
+    void UpdateBuffIcon(List<Buff> valueBuffs)
     {
         if (valueBuffs.Count == 0)
         {
@@ -210,7 +172,7 @@ public class CreatureMono : MonoBehaviour
 
     public virtual void PlayAudio(AudioType audioType)
     {
-        AudioClip[] audios = attackAudios;
+        List<AudioClip> audios = attackAudios;
         switch (audioType)
         {
             case AudioType.Attack:
@@ -222,9 +184,9 @@ public class CreatureMono : MonoBehaviour
             default:
                 break;
         }
-        if (audios.Length <= 0)
+        if (audios.Count <= 0)
             return;
-        AudioClip clip = audios[Random.Range(0, audios.Length)];
+        AudioClip clip = audios[Random.Range(0, audios.Count)];
         audioSource.clip = clip;
         audioSource.Play();
         StartCoroutine(SetAudioFinish(clip.length));

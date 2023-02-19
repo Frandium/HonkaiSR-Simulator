@@ -11,7 +11,7 @@ public abstract class AEquipmentTalents
         config = c;
     }
 
-    public abstract void OnEquiping(CharacterBase character);
+    public abstract void OnEquiping(Character character);
 
-    public abstract void OnTakingOff(CharacterBase character);
+    public abstract void OnTakingOff(Character character);
 }

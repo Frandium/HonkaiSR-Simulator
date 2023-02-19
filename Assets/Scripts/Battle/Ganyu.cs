@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Ganyu : ACharacterTalents
 {
-    public Ganyu(CharacterBase _self) : base(_self)
+    public Ganyu(Character _self) : base(_self)
     {
 
     }

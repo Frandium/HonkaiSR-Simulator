@@ -251,8 +251,8 @@ GameObject:
   m_Component:
   - component: {fileID: 4129915578433855377}
   - component: {fileID: 4129915578433855378}
-  - component: {fileID: 4129915578433855376}
   - component: {fileID: 4129915578433855471}
+  - component: {fileID: 3794810861593996506}
   m_Layer: 0
   m_Name: cha1
   m_TagString: Untagged
@@ -329,53 +329,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4129915578433855376
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4129915578433855379}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a1a378947fc3cb3418ebd0871bf85f13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  runwayAvatar: {fileID: 21300000, guid: 85631dc86083f7f4f8aee0be2c1864de, type: 3}
-  hpLine: {fileID: 0}
-  dmgText: {fileID: 4129915577783150851}
-  dmgGO: {fileID: 4129915578208974548}
-  selected: {fileID: 4129915577640034049}
-  eleImage: {fileID: 0}
-  buffImage: {fileID: 0}
-  attackAudios:
-  - {fileID: 8300000, guid: 75b9ceaa5e131bf478accd04ac34b38e, type: 3}
-  - {fileID: 8300000, guid: 4ee07761d9aaef54299d853c05483662, type: 3}
-  takeDamageAudios:
-  - {fileID: 8300000, guid: 42e34cbc23fdf0c4787266c7d4281c63, type: 3}
-  - {fileID: 8300000, guid: 021179c5318ad414a8da72b6bafe1011, type: 3}
-  audioSource: {fileID: 4129915578433855471}
-  attackIcon: {fileID: 21300000, guid: 13b6fdf310aad9f43852627a4941a048, type: 3}
-  skillIcon: {fileID: 21300000, guid: 5c2628c7790fae946889bff0afd2aaa2, type: 3}
-  burstIcon: {fileID: 21300000, guid: 31fc211a000946d4ca75d4487b6188c6, type: 3}
-  selectedCard: {fileID: 21300000, guid: ceb39893a87254848a63941392c3aa9a, type: 3}
-  burstSplash: {fileID: 21300000, guid: eb0bd0a41880fde4ca18a6eef863775d, type: 3}
-  selectedCardSR: {fileID: 4129915577640034049}
-  cardSR: {fileID: 4129915578433855378}
-  burstImage: {fileID: 0}
-  burstFillingImage: {fileID: 0}
-  skillAudios:
-  - {fileID: 8300000, guid: 75b9ceaa5e131bf478accd04ac34b38e, type: 3}
-  - {fileID: 8300000, guid: 4ee07761d9aaef54299d853c05483662, type: 3}
-  burstAudios:
-  - {fileID: 8300000, guid: 9c6c90c46f8db06478e1195a3b922a28, type: 3}
-  - {fileID: 8300000, guid: 3241fb22ff848cc49b1d3b6168036cfe, type: 3}
-  changeAudios:
-  - {fileID: 8300000, guid: 8721ae603fed110419242a241a96d91c, type: 3}
-  - {fileID: 8300000, guid: d1480d6cfd4bcb645b97b7a6004b1b65, type: 3}
-  burstPrepareAudios:
-  - {fileID: 8300000, guid: bed128180d6aa4c4aaf034b3aff95859, type: 3}
-  burstVideo: {fileID: 32900000, guid: 6e371c04cf4cb92418935b585b9d07f9, type: 3}
 --- !u!82 &4129915578433855471
 AudioSource:
   m_ObjectHideFlags: 0
@@ -472,6 +425,50 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &3794810861593996506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4129915578433855379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6b5889583c0cb1e42bb137428ebadaed, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  runwayAvatar: {fileID: 21300000, guid: fcbf09d1f642449479ddea4ccaf35286, type: 3}
+  hpLine: {fileID: 0}
+  dmgText: {fileID: 4129915577783150851}
+  dmgGO: {fileID: 4129915578208974548}
+  cardSR: {fileID: 4129915578433855378}
+  selectedSR: {fileID: 4129915577640034049}
+  eleImage: {fileID: 0}
+  buffImage: {fileID: 0}
+  attackAudios:
+  - {fileID: 8300000, guid: 80f32c552544dbd4c94491546a8ebf4f, type: 3}
+  - {fileID: 8300000, guid: 71e5c51bbf4f9204ba7dda0ab1fbe9ab, type: 3}
+  takeDamageAudios:
+  - {fileID: 8300000, guid: fc3a30fca11a0fe4ab6820bb27380760, type: 3}
+  audioSource: {fileID: 4129915578433855471}
+  attackIcon: {fileID: 0}
+  skillIcon: {fileID: 0}
+  burstIcon: {fileID: 0}
+  selectedCard: {fileID: 0}
+  burstSplash: {fileID: 0}
+  burstImage: {fileID: 0}
+  burstFillingImage: {fileID: 0}
+  skillAudios:
+  - {fileID: 8300000, guid: 80f32c552544dbd4c94491546a8ebf4f, type: 3}
+  - {fileID: 8300000, guid: 71e5c51bbf4f9204ba7dda0ab1fbe9ab, type: 3}
+  burstAudios:
+  - {fileID: 8300000, guid: 8616ca18fbfa1a74a945e0d4a7b763ff, type: 3}
+  - {fileID: 8300000, guid: ee27977cb944f5b48b18d5e41257541f, type: 3}
+  changeAudios:
+  - {fileID: 8300000, guid: 77b65801877d49444bdd3e57c60058b5, type: 3}
+  burstPrepareAudios:
+  - {fileID: 8300000, guid: 77b65801877d49444bdd3e57c60058b5, type: 3}
+  burstVideo: {fileID: 0}
 --- !u!1 &4129915578844280324
 GameObject:
   m_ObjectHideFlags: 0
