@@ -117,12 +117,6 @@ public class CharacterMono : CreatureMono
         base.Initialize(c);
     }
 
-    public override void TakeDamage(float value)
-    {
-        PlayAudio(AudioType.TakeDamage);
-        base.TakeDamage(value);
-    }
-
     public void UpdateEnergyIcon()
     {
         burstFillingImage.fillAmount = self.energy / self.maxEnergy;

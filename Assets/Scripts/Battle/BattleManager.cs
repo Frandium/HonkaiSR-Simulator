@@ -48,6 +48,7 @@ public class BattleManager : MonoBehaviour
     float minTurnTime = 3; // 每个回合最少 3 秒，防止操作输入太快出 bug
     private bool isBurst = false;
     public List<Character> characters { get; protected set; } = new List<Character>();
+    public List<Character> deadCharacters { get; protected set; } = new List<Character>();
     public List<CharacterMono> cMonos = new List<CharacterMono>();
     public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
@@ -255,7 +256,7 @@ public class BattleManager : MonoBehaviour
         }
 
         // 对上一回合进行收尾，= null 时是第一回合，跳过这个阶段
-        if (curCharacter != null)
+        if (curCreature != null)
         {
             // 刚结束的回合是元素爆发回合
             if (isBurst && curCreature is Character)
@@ -381,6 +382,8 @@ public class BattleManager : MonoBehaviour
     public void RemoveCharacter(Character c)
     {
         runway.RemoveCreature(c);
+        characters.Remove(c);
+        deadCharacters.Add(c);
     }
 
 

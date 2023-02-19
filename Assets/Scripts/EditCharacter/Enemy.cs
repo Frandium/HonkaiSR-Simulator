@@ -37,10 +37,10 @@ public class Enemy : Creature
         attrs[(int)CommonAttribute.Speed] = (float)(double)data["speed"];
         attrs[(int)CommonAttribute.MaxHP] = (float)(double)data["maxHp"];
 
-        for (int i = 0; i < (int)Element.Count; ++i)
-        {
-            attrs[(int)CommonAttribute.PhysicalResist + i] = (float)(double)data["elementalResist"][i];
-        }
+        //for (int i = 0; i < (int)Element.Count; ++i)
+        //{
+        //    attrs[(int)CommonAttribute.PhysicalResist + i] = (float)(double)data["elementalResist"][i];
+        //}
 
         switch (dbname)
         {

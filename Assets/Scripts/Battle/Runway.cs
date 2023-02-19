@@ -118,13 +118,11 @@ public class Runway : MonoBehaviour
 
     public void RemoveCreature(Creature creature)
     {
+        Debug.Log("123");
         creatures.Remove(creature);
-        RunwayAvatar ra = runwayAvatars.Find(r =>
-        {
-            return r.creature == creature;
-        });
-        Destroy(ra.gameObject);
-        runwayAvatars.Remove(ra);
+        runwayAvatars.Remove(creature2RunwayAvatar[creature]);
+        Destroy(creature2RunwayAvatar[creature].gameObject);
+        creature2RunwayAvatar.Remove(creature);
     }
 
     public void InsertBurst(Creature c, bool immediately = false)

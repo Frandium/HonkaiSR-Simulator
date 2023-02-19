@@ -157,7 +157,7 @@ public class Character: Creature
                 break;
         }
         talents.OnEquipping();
-        hp = attrs[(int)CommonAttribute.MaxHP];
+        hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
 
     public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr)
