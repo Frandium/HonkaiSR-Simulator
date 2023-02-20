@@ -63,16 +63,20 @@ public class CreatureMono : MonoBehaviour
     public ElementBuff elementBuff { get; protected set; } = ElementBuff.Count;
 
     //Battle functions
-    public virtual void TakeDamage(float value)
+    public virtual void TakeDamage(float value, Element e)
     {
         hpLine.fillAmount = hpPercentage;
-        StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(-value)));
+        int dmg = -Mathf.RoundToInt(value);
+        string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
+        StartCoroutine(TakeDamangeAnim(content, ElementColors[(int)e]));
     }
 
     public virtual void TakeHeal(float value)
     {
         hpLine.fillAmount = hpPercentage;
-        StartCoroutine(TakeDamangeAnim(Mathf.RoundToInt(value)));
+        int dmg = Mathf.RoundToInt(value);
+        string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
+        StartCoroutine(TakeDamangeAnim(content, Color.white));
     }
 
 
@@ -81,21 +85,21 @@ public class CreatureMono : MonoBehaviour
 
     }
 
-    protected virtual IEnumerator TakeDamangeAnim(int dmg)
+    protected virtual IEnumerator TakeDamangeAnim(string content, Color c)
     {
         isAnimFinished = false;
-        if (dmg < 0)
-            PlayAudio(AudioType.TakeDamage);
+        //if (dmg < 0)
+        //    PlayAudio(AudioType.TakeDamage);
         GameObject go = Instantiate(dmgGO);
         go.SetActive(true);
         go.transform.SetParent(canvas, false);
         Text t = go.GetComponentInChildren<Text>();
-        t.text = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
+        t.text = content;
         RectTransform rect = go.GetComponent<RectTransform>();
         Image dmgBgImg = go.GetComponent<Image>();
         dmgBgImg.color = new Color(1, 1, 1, dmgBgBaseAlpha);
         rect.localPosition = new Vector3(0, 0, 0);
-        t.color = Color.white;
+        t.color = c;
         float dmgAlpha = 1;
         float alphaFadeSpeed = 1 / dmgAnimTime;
         float dmgBgSpeed = (6 - 2.5f) / dmgAnimTime;
@@ -103,7 +107,8 @@ public class CreatureMono : MonoBehaviour
         {
             rect.localPosition += Vector3.up * dmgBgSpeed * Time.deltaTime;
             dmgBgImg.color = new Color(1, 1, 1, dmgBgBaseAlpha * dmgAlpha);
-            t.color = new Color(0, 0, 0, dmgAlpha);
+            c.a = dmgAlpha;
+            t.color = c;
             dmgAlpha -= alphaFadeSpeed * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }

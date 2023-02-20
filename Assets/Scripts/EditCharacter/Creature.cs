@@ -91,7 +91,7 @@ public class Creature
             e(source, value, element, type);
         }
         hp -= value;
-        mono?.TakeDamage(value);
+        mono?.TakeDamage(value, element);
     }
 
     public virtual void TakeHeal(Creature source, float value)
@@ -109,7 +109,7 @@ public class Creature
         {
             e(source, value);
         }
-        mono?.TakeDamage(value);
+        mono?.TakeHeal(value);
     }
 
     public virtual void DealHeal(Creature target, float value)

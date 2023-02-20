@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.43774465, g: 0.4856404, b: 0.56591517, a: 1}
+  m_IndirectSpecularColor: {r: 0.437745, g: 0.48564065, b: 0.5659156, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -3178,15 +3178,13 @@ MonoBehaviour:
   attackRecttrans: {fileID: 1827545898}
   skillRecttrans: {fileID: 1657684510}
   elementSymbols:
-  - {fileID: 21300000, guid: c86c865ab04f1264e96d96fb700f6ed0, type: 3}
-  - {fileID: 21300000, guid: 7fb0436a5db012041aee96d8349ac5da, type: 3}
-  - {fileID: 21300000, guid: f4d1c3cca199a4549a4cf2df7a566c4c, type: 3}
+  - {fileID: 21300000, guid: 57eae8f62bb29b84f91aadc0cf413ed1, type: 3}
   - {fileID: 21300000, guid: 39faae82ed7027d4fbb5fd7d20b52d5c, type: 3}
   - {fileID: 21300000, guid: 8f80cabd310772b43b4c78c57fc24e23, type: 3}
   - {fileID: 21300000, guid: b01e744fc4d16234fa982821b3e0df71, type: 3}
-  - {fileID: 21300000, guid: 79201e55058ccf442a81b403c6095f5d, type: 3}
-  - {fileID: 21300000, guid: ae89f01a1432b2649a4ff3dad8ed48dd, type: 3}
-  - {fileID: 21300000, guid: ae89f01a1432b2649a4ff3dad8ed48dd, type: 3}
+  - {fileID: 21300000, guid: c86c865ab04f1264e96d96fb700f6ed0, type: 3}
+  - {fileID: 21300000, guid: 5ee0eb60f9db21644a5b2d6011532c84, type: 3}
+  - {fileID: 21300000, guid: 34b72ff3fc9a1ba40845e2425d515a46, type: 3}
   buffSprite: {fileID: 21300000, guid: e23721a87c0e17c468574f52e2ba8d04, type: 3}
   debuffSprite: {fileID: 21300000, guid: 3ff514f3389ded64cbedfee53eae12c3, type: 3}
   nullBuffSprite: {fileID: 21300000, guid: ae89f01a1432b2649a4ff3dad8ed48dd, type: 3}

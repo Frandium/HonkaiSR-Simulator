@@ -1,6 +1,6 @@
 {
     "dbname": "bronya",
-    "disname": "布洛妮娅",
+    "disname": "申鹤",
     "element": 4,
     "career": 3,
     "maxEnergy": 60.0,
@@ -56,8 +56,7 @@
         "level": 44,
         "refine": 1
     },
-    "artifacts": [
-        {
+    "artifacts": [{
             "suitName": "default",
             "position": 0,
             "main": {
@@ -65,8 +64,7 @@
                 "value": 5.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 5.0,
                     "type": 0
@@ -96,8 +94,7 @@
                 "value": 5.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 5.0,
                     "type": 0
@@ -127,8 +124,7 @@
                 "value": 5.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 5.0,
                     "type": 0
@@ -158,8 +154,7 @@
                 "value": 5.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 5.0,
                     "type": 0
@@ -189,8 +184,7 @@
                 "value": 5.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 5.0,
                     "type": 0
@@ -220,8 +214,7 @@
                 "value": 5.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 5.0,
                     "type": 0
@@ -260,7 +253,7 @@
         "name": "先人一步",
         "description": "释放普攻后，布洛妮娅的下一次行动提前15%"
     },
-    "mystery":{
+    "mystery": {
         "name": "在旗帜下",
         "description": "使用秘技后，下一次战斗开始时我方全体攻击力提高15%，持续2回合。"
     }

@@ -75,6 +75,7 @@ public class CharacterMono : CreatureMono
         attackIcon = Resources.Load<Sprite>(c.dbname + "/attack");
         skillIcon = Resources.Load<Sprite>(c.dbname + "/skill");
         burstIcon = Resources.Load<Sprite>(c.dbname + "/burst");
+        burstImage.sprite = burstIcon;
         burstSplash = Resources.Load<Sprite>(c.dbname + "/splash");
         face.sprite = Resources.Load<Sprite>(c.dbname + "/face");
         burstVideo = Resources.Load<VideoClip>(c.dbname + "/burst_video");

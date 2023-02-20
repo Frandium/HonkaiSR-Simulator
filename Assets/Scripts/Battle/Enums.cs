@@ -5,9 +5,9 @@ using UnityEngine;
 public enum Element
 {
     Physical, // 物理 = 0
-    Pyro,     //火 = 1
+    Pyro,     // 火 = 1
     Cryo,     // 冰 = 2
-    Electro,  //雷 = 3
+    Electro,  // 雷 = 3
     Anemo,    // 风 = 4
     Quantus,  // 量子 = 5
     Imaginary,// 虚数 = 6

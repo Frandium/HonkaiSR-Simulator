@@ -48,7 +48,6 @@ public class EnemyMono : CreatureMono
             rect.sizeDelta = new Vector2(elementSize, elementSize);
             rect.anchoredPosition = new Vector3(left + elementSize * 1.2f * i, - elementSize / 2.0f, 0);
             go.AddComponent<Image>().sprite = BattleManager.Instance.elementSymbols[(int)self.weakPoint[i]];
-            Debug.Log("sadas");
         }
         weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
     }
@@ -59,10 +58,10 @@ public class EnemyMono : CreatureMono
         Destroy(gameObject);
     }
 
-    public override void TakeDamage(float value)
+    public override void TakeDamage(float value, Element e)
     {
         weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
-        base.TakeDamage(value);
+        base.TakeDamage(value, e);
     }
 
     //protected override IEnumerator TakeDamangeAnim(int dmg)

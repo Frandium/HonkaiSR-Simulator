@@ -96,6 +96,14 @@ public class BattleManager : MonoBehaviour
     bool interrupted = false;
     string mystery = "";
 
+    int curShowingDetail = -1; 
+    Dictionary<KeyCode, int> detailKey2Character = new Dictionary<KeyCode, int>() {
+        {KeyCode.Z, 0 },
+        {KeyCode.X, 1 },
+        {KeyCode.C, 2 },
+        {KeyCode.V, 3 }
+    };
+
     // Start is called before the first frame update
     void Start()
     {
@@ -192,20 +200,20 @@ public class BattleManager : MonoBehaviour
             } 
         }
 
-        if (Input.GetKeyDown(KeyCode.Z))
+
+        foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
         {
-            ShowCharacterDetail(0);
-        }else if (Input.GetKey(KeyCode.X))
-        {
-            ShowCharacterDetail(1);
-        }
-        else if (Input.GetKey(KeyCode.C))
-        {
-            ShowCharacterDetail(2);
-        }
-        else if (Input.GetKey(KeyCode.V))
-        {
-            ShowCharacterDetail(3);
+            if (Input.GetKeyDown(p.Key)) {
+                chaDetailActivated = false;
+                ShowCharacterDetail(p.Value);
+                curShowingDetail = p.Value;
+            }
+            if (Input.GetKeyUp(p.Key) && curShowingDetail == p.Value)
+            {
+                characterDetail.SetActive(false);
+                chaDetailActivated = false;
+                curShowingDetail = -1;
+            }
         }
     }
 
