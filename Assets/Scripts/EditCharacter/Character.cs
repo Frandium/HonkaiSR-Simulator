@@ -18,6 +18,10 @@ public class Character: Creature
 
     protected int breakLevel = 4;
     public int constellation { get; protected set; } = 0; // 命之座
+    public int atkLevel { get; protected set; } = 1; 
+    public int skillLevel { get; protected set; } = 1; 
+    public int burstLevel { get; protected set; } = 1; 
+
     public Element element { get; protected set; } = Element.Count;
     public float energy { get; protected set; } = 0;
     public float maxEnergy { get; protected set; } = 60;
@@ -71,6 +75,10 @@ public class Character: Creature
         element = (Element)(int)data["element"];
         breakLevel = (int)data["breakLevel"];
         maxEnergy = (float)(double)data["maxEnergy"];
+        constellation = (int)data["constellation"];
+        atkLevel = (int)data["atkLevel"];
+        skillLevel = (int)data["skillLevel"];
+        burstLevel = (int)data["burstLevel"];
         for(int i = 0; i < (int)CommonAttribute.Speed; ++i)
         {
             // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
@@ -147,6 +155,7 @@ public class Character: Creature
             artifacts[(int)pos] = new Artifact(b, new List<SimpleValueBuff>());
         }
 
+        // 之后改成反射 dict?
         switch (dbname)
         {
             case "bronya":

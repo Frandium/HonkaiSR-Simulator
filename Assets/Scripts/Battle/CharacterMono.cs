@@ -72,7 +72,6 @@ public class CharacterMono : CreatureMono
     {
         base.Initialize(c);
         self = c;
-        Debug.Log(c.dbname + "/splash");
         attackIcon = Resources.Load<Sprite>(c.dbname + "/attack");
         skillIcon = Resources.Load<Sprite>(c.dbname + "/skill");
         burstIcon = Resources.Load<Sprite>(c.dbname + "/burst");

@@ -3,5 +3,6 @@
     "enemies": [
         ["hilichurl", "hilichurl", "hilichurl", "hilichurl"],
         ["hilichurl", "hilichurl", "hilichurl"]
-    ]
+    ],
+    "mystery": "bronya"
 }

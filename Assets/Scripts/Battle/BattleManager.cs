@@ -47,12 +47,15 @@ public class BattleManager : MonoBehaviour
     float turnTime = 0;
     float minTurnTime = 3; // 每个回合最少 3 秒，防止操作输入太快出 bug
     private bool isBurst = false;
+    bool chaDetailActivated = false;
     public List<Character> characters { get; protected set; } = new List<Character>();
     public List<Character> deadCharacters { get; protected set; } = new List<Character>();
     public List<CharacterMono> cMonos = new List<CharacterMono>();
     public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
     public GameObject enemyPrefab;
+    public GameObject screenCanvas;
+    public GameObject characterDetail;
 
     // battle configuration
     List<string> chaNames;
@@ -91,6 +94,7 @@ public class BattleManager : MonoBehaviour
     Vector3 enmOriginal = new Vector3(147.2f, 8.1f, 99); // 第 0 个敌人的位置
     Vector3 enmInternal = new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
     bool interrupted = false;
+    string mystery = "";
 
     // Start is called before the first frame update
     void Start()
@@ -187,6 +191,22 @@ public class BattleManager : MonoBehaviour
                 TestAndInsertBurst(i);
             } 
         }
+
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            ShowCharacterDetail(0);
+        }else if (Input.GetKey(KeyCode.X))
+        {
+            ShowCharacterDetail(1);
+        }
+        else if (Input.GetKey(KeyCode.C))
+        {
+            ShowCharacterDetail(2);
+        }
+        else if (Input.GetKey(KeyCode.V))
+        {
+            ShowCharacterDetail(3);
+        }
     }
 
     // Game process
@@ -219,6 +239,7 @@ public class BattleManager : MonoBehaviour
             c.SetMono(cMonos[i]);
             runway.AddCreature(c);
         }
+        mystery = (string)data["mystery"];
     }
 
     public void NextTurn()
@@ -269,6 +290,12 @@ public class BattleManager : MonoBehaviour
                 curCreature.ChangePercentageLocation(-100);
                 curCreature.EndNormalTurn();
             }
+        }
+        else
+        {
+            // 第一回合发动秘技
+            Character c = characters.Find(x => x.dbname == mystery);
+            c.talents.Mystery(characters, enemies);
         }
 
         // 开启新回合
@@ -373,6 +400,26 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void ShowCharacterDetail(int x)
+    {
+        if (chaDetailActivated)
+            return;
+        Character c = characters[x];
+        chaDetailActivated = true;
+        characterDetail.SetActive(true);
+        Text t = characterDetail.GetComponentInChildren<Text>();
+        string show = "角色名：" + c.disname + "\n生命值：" + c.hp + "\n位置：" + (c.location / Runway.Length * 100) + "%";
+
+        for(int i = 0; i < (int)CommonAttribute.Count; ++i)
+        {
+            float b = c.GetBaseAttr((CommonAttribute)i);
+            float f = c.GetFinalAttr((CommonAttribute)i);
+            show += "\n" + Utils.attributeNames[i] + "：" +
+                 b + " + <color=green>" + (f-b) + "</color> = " + f;
+        }
+        t.text = show;
+    }
+
     public void RemoveEnemy(Enemy e)
     {
         enemies.Remove(e);
@@ -447,10 +494,12 @@ public class BattleManager : MonoBehaviour
 
     IEnumerator CloseVideoAfterPlay(double seconds)
     {
+        screenCanvas.SetActive(false);
         yield return new WaitForSeconds((float)seconds);
         videoPlayer.enabled = false;
         selection.ApplyAction(curCharacter.onBurst);
         curStage = TurnStage.Animation;
+        screenCanvas.SetActive(true);
     }
 
     IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)

@@ -5,11 +5,18 @@ using UnityEngine.UI;
 
 public class CreatureMono : MonoBehaviour
 {
-    public readonly static Color[] ElementColors = { new Color(.25f, .875f, .625f, 1), new Color(.875f, .75f, 0, 1), new Color(0, .25f, 1, 1), new Color(1, 0, 0, 1), new Color(0, .875f, .875f, 1), new Color(.5f, 0, 1, 1), new Color(0, .625f, .625f, 0), new Color(.375f, .375f, .375f, 1) };
+    public readonly static Color[] ElementColors = { 
+        new Color(.875f, .875f, .875f, 1), // 物理
+        new Color(1, .25f, 0, 1),     // 火
+        new Color(0, .75f, 1, 1),     // 冰
+        new Color(.375f, 0, 1, 1),    // 雷
+        new Color(0, .625f, .25f, 1), // 风
+        new Color(1, .75f, .25f, 1),  // 量子
+        new Color(0, .125f, .75f, 0), // 虚数
+        new Color(0, 0, 0, 1) };      // 黑色，缺省
 
     public CreatureMono()
     {
-        attributes = new float[(int)CommonAttribute.Count];
     }
 
     public int uniqueID { get; protected set; } = -1;
@@ -18,12 +25,11 @@ public class CreatureMono : MonoBehaviour
     // UI Binding
     public Sprite runwayAvatar;
     public Image hpLine;
-    public Text dmgText;
     public GameObject dmgGO;
     public SpriteRenderer cardSR;
     public SpriteRenderer selectedSR;
-    public Image eleImage;
     public Image buffImage;
+    public Transform canvas;
     protected List<AudioClip> attackAudios = new List<AudioClip>();
     protected List<AudioClip> takeDamageAudios = new List<AudioClip>();
     public AudioSource audioSource;
@@ -53,7 +59,6 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
-    protected float[] attributes;
     public Element elementState { get; protected set; } = Element.Count;
     public ElementBuff elementBuff { get; protected set; } = ElementBuff.Count;
 
@@ -81,13 +86,16 @@ public class CreatureMono : MonoBehaviour
         isAnimFinished = false;
         if (dmg < 0)
             PlayAudio(AudioType.TakeDamage);
-        dmgGO.SetActive(true);
-        dmgText.text = dmg>0 ? "+" + dmg.ToString() :  dmg.ToString();
-        RectTransform rect = dmgGO.GetComponent<RectTransform>();
-        Image dmgBgImg = dmgGO.GetComponent<Image>();
+        GameObject go = Instantiate(dmgGO);
+        go.SetActive(true);
+        go.transform.SetParent(canvas, false);
+        Text t = go.GetComponentInChildren<Text>();
+        t.text = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
+        RectTransform rect = go.GetComponent<RectTransform>();
+        Image dmgBgImg = go.GetComponent<Image>();
         dmgBgImg.color = new Color(1, 1, 1, dmgBgBaseAlpha);
         rect.localPosition = new Vector3(0, 0, 0);
-        dmgText.color = Color.white;
+        t.color = Color.white;
         float dmgAlpha = 1;
         float alphaFadeSpeed = 1 / dmgAnimTime;
         float dmgBgSpeed = (6 - 2.5f) / dmgAnimTime;
@@ -95,11 +103,11 @@ public class CreatureMono : MonoBehaviour
         {
             rect.localPosition += Vector3.up * dmgBgSpeed * Time.deltaTime;
             dmgBgImg.color = new Color(1, 1, 1, dmgBgBaseAlpha * dmgAlpha);
-            dmgText.color = new Color(0, 0, 0, dmgAlpha);
+            t.color = new Color(0, 0, 0, dmgAlpha);
             dmgAlpha -= alphaFadeSpeed * Time.deltaTime;
             yield return new WaitForEndOfFrame();
         }
-        dmgGO.SetActive(false);
+        Destroy(go);
         if(self.hp <= 0)
         {
             OnDying();

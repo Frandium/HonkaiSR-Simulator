@@ -8,6 +8,9 @@ using LitJson;
 public class EnemyMono : CreatureMono
 {
     new Enemy self;
+
+    public Image weakFilling;
+    public List<Image> weakpointImage;
     private void Update()
     {
         if (isMyTurn || isSelected)
@@ -20,6 +23,7 @@ public class EnemyMono : CreatureMono
         }
     }
 
+    readonly float elementSize = .6f;
     public void Initialize(Enemy e)
     {
         base.Initialize(e);
@@ -32,12 +36,33 @@ public class EnemyMono : CreatureMono
             i++;
             a = Resources.Load<AudioClip>(e.dbname + "/attack" + i);
         }
+        int weakCount = self.weakPoint.Count;
+        float left = - elementSize * .6f * (weakCount - 1);
+        for (i = 0; i < weakCount; ++i)
+        {
+            GameObject go = new GameObject("weakpoint" + i);
+            RectTransform rect = go.AddComponent<RectTransform>();
+            go.transform.SetParent(canvas, false);
+            rect.anchorMin = new Vector2(.5f, 1);
+            rect.anchorMax = new Vector2(.5f, 1);
+            rect.sizeDelta = new Vector2(elementSize, elementSize);
+            rect.anchoredPosition = new Vector3(left + elementSize * 1.2f * i, - elementSize / 2.0f, 0);
+            go.AddComponent<Image>().sprite = BattleManager.Instance.elementSymbols[(int)self.weakPoint[i]];
+            Debug.Log("sadas");
+        }
+        weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
     }
 
     public override void OnDying()
     {
         BattleManager.Instance.RemoveEnemy(self);
         Destroy(gameObject);
+    }
+
+    public override void TakeDamage(float value)
+    {
+        weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
+        base.TakeDamage(value);
     }
 
     //protected override IEnumerator TakeDamangeAnim(int dmg)

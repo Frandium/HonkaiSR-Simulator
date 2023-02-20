@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class Runway : MonoBehaviour
 {
 
-    public static readonly float Length = 1000;
+    public static readonly float Length = 10000;
 
     private Queue<Creature> burstWaitingQueue;
     private List<RunwayAvatar> burstAvatars;

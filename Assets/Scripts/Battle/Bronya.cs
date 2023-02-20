@@ -27,8 +27,8 @@ public class Bronya : ACharacterTalents
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Anemo, 50);
-        self.DealDamage(enemies[0], Element.Anemo, DamageType.Attack, dmg);
+        float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Pyro, 50);
+        self.DealDamage(enemies[0], Element.Pyro, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -90,7 +90,7 @@ public class Bronya : ACharacterTalents
     {
         foreach(Character c in characters)
         {
-            c.buffs.Add("bronyaMystery", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.ATK, 2, (s, t) =>
+            c.buffs.Add("bronyaMystery", Utils.valueBuffPool.GetOne().Set(BuffType.Permanent, CommonAttribute.ATK, 2, (s, t) =>
             {
                 return s.GetBaseAttr(CommonAttribute.ATK) * 0.15f;
             }));

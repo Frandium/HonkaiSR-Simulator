@@ -8,6 +8,9 @@ public class Enemy : Creature
 {
     public AEnemyTalents talents;
     public new EnemyMono mono { get; protected set; }
+    public List<Element> weakPoint { get; protected set; } = new List<Element>();
+    public float weakMaxHp { get; protected set; } = 100;
+    public float weakHp { get; protected set; } = 100;
 
     public void SetMono(EnemyMono m)
     {
@@ -37,10 +40,13 @@ public class Enemy : Creature
         attrs[(int)CommonAttribute.Speed] = (float)(double)data["speed"];
         attrs[(int)CommonAttribute.MaxHP] = (float)(double)data["maxHp"];
 
-        //for (int i = 0; i < (int)Element.Count; ++i)
-        //{
-        //    attrs[(int)CommonAttribute.PhysicalResist + i] = (float)(double)data["elementalResist"][i];
-        //}
+        foreach (JsonData d in data["weakPoint"])
+        {
+            weakPoint.Add((Element)(int)d);
+        }
+
+        weakMaxHp = (float)(double)data["weakMaxHp"];
+        weakHp = weakMaxHp;
 
         switch (dbname)
         {
@@ -51,6 +57,21 @@ public class Enemy : Creature
                 break;
         }
 
-        hp = attrs[(int)CommonAttribute.MaxHP];
+        hp = GetFinalAttr(CommonAttribute.MaxHP);
+    }
+
+    public override void TakeDamage(Creature source, float value, Element element, DamageType type)
+    {
+        if (weakHp > 0 && weakPoint.Contains(element))
+        {
+            weakHp -= 50.0f;
+            if (weakHp <= 0)
+            {
+                weakHp = 0;
+                ChangePercentageLocation(-.25f);
+                // ÆÆ·ÀÊÂ¼þ
+            }
+        }
+        base.TakeDamage(source, value, element, type);
     }
 }

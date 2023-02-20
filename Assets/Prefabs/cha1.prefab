@@ -443,31 +443,13 @@ MonoBehaviour:
   dmgGO: {fileID: 4129915578208974548}
   cardSR: {fileID: 4129915578433855378}
   selectedSR: {fileID: 4129915577640034049}
-  eleImage: {fileID: 0}
+  weakpointImage: []
   buffImage: {fileID: 0}
-  attackAudios:
-  - {fileID: 8300000, guid: 80f32c552544dbd4c94491546a8ebf4f, type: 3}
-  - {fileID: 8300000, guid: 71e5c51bbf4f9204ba7dda0ab1fbe9ab, type: 3}
-  takeDamageAudios:
-  - {fileID: 8300000, guid: fc3a30fca11a0fe4ab6820bb27380760, type: 3}
+  canvas: {fileID: 4129915578844280323}
   audioSource: {fileID: 4129915578433855471}
-  attackIcon: {fileID: 0}
-  skillIcon: {fileID: 0}
-  burstIcon: {fileID: 0}
-  selectedCard: {fileID: 0}
-  burstSplash: {fileID: 0}
+  face: {fileID: 0}
   burstImage: {fileID: 0}
   burstFillingImage: {fileID: 0}
-  skillAudios:
-  - {fileID: 8300000, guid: 80f32c552544dbd4c94491546a8ebf4f, type: 3}
-  - {fileID: 8300000, guid: 71e5c51bbf4f9204ba7dda0ab1fbe9ab, type: 3}
-  burstAudios:
-  - {fileID: 8300000, guid: 8616ca18fbfa1a74a945e0d4a7b763ff, type: 3}
-  - {fileID: 8300000, guid: ee27977cb944f5b48b18d5e41257541f, type: 3}
-  changeAudios:
-  - {fileID: 8300000, guid: 77b65801877d49444bdd3e57c60058b5, type: 3}
-  burstPrepareAudios:
-  - {fileID: 8300000, guid: 77b65801877d49444bdd3e57c60058b5, type: 3}
   burstVideo: {fileID: 0}
 --- !u!1 &4129915578844280324
 GameObject:
