@@ -114,6 +114,7 @@ public class Creature
 
     public virtual void TakeDamage(Creature source, float value, Element element, DamageType type)
     {
+        // value ÊÇÕýÊý
         List<string> toremove = new List<string>();
         foreach (var p in onTakingDamage)
         {
@@ -126,17 +127,22 @@ public class Creature
             onTakingDamage.Remove(s);
         }
         toremove.Clear();
-        float remain = float.MinValue;
+        float remain = value;
+        Debug.Log(value);
         foreach(var p in shields)
         {
-            float r = p.Value.TakeDamage(value);
-            remain = Mathf.Max(r, remain);
+            float r = - p.Value.TakeDamage(value);
+            remain = Mathf.Min(r, remain);
             if(r <= 0)
                 toremove.Add(p.Key);
         }
-        remain = Mathf.Max(0, -remain);
+        foreach(string s in toremove)
+        {
+            shields.Remove(s);
+        }
+        remain = Mathf.Max(0, remain);
         hp -= remain;
-        mono?.TakeDamage(value, element);
+        mono?.TakeDamage(remain, element);
     }
 
     public virtual void TakeHeal(Creature source, float value)
