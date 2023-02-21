@@ -30,7 +30,7 @@ public class Hilichurl : AEnemyTalents
             Debug.LogError("Wrong character index selected.");
             return;
         }
-        float dmg = DamageCal.DamageCharacter(self, characters[i], CommonAttribute.ATK, Element.Physical, 150);
+        float dmg = DamageCal.NormalDamage(self, characters[i], CommonAttribute.ATK, Element.Physical, 150, DamageType.Attack);
         self.DealDamage(characters[i], Element.Physical, DamageType.Attack, dmg);
         self.mono.PlayAudio(AudioType.Attack);
     }

@@ -57,8 +57,8 @@ public enum CommonAttribute
     HealedBonus, // 受治疗加成 = 7
     EnergyRecharge, // 充能效率 = 8
     Taunt, // 嘲讽权重 = 9
-    BuffHit, // 效果命中 = 10
-    BuffResist, // 效果抵抗 = 11
+    EffectHit, // 效果命中 = 10
+    EffectResist, // 效果抵抗 = 11
     GeneralBonus, // 通用伤害加成 = 12
     PhysicalBonus, // 物理伤害加成 = 13
     PyroBonus, // 火元素伤害加成 = 14
@@ -91,6 +91,8 @@ public enum DamageType
     Attack,
     Skill,
     Burst,
+    Continue,
+    All,
     Count
 }
 

@@ -10,12 +10,12 @@ public class Equipment
         // 如果给我方全体加，就找 BattleManager
     }
 
-    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a)
+    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a, DamageType damageType)
     {
         float res = 0;
         foreach(Buff b in buffs)
         {
-            res += b.CalBuffValue(source, target, a);
+            res += b.CalBuffValue(source, target, a, damageType);
         }
         return res;
     }

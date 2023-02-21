@@ -27,7 +27,7 @@ public class Bronya : ACharacterTalents
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.DamageCharacter(self, enemies[0], CommonAttribute.ATK, Element.Pyro, 50);
+        float dmg = DamageCal.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Pyro, 50, DamageType.Attack);
         self.DealDamage(enemies[0], Element.Pyro, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -35,18 +35,14 @@ public class Bronya : ACharacterTalents
     public override void SkillCharacterAction(List<Character> characters)
     {
         Character c = characters[0];
-        if (c.buffs.ContainsKey("bronyaBurstATK"))
-        {
-            Utils.valueBuffPool.ReturnOne(c.buffs["bronyaBurstATK"]);
-            c.buffs.Remove("bronyaBurstATK");
-        }
         c.ChangePercentageLocation(100);
         c.buffs.Add("bronyaSkill", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.GeneralBonus, 1,
-            (s, t) =>
+            (s, t, _) =>
             {
                 return 0.36f;
             })
         );
+        c.mono?.ShowMessage("行动提前", Color.black);
         string toRemove = "";
         foreach(KeyValuePair<string, Buff> kv in characters[0].buffs)
         {
@@ -69,7 +65,7 @@ public class Bronya : ACharacterTalents
                 Utils.valueBuffPool.ReturnOne(c.buffs["bronyaBurstATK"]);
                 c.buffs.Remove("bronyaBurstATK");
             }
-            c.buffs.Add("bronyaBurstATK", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.ATK, 2, (s, t) =>
+            c.buffs.Add("bronyaBurstATK", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.ATK, 2, (s, t, _) =>
             {
                 return s.GetBaseAttr(CommonAttribute.ATK) * 0.36f;
             }));
@@ -78,7 +74,7 @@ public class Bronya : ACharacterTalents
                 Utils.valueBuffPool.ReturnOne(c.buffs["bronyaBurstCrtDmg"]);
                 c.buffs.Remove("bronyaBurstCrtDmg");
             }
-            c.buffs.Add("bronyaBurstCrtDmg", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.CriticalDamage, 2, (s, t) =>
+            c.buffs.Add("bronyaBurstCrtDmg", Utils.valueBuffPool.GetOne().Set(BuffType.Buff, CommonAttribute.CriticalDamage, 2, (s, t, _) =>
             {
                 return 0.12f + self.GetBaseAttr(CommonAttribute.CriticalDamage) * 0.12f;
             }));
@@ -90,7 +86,7 @@ public class Bronya : ACharacterTalents
     {
         foreach(Character c in characters)
         {
-            c.buffs.Add("bronyaMystery", Utils.valueBuffPool.GetOne().Set(BuffType.Permanent, CommonAttribute.ATK, 2, (s, t) =>
+            c.buffs.Add("bronyaMystery", Utils.valueBuffPool.GetOne().Set(BuffType.Permanent, CommonAttribute.ATK, 2, (s, t, _) =>
             {
                 return s.GetBaseAttr(CommonAttribute.ATK) * 0.15f;
             }));

@@ -134,7 +134,8 @@ public class Character: Creature
         string weaponName = (string)weaponData["name"];
         int wLevel = (int)weaponData["level"];
         int rLevle = (int)weaponData["refine"];
-        weapon = new Weapon(weaponName, wLevel, rLevle);
+        int bLevle = (int)weaponData["breakLevel"];
+        weapon = new Weapon(weaponName, wLevel, bLevle, rLevle);
         weapon.OnEquipping(this);
 
         // Load ½ÇÉ«Ê¥ÒÅÎï
@@ -173,13 +174,24 @@ public class Character: Creature
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
 
-    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr)
+    public override float GetBaseAttr(CommonAttribute attr)
     {
-        float res = base.GetFinalAttr(c1, c2, attr);
-        res += weapon.CalBuffValue(null, null, attr);
+        if (attr == CommonAttribute.ATK)
+            return attrs[(int)CommonAttribute.ATK] + weapon.atk;
+        if (attr == CommonAttribute.MaxHP)
+            return attrs[(int)CommonAttribute.MaxHP] + weapon.maxHp;
+        if (attr == CommonAttribute.DEF)
+            return attrs[(int)CommonAttribute.DEF] + weapon.def;
+        return base.GetBaseAttr(attr);
+    }
+
+    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType)
+    {
+        float res = base.GetFinalAttr(c1, c2, attr, damageType);
+        res += weapon.CalBuffValue(null, null, attr, damageType);
         foreach(Artifact art in artifacts)
         {
-            res += art.CalBuffValue(this, this, attr);
+            res += art.CalBuffValue(this, this, attr, damageType);
         }
         return res;
     }

@@ -54,6 +54,7 @@
     "weapon": {
         "name": "battleNotEnd",
         "level": 44,
+        "breakLevel": 3,
         "refine": 1
     },
     "artifacts": [

@@ -2,7 +2,7 @@
     "dbname": "hilichurl",
     "disname": "\u6D4B\u8BD5\u89D2\u8272",
     "speed": 86.0,
-    "maxHp": 1508.5,
+    "maxHp": 3216.5,
     "atk": 105.0,
     "def": 674.0,
     "weakPoint": [1, 2],

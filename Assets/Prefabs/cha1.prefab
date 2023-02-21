@@ -119,8 +119,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -0, y: 0}
-  m_SizeDelta: {x: 0.00000008940697, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &4129915577783150850
 CanvasRenderer:
@@ -154,8 +154,8 @@ MonoBehaviour:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
     m_FontSize: 1
     m_FontStyle: 0
-    m_BestFit: 0
-    m_MinSize: 1
+    m_BestFit: 1
+    m_MinSize: 0
     m_MaxSize: 128
     m_Alignment: 4
     m_AlignByGeometry: 0
@@ -198,8 +198,8 @@ RectTransform:
   m_Father: {fileID: 4129915578844280323}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.2, y: 0}
-  m_AnchorMax: {x: 0.8, y: 0}
+  m_AnchorMin: {x: -0.2, y: 0}
+  m_AnchorMax: {x: 1.2, y: 0}
   m_AnchoredPosition: {x: 0, y: 2}
   m_SizeDelta: {x: 0, y: 1.4999998}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -439,11 +439,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   runwayAvatar: {fileID: 21300000, guid: fcbf09d1f642449479ddea4ccaf35286, type: 3}
   hpLine: {fileID: 0}
-  dmgText: {fileID: 4129915577783150851}
   dmgGO: {fileID: 4129915578208974548}
   cardSR: {fileID: 4129915578433855378}
   selectedSR: {fileID: 4129915577640034049}
-  weakpointImage: []
   buffImage: {fileID: 0}
   canvas: {fileID: 4129915578844280323}
   audioSource: {fileID: 4129915578433855471}

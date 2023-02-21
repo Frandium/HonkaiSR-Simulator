@@ -16,7 +16,7 @@ public class Creature
     protected float[] attrs = new float[(int)CommonAttribute.Count];
     public int level { get; protected set; } = 60;
     public float location { get; protected set; } = 0;
-    public float hp { get; protected set; } = 100;
+    public float hp = 100;
     public CreatureMono mono { get; protected set; }
     public Dictionary<string, Buff> buffs { get; protected set; } = new Dictionary<string, Buff>();
 
@@ -32,7 +32,9 @@ public class Creature
     public delegate void TurnStartEndEvent();
     public Dictionary<string, TriggerEvent<TurnStartEndEvent>> onTurnStart { get; protected set; } = new Dictionary<string, TriggerEvent<TurnStartEndEvent>>();
     public Dictionary<string, TriggerEvent<TurnStartEndEvent>> onTurnEnd { get; protected set; } = new Dictionary<string, TriggerEvent<TurnStartEndEvent>>();
-    // 造成伤害时，受到伤害时，造成治疗，受到治疗，回合开始时，回合结束时，普通攻击时，释放战技 / 爆发时，
+
+    public Dictionary<string, Shield> shields = new Dictionary<string, Shield>();
+    
     public Creature() { }
 
     public virtual float GetBaseAttr(CommonAttribute attr)
@@ -42,7 +44,7 @@ public class Creature
 
     public virtual float GetFinalAttr(CommonAttribute attr)
     {
-        return GetFinalAttr(this, this, attr);
+        return GetFinalAttr(this, this, attr, DamageType.Count);
     }
 
     public virtual void SetMono(CreatureMono m)
@@ -50,13 +52,13 @@ public class Creature
         mono = m;
     }
 
-    public virtual float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr)
+    public virtual float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType)
     {
         // 为了满足【攻击 XX 类敌人时，攻击力提升 XXX】这种功能
         float res = attrs[(int)attr];
         foreach (Buff buff in buffs.Values)
         {
-            res += buff.CalBuffValue(c1, c2, attr);
+            res += buff.CalBuffValue(c1, c2, attr, damageType);
         }
         return res;
     }
@@ -73,6 +75,23 @@ public class Creature
     public void ChangeAbsoluteLocation(float offset)
     {
         location += offset;
+    }
+
+    public void GetShield(string tag, Shield shield, bool removeIfExists = true)
+    {
+        if (shields.ContainsKey(tag))
+        {
+            if (removeIfExists)
+                shields.Remove(tag);
+            else
+                return;
+        }
+        shields.Add(tag, shield);
+    }
+
+    public void RemoveShield()
+    {
+
     }
 
 
@@ -106,7 +125,17 @@ public class Creature
         {
             onTakingDamage.Remove(s);
         }
-        hp -= value;
+        toremove.Clear();
+        float remain = float.MinValue;
+        foreach(var p in shields)
+        {
+            float r = p.Value.TakeDamage(value);
+            remain = Mathf.Max(r, remain);
+            if(r <= 0)
+                toremove.Add(p.Key);
+        }
+        remain = Mathf.Max(0, -remain);
+        hp -= remain;
         mono?.TakeDamage(value, element);
     }
 
@@ -212,10 +241,12 @@ public class Creature
         buffs.Add(tag, buff);
     }
 
-    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, int duration, ValueType valueType, float value)
+    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, int duration, ValueType valueType, float value, DamageType damageType = DamageType.All)
     {
-        Buff b = Utils.valueBuffPool.GetOne().Set(buffType, attr, duration, (s, t) =>
+        Buff b = Utils.valueBuffPool.GetOne().Set(buffType, attr, duration, (s, t, d) =>
         {
+            if(damageType != DamageType.All && damageType != d)
+                return 0;
             if(valueType == ValueType.InstantNumber)
                 return value;
             return s.GetBaseAttr(attr) * value;

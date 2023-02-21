@@ -268,7 +268,7 @@ public class BattleManager : MonoBehaviour
                 StartCoroutine(ShowBanner("µÚ " + (enmWave + 1).ToString() + " / " + enmNames.Count.ToString() + " ²¨ µÐ ÈË", new Color(1, .5f, 0, .875f), 1));
                 for (int i = 0; i < enmNames[enmWave].Count; ++i)
                 {
-                    EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -30, 0)).GetComponent<EnemyMono>();
+                    EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -65, 0)).GetComponent<EnemyMono>();
                     Enemy e = new Enemy(enmNames[enmWave][i]);
                     enemies.Add(e);
                     e.SetMono(em);

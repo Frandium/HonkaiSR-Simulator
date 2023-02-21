@@ -52,8 +52,9 @@
     "burstSelectionType": 1,
     "takeDmgGainEnergy": 5.0,
     "weapon": {
-        "name": "battleNotEnd",
-        "level": 44,
+        "name": "inTheNight",
+        "level": 30,
+        "breakLevel": 2,
         "refine": 1
     },
     "artifacts": [

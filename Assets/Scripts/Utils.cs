@@ -5,21 +5,21 @@ using UnityEngine;
 public class Utils
 {
     public static ObjectPool<Buff> valueBuffPool = new ObjectPool<Buff>(100);
-    public static double Lerp(double min, double max, float scale, float value){
-        return min + (max - min) * scale / value;
+    public static double Lerp(double min, double max, float scale, float length){
+        return min + (max - min) * scale / length;
     }
 
-    public static double Lerp(double min, double max, int scale, int value) 
+    public static double Lerp(double min, double max, int scale, int length) 
     {
-        return min + (max - min) * (float)scale / (float)value;
+        return min + (max - min) * (float)scale / (float)length;
     }
-    public static float Lerp(float min, float max, float scale, float value)
+    public static float Lerp(float min, float max, float scale, float length)
     {
-        return min + (max - min) * scale / value;
+        return min + (max - min) * scale / length;
     }
-    public static float Lerp(float min, float max, int scale, int value)
+    public static float Lerp(float min, float max, int scale, int length)
     {
-        return min + (max - min) * (float)scale / (float)value;
+        return min + (max - min) * (float)scale / (float)length;
     }
 
     public static string[] attributeNames = new string[(int)CommonAttribute.Count]
@@ -54,4 +54,10 @@ public class Utils
         "–È ˝…À∫¶øπ–‘"
     };
 
+    public static bool TwoRandom(float rate)
+    {
+        int p = (int)(rate * 10000);
+        int r = Random.Range(0, 10000);
+        return r < p;
+    }
 }

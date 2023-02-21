@@ -312,6 +312,10 @@ PrefabInstance:
       propertyPath: burstFillingImage
       value: 
       objectReference: {fileID: 1639331751}
+    - target: {fileID: 4129915577783150852, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4129915578433855377, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
       propertyPath: m_RootOrder
       value: 7
@@ -393,6 +397,10 @@ PrefabInstance:
       propertyPath: burstFillingImage
       value: 
       objectReference: {fileID: 1138474410}
+    - target: {fileID: 4129915577783150852, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4129915578433855377, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
       propertyPath: m_RootOrder
       value: 8
@@ -1702,14 +1710,14 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 963194225}
-  m_LocalRotation: {x: 0.1656112, y: -0.29613733, z: 0.052217, w: 0.9392279}
-  m_LocalPosition: {x: 184.17, y: 11.94, z: 76.16}
+  m_LocalRotation: {x: -0.10366101, y: 0.63287354, z: -0.05669471, w: -0.765187}
+  m_LocalPosition: {x: 216.63, y: 9.87, z: 92.05}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 20, y: -35, z: 0}
+  m_LocalEulerAnglesHint: {x: 13.321, y: -439.49298, z: -2.618}
 --- !u!1 &1016968431
 GameObject:
   m_ObjectHideFlags: 0
@@ -3419,6 +3427,10 @@ PrefabInstance:
       propertyPath: burstFillingImage
       value: 
       objectReference: {fileID: 2059416978}
+    - target: {fileID: 4129915577783150852, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4129915578433855377, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
       propertyPath: m_RootOrder
       value: 6
@@ -3804,6 +3816,10 @@ PrefabInstance:
       propertyPath: burstFillingImage
       value: 
       objectReference: {fileID: 1652928227}
+    - target: {fileID: 4129915577783150852, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4129915578433855377, guid: e14e2931a91f68f46892229fbe9c9c50, type: 3}
       propertyPath: m_RootOrder
       value: 5

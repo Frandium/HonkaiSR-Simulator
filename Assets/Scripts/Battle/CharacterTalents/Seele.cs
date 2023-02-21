@@ -41,7 +41,7 @@ public class Seele : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.DamageCharacter(self, e, CommonAttribute.ATK, Element.Quantus, 50);
+        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, 50, DamageType.Attack);
         self.DealDamage(e, Element.Quantus, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -49,7 +49,7 @@ public class Seele : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.DamageCharacter(self, e, CommonAttribute.ATK, Element.Quantus, 110);
+        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, 110, DamageType.Skill);
         self.DealDamage(e, Element.Quantus, DamageType.Skill, dmg);
         self.AddBuff("seeleSkillSpeed", BuffType.Buff, CommonAttribute.Speed, 2, ValueType.Percentage, .25f);
         base.SkillEnemyAction(enemies);
@@ -59,7 +59,7 @@ public class Seele : ACharacterTalents
     {
         Enemy e = enemies[0];
         self.AddBuff("seelUp", BuffType.Buff, CommonAttribute.GeneralBonus, 1, ValueType.InstantNumber, .4f);
-        float dmg = DamageCal.DamageCharacter(self, e, CommonAttribute.ATK, Element.Quantus, 240);
+        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, 240, DamageType.Burst);
         self.DealDamage(e, Element.Quantus, DamageType.Burst, dmg);
         base.BurstEnemyAction(enemies);
     }

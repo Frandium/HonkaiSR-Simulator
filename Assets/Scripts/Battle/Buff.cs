@@ -20,7 +20,7 @@ public class Buff
 
     public BuffContent content;
     
-    public delegate float BuffContent(Creature source, Creature target);
+    public delegate float BuffContent(Creature source, Creature target, DamageType damageType);
 
     public Buff()
     {
@@ -32,7 +32,7 @@ public class Buff
         buffType = BuffType.Permanent;
         targetAttribute = s.attribute;
         duration = 100000;
-        content = (c, e) =>
+        content = (c, e, t) =>
         {
             if (s.type == ValueType.InstantNumber)
                 return s.value;
@@ -61,11 +61,11 @@ public class Buff
     }
 
 
-    public float CalBuffValue(Creature source, Creature target, CommonAttribute attr)
+    public float CalBuffValue(Creature source, Creature target, CommonAttribute attr, DamageType damageType)
     {
         if (targetAttribute != attr)
             return 0;
-        return content(source, target);
+        return content(source, target, damageType);
     }
 
 }
