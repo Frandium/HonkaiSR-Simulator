@@ -26,6 +26,7 @@ public class Character: Creature
     public float energy { get; protected set; } = 0;
     public float maxEnergy { get; protected set; } = 60;
     public ACharacterTalents talents { get; protected set; }
+    public JsonData config { get; protected set; }
     public new CharacterMono mono { get; protected set; }
     public Weapon weapon;
     public List<AEquipmentTalents> artifactsSuit = new List<AEquipmentTalents>();
@@ -66,25 +67,25 @@ public class Character: Creature
 
         // Load 角色基本属性
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
-        JsonData data = JsonMapper.ToObject(jsonString);
+        config = JsonMapper.ToObject(jsonString);
 
         // set character template
         dbname = name;
-        disname = (string)data["disname"];
-        level = (int)data["level"];
-        element = (Element)(int)data["element"];
-        breakLevel = (int)data["breakLevel"];
-        maxEnergy = (float)(double)data["maxEnergy"];
-        constellation = (int)data["constellation"];
-        atkLevel = (int)data["atkLevel"];
-        skillLevel = (int)data["skillLevel"];
-        burstLevel = (int)data["burstLevel"];
+        disname = (string)config["disname"];
+        level = (int)config["level"];
+        element = (Element)(int)config["element"];
+        breakLevel = (int)config["breakLevel"];
+        maxEnergy = (float)(double)config["maxEnergy"];
+        constellation = (int)config["constellation"];
+        atkLevel = (int)config["atkLevel"];
+        skillLevel = (int)config["skillLevel"];
+        burstLevel = (int)config["burstLevel"];
         for(int i = 0; i < (int)CommonAttribute.Speed; ++i)
         {
             // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
             if(level < 20)
             {
-                attrs[i] = Utils.Lerp((float)(double)data["attrs"][i][0], (float)(double)data["attrs"][i][0], 19, level - 1);
+                attrs[i] = Utils.Lerp((float)(double)config["attrs"][i][0], (float)(double)config["attrs"][i][0], 19, level - 1);
                 continue;
             }
             int levelRate = level % 10;
@@ -92,44 +93,44 @@ public class Character: Creature
             {
                 // 突破等级最低为0， 最高为 6
                 if(breakLevel == level / 10 - 1)
-                    attrs[i] = (float)(double)data["attrs"][i][2 * breakLevel];
+                    attrs[i] = (float)(double)config["attrs"][i][2 * breakLevel];
                 else
-                    attrs[i] = (float)(double)data["attrs"][i][2 * breakLevel - 1];
+                    attrs[i] = (float)(double)config["attrs"][i][2 * breakLevel - 1];
             }
             else
             {
-                attrs[i] = Utils.Lerp((float)(double)data["attrs"][i][2 * breakLevel - 2], (float)(double)data["attrs"][i][2 * breakLevel - 1], levelRate, 10);
+                attrs[i] = Utils.Lerp((float)(double)config["attrs"][i][2 * breakLevel - 2], (float)(double)config["attrs"][i][2 * breakLevel - 1], levelRate, 10);
             }
         }
         for(int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
         {
-            attrs[i] = (float)(double)data["attrs"][i];
+            attrs[i] = (float)(double)config["attrs"][i];
         }
-        atkName = (string)data["atk"]["name"];
-        atkDescription = (string)data["atk"]["description"];
-        skillName = (string)data["skill"]["name"];
-        skillDescription = (string)data["skill"]["description"];
-        burstName = (string)data["burst"]["name"];
-        burstDescription = (string)data["burst"]["description"];
-        talentName = (string)data["talent"]["name"];
-        talentDescription = (string)data["talent"]["description"];
-        mysteryName = (string)data["mystery"]["name"];
-        mysteryDescription = (string)data["mystery"]["description"];
+        atkName = (string)config["atk"]["name"];
+        atkDescription = (string)config["atk"]["description"];
+        skillName = (string)config["skill"]["name"];
+        skillDescription = (string)config["skill"]["description"];
+        burstName = (string)config["burst"]["name"];
+        burstDescription = (string)config["burst"]["description"];
+        talentName = (string)config["talent"]["name"];
+        talentDescription = (string)config["talent"]["description"];
+        mysteryName = (string)config["mystery"]["name"];
+        mysteryDescription = (string)config["mystery"]["description"];
 
-        isAttackTargetEnemy = (bool)data["isAttackTargetEnemy"];
-        attackSelectionType = (SelectionType)(int)data["attackSelectionType"];
-        isSkillTargetEnemy = (bool)data["isSkillTargetEnemy"];
-        skillSelectionType = (SelectionType)(int)data["skillSelectionType"];
-        isBurstTargetEnemy = (bool)data["isBurstTargetEnemy"];
-        burstSelectionType = (SelectionType)(int)data["burstSelectionType"];
-        attackGainPointCount = (int)data["attackGainPointCount"];
-        skillConsumePointCount = (int)data["skillConsumePointCount"];
-        attackGainEnergy = (float)(double)data["attackGainEnergy"];
-        skillGainEnergy = (float)(double)data["skillGainEnergy"];
-        takeDmgGainEnergy = (float)(double)data["takeDmgGainEnergy"];
+        isAttackTargetEnemy = (bool)config["isAttackTargetEnemy"];
+        attackSelectionType = (SelectionType)(int)config["attackSelectionType"];
+        isSkillTargetEnemy = (bool)config["isSkillTargetEnemy"];
+        skillSelectionType = (SelectionType)(int)config["skillSelectionType"];
+        isBurstTargetEnemy = (bool)config["isBurstTargetEnemy"];
+        burstSelectionType = (SelectionType)(int)config["burstSelectionType"];
+        attackGainPointCount = (int)config["attackGainPointCount"];
+        skillConsumePointCount = (int)config["skillConsumePointCount"];
+        attackGainEnergy = (float)(double)config["attackGainEnergy"];
+        skillGainEnergy = (float)(double)config["skillGainEnergy"];
+        takeDmgGainEnergy = (float)(double)config["takeDmgGainEnergy"];
 
         // Load 角色光锥
-        JsonData weaponData = data["weapon"];
+        JsonData weaponData = config["weapon"];
         string weaponName = (string)weaponData["name"];
         int wLevel = (int)weaponData["level"];
         int rLevle = (int)weaponData["refine"];
@@ -137,7 +138,7 @@ public class Character: Creature
         weapon.OnEquipping(this);
 
         // Load 角色圣遗物
-        JsonData artsJson = data["artifacts"];
+        JsonData artsJson = config["artifacts"];
         Dictionary<string, int> suitCount = new Dictionary<string, int>();
         foreach(JsonData artJson in artsJson)
         {
@@ -160,6 +161,9 @@ public class Character: Creature
         {
             case "bronya":
                 talents = new Bronya(this);
+                break;
+            case "seele":
+                talents = new Seele(this);
                 break;
             default:
                 talents = new Bronya(this);
@@ -197,24 +201,46 @@ public class Character: Creature
 
     public virtual void StartBurstTurn()
     {
-        foreach (TurnStartEndEvent e in onTurnStart.Values)
+        List<string> toremove = new List<string>();
+        foreach (var p in onTurnStart)
         {
-            e();
+            p.Value.trigger();
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
         }
-        mono.StartMyTurn();
+        foreach (string s in toremove)
+        {
+            onTurnStart.Remove(s);
+        }
+        mono?.StartMyTurn();
     }
 
     public virtual void EndBurstTurn()
     {
-        foreach (TurnStartEndEvent e in onTurnEnd.Values)
+        List<string> toremove = new List<string>();
+        foreach (var p in onTurnEnd)
         {
-            e();
+            p.Value.trigger();
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
         }
-        foreach (Buff b in buffs.Values)
+        foreach (string s in toremove)
         {
-            b.CountDown();
+            onTurnEnd.Remove(s);
         }
-        mono.EndBurstTurn();
+        toremove.Clear();
+        foreach (KeyValuePair<string, Buff> p in buffs)
+        {
+            if (p.Value.CountDown())
+            {
+                toremove.Add(p.Key);
+            }
+        }
+        foreach (string tag in toremove)
+        {
+            RemoveBuff(tag);
+        }
+        mono?.EndBurstTurn();
     }
 
 }

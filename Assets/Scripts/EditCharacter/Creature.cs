@@ -21,17 +21,17 @@ public class Creature
     public Dictionary<string, Buff> buffs { get; protected set; } = new Dictionary<string, Buff>();
 
     public delegate float DamageEvent(Creature sourceOrTarget, float value, Element element, DamageType type);
-    public Dictionary<string, DamageEvent> onTakingDamage { get; protected set; } = new Dictionary<string, DamageEvent>();
-    public Dictionary<string, DamageEvent> onDealingDamage { get; protected set; } = new Dictionary<string, DamageEvent>();
+    public Dictionary<string, TriggerEvent<DamageEvent>> onTakingDamage { get; protected set; } =  new Dictionary<string, TriggerEvent<DamageEvent>>();
+    public Dictionary<string, TriggerEvent<DamageEvent>> onDealingDamage { get; protected set; } = new Dictionary<string, TriggerEvent<DamageEvent>>();
 
     public delegate float HealEvent(Creature sourceOrTarget, float value);
 
-    public Dictionary<string, HealEvent> onTakingHeal { get; protected set; } = new Dictionary<string, HealEvent>();
-    public Dictionary<string, HealEvent> onDealingHeal { get; protected set; } = new Dictionary<string, HealEvent>();
+    public Dictionary<string, TriggerEvent<HealEvent>> onTakingHeal { get; protected set; } = new Dictionary<string, TriggerEvent<HealEvent>>();
+    public Dictionary<string, TriggerEvent<HealEvent>> onDealingHeal { get; protected set; } = new Dictionary<string, TriggerEvent<HealEvent>>();
 
     public delegate void TurnStartEndEvent();
-    public Dictionary<string, TurnStartEndEvent> onTurnStart { get; protected set; } = new Dictionary<string, TurnStartEndEvent>();
-    public Dictionary<string, TurnStartEndEvent> onTurnEnd { get; protected set; } = new Dictionary<string, TurnStartEndEvent>();
+    public Dictionary<string, TriggerEvent<TurnStartEndEvent>> onTurnStart { get; protected set; } = new Dictionary<string, TriggerEvent<TurnStartEndEvent>>();
+    public Dictionary<string, TriggerEvent<TurnStartEndEvent>> onTurnEnd { get; protected set; } = new Dictionary<string, TriggerEvent<TurnStartEndEvent>>();
     // 造成伤害时，受到伤害时，造成治疗，受到治疗，回合开始时，回合结束时，普通攻击时，释放战技 / 爆发时，
     public Creature() { }
 
@@ -75,20 +75,36 @@ public class Creature
         location += offset;
     }
 
+
     public void DealDamage(Creature target, Element element, DamageType type, float value)
     {
-        foreach (DamageEvent e in onDealingDamage.Values)
-        {
-            e(target, value, element, type);
-        }
+        // 先 take damage，再触发事件，不然 damage 可能就错了
         target.TakeDamage(this, value, element, type);
+        List<string> toremove = new List<string>();
+        foreach (var p in onDealingDamage)
+        {
+            p.Value.trigger(target, value, element, type);
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
+        }
+        foreach (string s in toremove)
+        {
+            onDealingDamage.Remove(s);
+        }
     }
 
     public virtual void TakeDamage(Creature source, float value, Element element, DamageType type)
     {
-        foreach (DamageEvent e in onTakingDamage.Values)
+        List<string> toremove = new List<string>();
+        foreach (var p in onTakingDamage)
         {
-            e(source, value, element, type);
+            p.Value.trigger(source, value, element, type);
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
+        }
+        foreach (string s in toremove)
+        {
+            onTakingDamage.Remove(s);
         }
         hp -= value;
         mono?.TakeDamage(value, element);
@@ -105,27 +121,48 @@ public class Creature
         {
             hp += value;
         }
-        foreach(HealEvent e in onTakingHeal.Values)
+        List<string> toremove = new List<string>();
+        foreach (var p in onTakingHeal)
         {
-            e(source, value);
+            p.Value.trigger(source, value);
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
+        }
+        foreach (string s in toremove)
+        {
+            onTakingHeal.Remove(s);
         }
         mono?.TakeHeal(value);
     }
 
     public virtual void DealHeal(Creature target, float value)
     {
-        foreach(HealEvent e in onDealingHeal.Values)
+        List<string> toremove = new List<string>();
+        foreach (var p in onDealingHeal)
         {
-            e(target, value);
+            p.Value.trigger(target, value);
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
+        }
+        foreach (string s in toremove)
+        {
+            onDealingHeal.Remove(s);
         }
         target.TakeHeal(this, value);
     }
 
     public virtual bool StartNormalTurn()
     {
-        foreach(TurnStartEndEvent e in onTurnStart.Values)
+        List<string> toremove = new List<string>();
+        foreach (var p in onTurnStart)
         {
-            e();
+            p.Value.trigger();
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
+        }
+        foreach (string s in toremove)
+        {
+            onTurnStart.Remove(s);
         }
         mono?.StartMyTurn();
         return false;
@@ -133,11 +170,18 @@ public class Creature
 
     public virtual void EndNormalTurn()
     {
-        foreach(TurnStartEndEvent e in onTurnEnd.Values)
-        {
-            e();
-        }
         List<string> toremove = new List<string>();
+        foreach (var p in onTurnEnd)
+        {
+            p.Value.trigger();
+            if (p.Value.CountDown())
+                toremove.Add(p.Key);
+        }
+        foreach (string s in toremove)
+        {
+            onTurnEnd.Remove(s);
+        }
+        toremove.Clear();
         foreach(KeyValuePair<string ,Buff> p in buffs)
         {
             if (p.Value.CountDown())
@@ -147,10 +191,43 @@ public class Creature
         }
         foreach(string tag in toremove)
         {
-            buffs.Remove(tag);
+            RemoveBuff(tag);
         }
-        mono.EndMyTurn();
+        mono?.EndMyTurn();
     }
 
+    public virtual void AddBuff(string tag, Buff buff, bool removeIfExist = true)
+    {
+        if (buffs.ContainsKey(tag))
+        {
+            if (removeIfExist)
+            {
+                buffs.Remove(tag);
+            }
+            else
+            {
+                return;
+            }
+        }
+        buffs.Add(tag, buff);
+    }
+
+    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, int duration, ValueType valueType, float value)
+    {
+        Buff b = Utils.valueBuffPool.GetOne().Set(buffType, attr, duration, (s, t) =>
+        {
+            if(valueType == ValueType.InstantNumber)
+                return value;
+            return s.GetBaseAttr(attr) * value;
+        });
+        AddBuff(tag, b);
+    }
+
+    public virtual void RemoveBuff(string tag)
+    {
+        Buff b = buffs[tag];
+        buffs.Remove(tag);
+        Utils.valueBuffPool.ReturnOne(b);
+    }
 
 }

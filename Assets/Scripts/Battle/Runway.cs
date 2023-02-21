@@ -11,8 +11,15 @@ public class Runway : MonoBehaviour
     private Queue<Creature> burstWaitingQueue;
     private List<RunwayAvatar> burstAvatars;
     private List<RunwayAvatar> runwayAvatars;
+
     Dictionary<Creature, RunwayAvatar> creature2RunwayAvatar;
     private List<Creature> creatures = new List<Creature>();
+    
+    private Creature addtionalWaiting;
+    private bool firstTime = true;
+    private Creature interruptedByBurst = null;
+    private Creature curCreature = null;
+    private bool isAdditionalTurn = false;
 
 
     public GameObject[] burstAvatarGO;
@@ -34,7 +41,6 @@ public class Runway : MonoBehaviour
         creature2RunwayAvatar = new Dictionary<Creature, RunwayAvatar>();
     }
 
-    private bool firstTime = true;
 
     public void AddCreature(Creature c)
     {
@@ -47,16 +53,17 @@ public class Runway : MonoBehaviour
         creature2RunwayAvatar[c] = newOne;
     }
 
-    public Creature UpdateRunway(out bool isBurst)
+    public Creature UpdateRunway(out bool isBurst, out bool isAdditional)
     {
         isBurst = burstWaitingQueue.Count > 0;
+        isAdditional = false;
         if (!firstTime)
         {
             // 移除第一个 avatar，如果被移除的不是 burst，在队尾创建一个新的
             RunwayAvatar firstAvatar = runwayAvatars[0];
             firstAvatar.MoveTowards(new Vector3(10, 25, 0), () => { Destroy(firstAvatar.gameObject); });
             runwayAvatars.RemoveAt(0);
-            if (!firstAvatar.IsBurst)
+            if (!firstAvatar.IsBurst && !isAdditionalTurn)
             {
                 RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
                 newOne.SetCreature(firstAvatar.creature, false);
@@ -67,6 +74,25 @@ public class Runway : MonoBehaviour
         }
         firstTime = false;
 
+        if (addtionalWaiting != null)
+        {
+            Creature c = addtionalWaiting;
+            // 播放插入回合的动画
+            GameObject go = Instantiate(avatarPrefab, runwayTransform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(10, -800);
+            go.GetComponent<Image>().sprite = c.mono.runwayAvatar;
+            RunwayAvatar ra = go.GetComponent<RunwayAvatar>();
+            ra.SetCreature(c, true);
+            ra.MoveTowards(firstRunwayAvatarPos);
+            runwayAvatars.Insert(0, ra);
+            addtionalWaiting = null;
+            isAdditional = true;
+            isAdditionalTurn = true;
+            curCreature = c;
+            return c;
+        }
+
+        isAdditionalTurn = false;
         // 有插入的大招时，先放大招
         if (isBurst)
         {
@@ -77,6 +103,15 @@ public class Runway : MonoBehaviour
             runwayAvatars.Insert(0, burstAvatars[0]);
             burstAvatars.RemoveAt(0);
             return burstWaitingQueue.Dequeue();
+        }
+
+        if(interruptedByBurst != null)
+        {
+            Creature c = interruptedByBurst;
+            curCreature = c;
+            interruptedByBurst = null;
+            RearrangeRunwayUI();
+            return c;
         }
 
         // 非大招回合，update 所有人的进度，更新UI
@@ -104,21 +139,24 @@ public class Runway : MonoBehaviour
         }
         Debug.Log(pos);
 #endif
+        curCreature = creatures[0];
         return creatures[0];
     }
 
     private void RearrangeRunwayUI()
     {
-        for(int i = 0; i < creatures.Count; ++i)
+        for (int i = 0; i < creatures.Count; ++i)
         {
-            runwayAvatars[i] = creature2RunwayAvatar[creatures[i]];
+            runwayAvatars[runwayAvatars.Count - 1 - i] = creature2RunwayAvatar[creatures[creatures.Count - 1 - i]];
+        }
+        for (int i = 0; i < runwayAvatars.Count; ++i)
+        {
             runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + i * runwayAvatarInternal);
         }
     }
 
     public void RemoveCreature(Creature creature)
     {
-        Debug.Log("123");
         creatures.Remove(creature);
         runwayAvatars.Remove(creature2RunwayAvatar[creature]);
         Destroy(creature2RunwayAvatar[creature].gameObject);
@@ -142,13 +180,19 @@ public class Runway : MonoBehaviour
         }
         else
         { // 如果现在不是 burst，那么当前插入的回合到 runway 头，其他人后退
-            for (int i = 0; i < creatures.Count; ++i)
+            for (int i = 0; i < runwayAvatars.Count; ++i)
             {
-                creature2RunwayAvatar[creatures[i]].MoveTowards(firstRunwayAvatarPos + (i + 1) * runwayAvatarInternal);
+                runwayAvatars[i].MoveTowards(firstRunwayAvatarPos + (i + 1) * runwayAvatarInternal);
             }
             runwayAvatars.Insert(0, ra);
             ra.MoveTowards(firstRunwayAvatarPos);
+            interruptedByBurst = curCreature;
         }
+    }
+
+    public void InsertAdditionalTurn(Creature c)
+    {
+        addtionalWaiting = c;
     }
 
     private readonly Vector3 firstBurstStartPos = new Vector3(200, -25, 0);

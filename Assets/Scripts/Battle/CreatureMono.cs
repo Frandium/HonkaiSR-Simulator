@@ -11,8 +11,8 @@ public class CreatureMono : MonoBehaviour
         new Color(0, .75f, 1, 1),     // 冰
         new Color(.375f, 0, 1, 1),    // 雷
         new Color(0, .625f, .25f, 1), // 风
-        new Color(1, .75f, .25f, 1),  // 量子
-        new Color(0, .125f, .75f, 0), // 虚数
+        new Color(0, .125f, .75f, 1), // 量子
+        new Color(1, .75f, .25f, 1),  // 虚数
         new Color(0, 0, 0, 1) };      // 黑色，缺省
 
     public CreatureMono()
@@ -83,6 +83,11 @@ public class CreatureMono : MonoBehaviour
     public virtual void OnDying()
     {
 
+    }
+
+    public virtual void ShowMessage(string content, Color c)
+    {
+        StartCoroutine(TakeDamangeAnim(content, c));
     }
 
     protected virtual IEnumerator TakeDamangeAnim(string content, Color c)

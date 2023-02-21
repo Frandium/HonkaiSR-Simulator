@@ -308,7 +308,8 @@ public class BattleManager : MonoBehaviour
 
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
-        curCreature = runway.UpdateRunway(out isBurst);
+        bool isAdditional = false;
+        curCreature = runway.UpdateRunway(out isBurst, out isAdditional);
         if (curCreature is Character) // 玩家的回合
         {
             curStage = TurnStage.Instruction;
@@ -321,7 +322,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 // 如果我这个回合是刚才被元素爆发打断的回合，不触发 start。
-                if (interrupted)
+                if (interrupted && !isAdditional)
                 {
                     curCharacter.mono.StartMyTurn();
                     selection.StartNewTurn(curCharacter.mono);

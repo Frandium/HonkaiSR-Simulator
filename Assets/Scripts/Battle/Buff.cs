@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
+public enum BuffType
+{
+    Debuff,
+    Buff,
+    Permanent,
+    Count
+}
 public class Buff
 {
     // 可以做到高度可配置，一个 value buff 应该包含 收益属性、源属性、收益数值、源 min、源 max，目标 min，目标 max，过滤器、持续回合。
