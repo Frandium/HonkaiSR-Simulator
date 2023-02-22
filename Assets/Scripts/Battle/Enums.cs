@@ -14,6 +14,7 @@ public enum Element
     Count
 }
 
+
 public enum Career
 {
     Destroy,  // 毁灭 = 0
@@ -26,11 +27,13 @@ public enum Career
     Count
 }
 
+
 public enum StateType
 {
     Frozen,   // 冻结 = 0
     Count
 }
+
 
 public enum ArtifactPosition
 {
@@ -77,6 +80,7 @@ public enum CommonAttribute
     Count // = 28
 }
 
+
 public enum SelectionType
 {
     Self, // 自身 = 0
@@ -87,6 +91,7 @@ public enum SelectionType
     Count
 }
 
+
 public enum TurnStage
 {
     Instruction,
@@ -95,12 +100,14 @@ public enum TurnStage
     Count
 }
 
+
 public enum ValueType
 {
     Percentage,
     InstantNumber,
     Count
 }
+
 
 public enum DamageType
 {
@@ -112,6 +119,7 @@ public enum DamageType
     Count
 }
 
+
 public enum ActionType
 {
     DealDamage,  // 造成伤害   = 0
@@ -120,6 +128,7 @@ public enum ActionType
     AddBuff,     // 增加 buff = 3
     Count
 }
+
 
 public class Enums
 {

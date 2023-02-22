@@ -16,13 +16,14 @@ public class Character: Creature
     public string mysteryName = "秘技";
     public string mysteryDescription = "秘技效果";
 
-    protected int breakLevel = 4;
+    public int breakLevel { get; protected set; } = 4;
     public int constellation { get; protected set; } = 0; // 命之座
     public int atkLevel { get; protected set; } = 1; 
     public int skillLevel { get; protected set; } = 1; 
     public int burstLevel { get; protected set; } = 1; 
 
     public Element element { get; protected set; } = Element.Count;
+    public Career career { get; protected set; } = Career.Count;
     public float energy { get; protected set; } = 0;
     public float maxEnergy { get; protected set; } = 60;
     public ACharacterTalents talents { get; protected set; }
@@ -74,6 +75,7 @@ public class Character: Creature
         disname = (string)config["disname"];
         level = (int)config["level"];
         element = (Element)(int)config["element"];
+        career = (Career)(int)config["career"];
         breakLevel = (int)config["breakLevel"];
         maxEnergy = (float)(double)config["maxEnergy"];
         constellation = (int)config["constellation"];
@@ -168,6 +170,9 @@ public class Character: Creature
                 break;
             case "japard":
                 talents = new Japard(this);
+                break;
+            case "tingyun":
+                talents = new Tingyun(this);
                 break;
             default:
                 talents = new Bronya(this);

@@ -53,6 +53,9 @@ public class Enemy : Creature
             case "hilichurl":
                 talents = new Hilichurl(this);
                 break;
+            case "boss":
+                talents = new Hilichurl(this);
+                break;
             default:
                 break;
         }

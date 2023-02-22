@@ -68,4 +68,12 @@ public class Japard : ACharacterTalents
         self.onTakingDamage.Add(t);
     }
 
+    public override void Mystery(List<Character> characters, List<Enemy> enemies)
+    {
+        foreach(Character c in characters)
+        {
+            c.AddBuff("japardMystery", BuffType.Buff, CommonAttribute.DEF, ValueType.InstantNumber, self.GetBaseAttr(CommonAttribute.DEF) * .25f, 2);
+        }
+    }
+
 }

@@ -179,7 +179,7 @@ public class Selection : MonoBehaviour
                     enemies.Add(e.mono);
                 }
                 int curSelected = selectedCreatures[0];
-                if (Input.GetKeyDown(KeyCode.A))
+                if (Input.GetKeyDown(KeyCode.D))
                 {
                     bool change = curSelected > 0;
                     PlayAudio(change);
@@ -191,7 +191,7 @@ public class Selection : MonoBehaviour
                         selectedCreatures[0] = curSelected;
                     }
                 }
-                else if (Input.GetKeyDown(KeyCode.D))
+                else if (Input.GetKeyDown(KeyCode.A))
                 {
                     bool change = curSelected < enemies.Count - 1;
                     PlayAudio(change);

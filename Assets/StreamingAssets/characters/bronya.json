@@ -42,7 +42,7 @@
     ],
     "isAttackTargetEnemy": true,
     "attackSelectionType": 1,
-    "attackGainEnergy": 50.0,
+    "attackGainEnergy": 8.0,
     "attackGainPointCount": 1,
     "isSkillTargetEnemy": false,
     "skillSelectionType": 1,
@@ -53,8 +53,8 @@
     "takeDmgGainEnergy": 5.0,
     "weapon": {
         "name": "battleNotEnd",
-        "level": 44,
-        "breakLevel": 3,
+        "level": 30,
+        "breakLevel": 2,
         "refine": 1
     },
     "artifacts": [
@@ -63,28 +63,28 @@
             "position": 0,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
             "vice": [
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -94,28 +94,28 @@
             "position": 1,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
             "vice": [
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -125,28 +125,28 @@
             "position": 2,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
             "vice": [
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -156,28 +156,28 @@
             "position": 3,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
             "vice": [
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -187,28 +187,28 @@
             "position": 4,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
             "vice": [
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -218,28 +218,28 @@
             "position": 5,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
             "vice": [
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -263,6 +263,6 @@
     },
     "mystery":{
         "name": "在旗帜下",
-        "description": "使用秘技后，下一次战斗开始时我方全体攻击力提高15%，持续2回合。"
+        "description": "我方全体攻击力提高15%，持续2回合。"
     }
 }

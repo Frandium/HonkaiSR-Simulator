@@ -27,8 +27,8 @@ public class Bronya : ACharacterTalents
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Pyro, 50, DamageType.Attack);
-        self.DealDamage(enemies[0], Element.Pyro, DamageType.Attack, dmg);
+        float dmg = DamageCal.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Anemo, 50, DamageType.Attack);
+        self.DealDamage(enemies[0], Element.Anemo, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -63,5 +63,4 @@ public class Bronya : ACharacterTalents
             c.AddBuff("bronyaMystery", BuffType.Permanent, CommonAttribute.ATK, ValueType.Percentage, .15f, 2);
         }
     }
-
 }

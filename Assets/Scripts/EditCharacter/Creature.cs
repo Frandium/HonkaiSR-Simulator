@@ -225,7 +225,11 @@ public class Creature
     public virtual void RemoveBuff(string tag)
     {
         Buff b = buffs.Find(p => p.tag == tag);
-        buffs.Remove(b);
+        if (b != null)
+        {
+            buffs.Remove(b);
+            Utils.valueBuffPool.ReturnOne(b);
+        }
     }
 
     public virtual void AddState(Creature source, State state)

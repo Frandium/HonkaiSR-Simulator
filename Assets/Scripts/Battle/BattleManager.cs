@@ -74,8 +74,8 @@ public class BattleManager : MonoBehaviour
     public Sprite buffSprite;
     public Sprite debuffSprite;
     public Sprite nullBuffSprite;
-    Vector3 enmOriginal = new Vector3(147.2f, 8.1f, 99); // 第 0 个敌人的位置
-    Vector3 enmInternal = new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
+    Vector3 enmInternal = - new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
+    Vector3 enmOriginal = new Vector3(185.6f, 8.1f, 121.2f);
     bool interrupted = false;
     string mystery = "";
 
@@ -230,7 +230,7 @@ public class BattleManager : MonoBehaviour
             c.SetMono(cMonos[i]);
             runway.AddCreature(c);
         }
-        mystery = (string)data["mystery"];
+        mystery = GlobalInfoHolder.Instance.mystery;
     }
 
     public void NextTurn()
@@ -285,8 +285,11 @@ public class BattleManager : MonoBehaviour
         else
         {
             // 第一回合发动秘技
-            Character c = characters.Find(x => x.dbname == mystery);
-            c.talents.Mystery(characters, enemies);
+            if (mystery != "none")
+            {
+                Character c = characters.Find(x => x.dbname == mystery);
+                c.talents.Mystery(characters, enemies);
+            }
         }
 
         // 开启新回合
@@ -400,7 +403,16 @@ public class BattleManager : MonoBehaviour
         chaDetailActivated = true;
         characterDetail.SetActive(true);
         Text t = characterDetail.GetComponentInChildren<Text>();
-        string show = "角色名：" + c.disname + "\n生命值：" + c.hp + "\n位置：" + (c.location / Runway.Length * 100) + "%";
+        string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
+            + "  " + Utils.CareerName[(int)c.career];
+        show += "\n" + c.atkName + "：" + c.atkDescription;
+        show += "\n" + c.skillName + "：" + c.skillDescription;
+        show += "\n" + c.burstName + "：" + c.burstDescription;
+        show += "\n" + c.talentName + "：" + c.talentDescription;
+
+        show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
+        show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;
+        show += "\n生命值：" + c.hp + "  位置：" + (c.location / Runway.Length * 100) + "%";
 
         for(int i = 0; i < (int)CommonAttribute.Count; ++i)
         {

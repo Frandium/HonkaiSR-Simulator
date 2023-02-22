@@ -1,8 +1,7 @@
 {
-    "characters": ["kazuha", "japard", "seele", "bronya"],
+    "characters": ["tingyun", "japard", "seele", "bronya"],
     "enemies": [
         ["hilichurl", "hilichurl", "hilichurl", "hilichurl"],
         ["hilichurl", "hilichurl", "hilichurl"]
-    ],
-    "mystery": "bronya"
+    ]
 }

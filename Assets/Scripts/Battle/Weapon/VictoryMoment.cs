@@ -15,7 +15,7 @@ public class VictoryMoment : AEquipmentTalents
     {
         character.AddBuff("victoryMomentDEF", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, (float)(double)config["def1"][refine]);
         character.AddBuff("victoryMomentEffectHit", BuffType.Permanent, CommonAttribute.EffectHit, ValueType.InstantNumber, (float)(double)config["effHit"][refine]);
-        character.AddBuff("victoryMomentTaunt", BuffType.Permanent, CommonAttribute.Taunt, ValueType.InstantNumber, 40);
+        character.AddBuff("victoryMomentTaunt", BuffType.Permanent, CommonAttribute.Taunt, ValueType.InstantNumber, 100);
 
         character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, v, e, d) =>
         {

@@ -54,6 +54,29 @@ public class Utils
         "虚数伤害抗性"
     };
 
+    public static string[] ElementName = new string[] {
+    "物理",
+    "火",
+    "冰",
+    "雷",
+    "风",
+    "量子",
+    "虚数",
+    "？？？"
+    };
+
+    public static string[] CareerName = new string[]
+    {
+    "毁灭",
+    "巡猎",
+    "智识",
+    "同谐",
+    "虚无",
+    "存护",
+    "丰饶",
+    "？？？"
+    };
+
     public static bool TwoRandom(float rate)
     {
         int p = (int)(rate * 10000);

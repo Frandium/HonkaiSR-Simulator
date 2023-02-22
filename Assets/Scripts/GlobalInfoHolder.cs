@@ -28,4 +28,6 @@ public class GlobalInfoHolder
 
     public string battleFilePath = Application.streamingAssetsPath + "/battles/default_battle.json";
 
+    public string mystery = "tingyun";
+
 }

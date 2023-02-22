@@ -14,12 +14,12 @@ public class Weapon: Equipment
     public float def;
     public float maxHp;
 
-    int level;
-    int breakLevel;
-    string effectName;
-    string effectDescription;
+    public int level { get; protected set; }
+    public int breakLevel { get; protected set; }
+    public string effectName { get; protected set; }
+    public string effectDescription { get; protected set; }
     int refine = 1;
-    int career = (int)Career.Count;
+    public Career career { get; protected set; } = Career.Count;
 
 
     AEquipmentTalents talents;
@@ -41,11 +41,12 @@ public class Weapon: Equipment
         return res + base.CalBuffValue(source, target, a, damageType);
     }
 
-    public void LoadJson(string _dbname, int _level, int breakLevel, int refineLevel)
+    public void LoadJson(string _dbname, int _level, int blevel, int refineLevel)
     {
         dbName = _dbname;
         level = _level;
         refine = refineLevel;
+        breakLevel = blevel;
 
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbName + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
@@ -62,7 +63,7 @@ public class Weapon: Equipment
         else if (level >= 20)
         {
             int l = 2 * (level / 10 - 2);
-            if (level % 10 == 0 && breakLevel == (level / 10 - 1))
+            if (level % 10 == 0 && blevel == (level / 10 - 1))
             {
                 l++;
             }
@@ -74,7 +75,7 @@ public class Weapon: Equipment
 
         effectName = (string)data["effect"]["name"];
         effectDescription = (string)data["effect"]["description"][refineLevel];
-        career = (int)data["career"];
+        career = (Career)(int)data["career"];
 
         switch (_dbname)
         {

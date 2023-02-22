@@ -1,8 +1,8 @@
 {
     "dbname": "japard",
     "disname": "杰帕德",
-    "element": 4,
-    "career": 3,
+    "element": 2,
+    "career": 5,
     "maxEnergy": 60.0,
     "level": 30,
     "breakLevel": 2,
@@ -11,9 +11,54 @@
     "skillLevel": 1,
     "burstLevel": 1,
     "attrs": [
-        [73.0, 144.0, 173.0, 210.0, 240.0, 277.0, 306.0, 343.0, 373.0, 410.0, 410.0, 410.0, 410.0, 410.0],
-        [89.0, 173.0, 209.0, 253.0, 289.0, 334.0, 369.0, 414.0, 449.0, 494.0, 494.0, 494.0, 494.0, 494.0],
-        [190.0, 370.0, 446.0, 541.0, 617.0, 712.0, 788.0, 883.0, 959.0, 1054.0, 1054.0, 1054.0, 1054.0, 1054.0],
+        [
+            73.0,
+            144.0,
+            173.0,
+            210.0,
+            240.0,
+            277.0,
+            306.0,
+            343.0,
+            373.0,
+            410.0,
+            410.0,
+            410.0,
+            410.0,
+            410.0
+        ],
+        [
+            89.0,
+            173.0,
+            209.0,
+            253.0,
+            289.0,
+            334.0,
+            369.0,
+            414.0,
+            449.0,
+            494.0,
+            494.0,
+            494.0,
+            494.0,
+            494.0
+        ],
+        [
+            190.0,
+            370.0,
+            446.0,
+            541.0,
+            617.0,
+            712.0,
+            788.0,
+            883.0,
+            959.0,
+            1054.0,
+            1054.0,
+            1054.0,
+            1054.0,
+            1054.0
+        ],
         92.0,
         0.05,
         0.5,
@@ -53,36 +98,38 @@
     "takeDmgGainEnergy": 15.0,
     "weapon": {
         "name": "victoryMoment",
-        "level": 40,
+        "level": 30,
         "breakLevel": 2,
         "refine": 1
     },
-    "artifacts": [{
+    "artifacts": [
+        {
             "suitName": "default",
             "position": 0,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
-            "vice": [{
+            "vice": [
+                {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -92,27 +139,28 @@
             "position": 1,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
-            "vice": [{
+            "vice": [
+                {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -122,27 +170,28 @@
             "position": 2,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
-            "vice": [{
+            "vice": [
+                {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -152,27 +201,28 @@
             "position": 3,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
-            "vice": [{
+            "vice": [
+                {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -182,27 +232,28 @@
             "position": 4,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
-            "vice": [{
+            "vice": [
+                {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
@@ -212,38 +263,39 @@
             "position": 5,
             "main": {
                 "attr": 1,
-                "value": 5.0,
+                "value": 0.0,
                 "type": 0
             },
-            "vice": [{
+            "vice": [
+                {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 },
                 {
                     "attr": 1,
-                    "value": 5.0,
+                    "value": 0.0,
                     "type": 0
                 }
             ]
         }
     ],
     "atk": {
-        "name": "驭风的子弹",
-        "description": "对指定敌方单体造成等同于布洛妮娅50%攻击力的风属性伤害。"
+        "name": "一意之拳",
+        "description": "对指定敌方单体造成等同于杰帕德50%攻击力的冰属性伤害。"
     },
     "skill": {
-        "name": "作战再部署",
+        "name": "震撼之击",
         "description": "解除我方单体的1个负面状态，并使该目标行动提前100%，造成的伤害提高36%，持续1回合。"
     },
     "burst": {
@@ -255,7 +307,7 @@
         "description": "释放普攻后，布洛妮娅的下一次行动提前15%"
     },
     "mystery": {
-        "name": "在旗帜下",
-        "description": "使用秘技后，下一次战斗开始时我方全体攻击力提高15%，持续2回合。"
+        "name": "有情之证",
+        "description": "我方全体获得等同于杰帕德25%防御力的防御力加成，持续2回合。"
     }
 }
