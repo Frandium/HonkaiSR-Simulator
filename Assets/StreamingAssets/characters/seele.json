@@ -57,8 +57,7 @@
         "breakLevel": 2,
         "refine": 1
     },
-    "artifacts": [
-        {
+    "artifacts": [{
             "suitName": "default",
             "position": 0,
             "main": {
@@ -66,8 +65,7 @@
                 "value": 0.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 0.0,
                     "type": 0
@@ -97,8 +95,7 @@
                 "value": 0.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 0.0,
                     "type": 0
@@ -128,8 +125,7 @@
                 "value": 0.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 0.0,
                     "type": 0
@@ -159,8 +155,7 @@
                 "value": 0.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 0.0,
                     "type": 0
@@ -190,8 +185,7 @@
                 "value": 0.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 0.0,
                     "type": 0
@@ -221,8 +215,7 @@
                 "value": 0.0,
                 "type": 0
             },
-            "vice": [
-                {
+            "vice": [{
                     "attr": 1,
                     "value": 0.0,
                     "type": 0
@@ -261,7 +254,7 @@
         "name": "再现",
         "description": "消灭敌方目标时立即获得一个再次行动的机会并进人增幅状态，增幅状态下希儿攻击造成的伤害提高40%，持续1回合。 若希儿在因天赋【再现】获得的额外行动机会中消灭敌方目标，此天赋不会生效。"
     },
-    "mystery":{
+    "mystery": {
         "name": "幻身",
         "description": "希儿立即进入增幅状态。"
     }

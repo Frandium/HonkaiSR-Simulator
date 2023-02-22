@@ -2,9 +2,9 @@
     "dbname": "hilichurl",
     "disname": "丘丘人",
     "speed": 86.0,
-    "maxHp": 3216.5,
+    "maxHp": 1504.5,
     "atk": 105.0,
-    "def": 674.0,
+    "def": 300.0,
     "weakPoint": [1, 2],
     "weakMaxHp": 100.0
 }

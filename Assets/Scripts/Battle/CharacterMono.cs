@@ -80,11 +80,18 @@ public class CharacterMono : CreatureMono
         face.sprite = Resources.Load<Sprite>(c.dbname + "/face");
         burstVideo = Resources.Load<VideoClip>(c.dbname + "/burst_video");
         int i = 1;
-        AudioClip a = Resources.Load<AudioClip>(c.dbname + "/skill" + i);
-        while(a != null)
+        AudioClip a = Resources.Load<AudioClip>(c.dbname + "/attack" + i);
+        while (a != null)
+        {
+            attackAudios.Add(a);
+            i++;
+            a = Resources.Load<AudioClip>(c.dbname + "/attack" + i);
+        }
+        i = 1;
+        a = Resources.Load<AudioClip>(c.dbname + "/skill" + i);
+        while (a != null)
         {
             skillAudios.Add(a);
-            attackAudios.Add(a);
             i++;
             a = Resources.Load<AudioClip>(c.dbname + "/skill" + i);
         }

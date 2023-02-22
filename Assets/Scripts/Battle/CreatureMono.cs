@@ -50,6 +50,8 @@ public class CreatureMono : MonoBehaviour
     protected bool isAnimFinished = true;
     protected bool isAudioFinished = true;
 
+    public delegate void Then();
+
     // Battle Attributes
     public float hpPercentage
     {
@@ -65,7 +67,7 @@ public class CreatureMono : MonoBehaviour
         hpLine.fillAmount = hpPercentage;
         int dmg = -Mathf.RoundToInt(value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        StartCoroutine(TakeDamangeAnim(content, ElementColors[(int)e]));
+        StartCoroutine(TakeDamangeAnim(content, ElementColors[(int)e], () => {if (self.hp <= 0)  OnDying(); }));
     }
 
     public virtual void TakeHeal(float value)
@@ -87,7 +89,7 @@ public class CreatureMono : MonoBehaviour
         StartCoroutine(TakeDamangeAnim(content, c));
     }
 
-    protected virtual IEnumerator TakeDamangeAnim(string content, Color c)
+    protected virtual IEnumerator TakeDamangeAnim(string content, Color c, Then then = null)
     {
         isAnimFinished = false;
         //if (dmg < 0)
@@ -115,11 +117,8 @@ public class CreatureMono : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         Destroy(go);
-        if(self.hp <= 0)
-        {
-            OnDying();
-        }
         isAnimFinished = true;
+        then?.Invoke();
     }
 
     public virtual void StartMyTurn()

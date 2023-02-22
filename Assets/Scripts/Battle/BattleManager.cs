@@ -426,12 +426,16 @@ public class BattleManager : MonoBehaviour
 
     public void RemoveEnemy(Enemy e)
     {
+        if (!enemies.Contains(e))
+            return;
         enemies.Remove(e);
         runway.RemoveCreature(e);
     }
 
     public void RemoveCharacter(Character c)
     {
+        if (!characters.Contains(c))
+            return;
         runway.RemoveCreature(c);
         characters.Remove(c);
         deadCharacters.Add(c);

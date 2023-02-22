@@ -203,7 +203,13 @@ public class Character: Creature
         }
         return res;
     }
-    
+
+    public override void TakeDamage(Creature source, float value, Element element, DamageType type)
+    {
+        base.TakeDamage(source, value, element, type);
+        ChangeEnergy(takeDmgGainEnergy);
+    }
+
     public void ChangeEnergy(float offset)
     {
         energy += offset;
