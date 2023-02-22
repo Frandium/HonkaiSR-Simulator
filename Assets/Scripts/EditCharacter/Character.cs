@@ -166,6 +166,9 @@ public class Character: Creature
             case "seele":
                 talents = new Seele(this);
                 break;
+            case "japard":
+                talents = new Japard(this);
+                break;
             default:
                 talents = new Bronya(this);
                 break;
@@ -213,45 +216,39 @@ public class Character: Creature
 
     public virtual void StartBurstTurn()
     {
-        List<string> toremove = new List<string>();
         foreach (var p in onTurnStart)
         {
-            p.Value.trigger();
-            if (p.Value.CountDown())
-                toremove.Add(p.Key);
+            p.trigger();
         }
-        foreach (string s in toremove)
-        {
-            onTurnStart.Remove(s);
-        }
+        onTurnStart.RemoveAll(p => p.CountDown());
         mono?.StartMyTurn();
     }
 
     public virtual void EndBurstTurn()
     {
-        List<string> toremove = new List<string>();
+        // Remove event
         foreach (var p in onTurnEnd)
         {
-            p.Value.trigger();
-            if (p.Value.CountDown())
-                toremove.Add(p.Key);
+            p.trigger();
         }
-        foreach (string s in toremove)
+        onTurnEnd.RemoveAll(p => p.CountDown());
+
+        // Remove Buff
+        for (int i = buffs.Count - 1; i >= 0; --i)
         {
-            onTurnEnd.Remove(s);
-        }
-        toremove.Clear();
-        foreach (KeyValuePair<string, Buff> p in buffs)
-        {
-            if (p.Value.CountDown())
+            if (buffs[i].CountDown())
             {
-                toremove.Add(p.Key);
+                Utils.valueBuffPool.ReturnOne(buffs[i]);
+                buffs.RemoveAt(i);
             }
         }
-        foreach (string tag in toremove)
-        {
-            RemoveBuff(tag);
-        }
+
+        // Remove shields
+        shields.RemoveAll(s => s.CountDown());
+
+        // Remove states
+        states.RemoveAll(s => s.CountDown());
+
         mono?.EndBurstTurn();
     }
 

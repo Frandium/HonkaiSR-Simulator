@@ -59,9 +59,6 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
-    public Element elementState { get; protected set; } = Element.Count;
-    public ElementBuff elementBuff { get; protected set; } = ElementBuff.Count;
-
     //Battle functions
     public virtual void TakeDamage(float value, Element e)
     {
@@ -136,6 +133,7 @@ public class CreatureMono : MonoBehaviour
         isMyTurn = false;
         alpha = 0;
         selectedSR.color = new Color(0, 0, 0, 0);
+        UpdateState();
     }
 
     public virtual void Initialize(Creature c)
@@ -215,5 +213,14 @@ public class CreatureMono : MonoBehaviour
         isAudioFinished = false;
         yield return new WaitForSeconds(s);
         isAudioFinished = true;
+    }
+
+    public virtual void UpdateState()
+    {
+        cardSR.color = Color.white;
+        if(self.IsUnderState(StateType.Frozen))
+        {
+            cardSR.color = Color.blue;
+        }
     }
 }

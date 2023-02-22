@@ -13,8 +13,7 @@ public class BattleNotEnd : AEquipmentTalents
 
     public override void OnEquiping(Character character)
     {
-        character.buffs.Add("battleNotEnd", Utils.valueBuffPool.GetOne().Set(
-            new SimpleValueBuff(CommonAttribute.EnergyRecharge, (float)(double)config["selfEnergy"][refine], ValueType.InstantNumber)));
+        character.AddBuff("battleNotEnd", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, (float)(double)config["selfEnergy"][refine]);
         character.onBurst.Add("battleNotEndBurstPoint", c => { 
             if(c is Character)
             {
@@ -36,7 +35,7 @@ public class BattleNotEnd : AEquipmentTalents
 
     public override void OnTakingOff(Character character)
     {
-        character.buffs.Remove("battleNotEnd");
+        character.buffs.RemoveAll( b => b.tag == "battleNotEnd");
         character.onBurst.Remove("battleNotEndSkillPoint");
         character.onSkill.Remove("battleNotEndSkillEnergy");
     }

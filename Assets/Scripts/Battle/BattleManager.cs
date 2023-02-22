@@ -7,23 +7,6 @@ using System.IO;
 using LitJson;
 using UnityEngine.SceneManagement;
 
-public enum SelectionType
-{
-    Self, // 自身 = 0
-    One,  // 单体 = 1
-    OneExceptSelf, // 除自身外的一个 = 2
-    All, // 全体 = 3
-    AllExceptSelf, //除自身外全体 = 4
-    Count
-}
-
-public enum TurnStage
-{
-    Instruction,
-    Animation,
-    GameEnd,
-    Count
-}
 
 public class BattleManager : MonoBehaviour
 {

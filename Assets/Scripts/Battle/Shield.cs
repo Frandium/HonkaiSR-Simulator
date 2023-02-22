@@ -2,28 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Shield
+public class Shield : AProgressWithTurn
 {
-    float maxHp;
-    float hp;
-    int times;
+    public float maxHp { get; protected set; }
+    public float hp { get; protected set; }
 
-    public Shield(float max, int _times)
+    public Shield(string tag, float max, int _times): base(tag, _times)
     {
         maxHp = max;
         hp = maxHp;
-        times = _times;
     }
 
     public float TakeDamage(float v)
     {
         hp -= v;
         return hp;
-    }
-
-    public bool CountDown()
-    {
-        times--;
-        return times >= 0;
     }
 }

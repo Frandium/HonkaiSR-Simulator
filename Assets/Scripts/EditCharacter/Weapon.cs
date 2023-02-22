@@ -84,6 +84,9 @@ public class Weapon: Equipment
             case "inTheNight":
                 talents = new InTheNight(data, refine);
                 break;
+            case "victoryMoment":
+                talents = new VictoryMoment(data, refine);
+                break;
             default:
                 break;
         }

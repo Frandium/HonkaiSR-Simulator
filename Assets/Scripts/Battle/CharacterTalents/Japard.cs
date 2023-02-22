@@ -26,11 +26,15 @@ public class Japard : ACharacterTalents
         if (Utils.TwoRandom(p))
         {
             // 冻结敌人
-            e.onTurnStart.Add("japardFreeze", new TriggerEvent<Creature.TurnStartEndEvent>(() =>
+            e.AddState(self, new State(StateType.Frozen, 1));
+            e.mono?.ShowMessage("冻结", Color.blue);
+            e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("japardFreeze", () =>
             {
-                // 如果被冻结
-                float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 25, DamageType.Continue);
-                self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
+                if (e.IsUnderState(StateType.Frozen))
+                {
+                    float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 25, DamageType.Continue);
+                    self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
+                }
             }));
         }
         base.SkillEnemyAction(enemies);
@@ -38,13 +42,17 @@ public class Japard : ACharacterTalents
 
     public override void BurstCharacterAction(List<Character> characters)
     {
-
+        float shield = .36f * self.GetFinalAttr(CommonAttribute.DEF) + 120;
+        foreach(Character c in characters)
+        {
+            c.GetShield(new Shield("japardBurst", shield, 3));
+        }
         base.BurstCharacterAction(characters);
     }
 
     public override void OnEquipping()
     {
-        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>();
+        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
         t.trigger = (s, v, e, dt) =>
         {
             if (self.hp - v <= 0)
@@ -57,7 +65,7 @@ public class Japard : ACharacterTalents
             }
             return v;
         };
-        self.onTakingDamage.Add("japardTalent", t);
+        self.onTakingDamage.Add(t);
     }
 
 }

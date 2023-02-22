@@ -13,8 +13,8 @@ public class InTheNight : AEquipmentTalents
 
     public override void OnEquiping(Character character)
     {
-        character.AddBuff("inTheNightCritRate", BuffType.Permanent, CommonAttribute.CriticalRate, int.MaxValue, ValueType.InstantNumber, (float)(double)config["crit"][refine]);
-        character.AddBuff("inTheNightAtkSkill", Utils.valueBuffPool.GetOne().Set(BuffType.Permanent, CommonAttribute.GeneralBonus, int.MaxValue, (c, e, t) =>
+        character.AddBuff("inTheNightCritRate", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, (float)(double)config["crit"][refine]);
+        character.AddBuff(Utils.valueBuffPool.GetOne().Set("inTheNightAtkSkill", BuffType.Permanent, CommonAttribute.GeneralBonus, int.MaxValue, (c, e, t) =>
         {
             if (t == DamageType.Attack || t == DamageType.Skill)
             {
@@ -27,7 +27,7 @@ public class InTheNight : AEquipmentTalents
             return 0;
         })
             );
-        character.AddBuff("inTheNightBurst", Utils.valueBuffPool.GetOne().Set(BuffType.Permanent, CommonAttribute.GeneralBonus, int.MaxValue, (c, e, t) =>
+        character.AddBuff(Utils.valueBuffPool.GetOne().Set("inTheNightBurst", BuffType.Permanent, CommonAttribute.GeneralBonus, int.MaxValue, (c, e, t) =>
         {
             if (t == DamageType.Attack || t == DamageType.Skill)
             {
@@ -44,6 +44,8 @@ public class InTheNight : AEquipmentTalents
 
     public override void OnTakingOff(Character character)
     {
-        throw new System.NotImplementedException();
+        character.RemoveBuff("inTheNightCritRate");
+        character.RemoveBuff("inTheNightAtkSkill");
+        character.RemoveBuff("inTheNightBurst");
     }
 }

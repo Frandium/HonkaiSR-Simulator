@@ -2,30 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TriggerEvent<T>
+public class TriggerEvent<T> : AProgressWithTurn
 {
-    int times;
     public T trigger;
 
-    public TriggerEvent(int _times = int.MaxValue)
+    public TriggerEvent(string _tag, int _times = int.MaxValue): base(_tag, _times)
     {
-        times = _times;
+        tag = _tag;
     }
 
-    public TriggerEvent(T e, int _times = int.MaxValue)
+    public TriggerEvent(string _tag, T e, int _times = int.MaxValue): base(_tag, _times)
     {
+        tag = _tag;
         trigger = e;
-        times = _times;
-    }
-
-    public bool CountDown()
-    {
-        times--;
-        return times <= 0;
-    }
-
-    public void Zero()
-    {
-        times = 0;
     }
 }
