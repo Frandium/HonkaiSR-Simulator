@@ -63,7 +63,7 @@ public class Japard : ACharacterTalents
                 t.Zero();
                 return 0;
             }
-            return v;
+            return 0;
         };
         self.onTakingDamage.Add(t);
     }

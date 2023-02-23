@@ -443,12 +443,6 @@ public class BattleManager : MonoBehaviour
 
 
     // Animation Settings
-    float burstSplashSpeed = .01f;
-    const float BURST_INIT_SPEED = 3f;
-    const float BURST_FINAL_SPEED = .1f;
-    const float BURST_IMAGE_HALF_DISTANCE = .48f; // 速度变化的长度
-    const float BURST_IMAGE_WIDTH = 1f;  // 图片宽度
-    const float ACCELERATION = (BURST_INIT_SPEED * BURST_INIT_SPEED - BURST_FINAL_SPEED * BURST_FINAL_SPEED) / (BURST_IMAGE_HALF_DISTANCE * (1 + BURST_IMAGE_WIDTH)) / 2; // 加速度
 
     IEnumerator ChangeLocalScale(RectTransform tran, Vector3 target, float time)
     {
@@ -472,42 +466,39 @@ public class BattleManager : MonoBehaviour
         StartCoroutine(BurstSplashAnim());
     }
 
+    const float ACCELERATION = .5f; // 加速度
+
     IEnumerator BurstSplashAnim()
     {
-        splash.rectTransform.anchorMin = new Vector2(1f, -.5f);
-        splash.rectTransform.anchorMax = new Vector2(1 + BURST_IMAGE_WIDTH, 1.05f);
-        burstSplashSpeed = BURST_INIT_SPEED;
-        float slow_len = (1 + BURST_IMAGE_WIDTH) * (1 - 2 * BURST_IMAGE_HALF_DISTANCE);
-        while (splash.rectTransform.anchorMin.x > .5f - BURST_IMAGE_WIDTH / 2 + slow_len / 2)
+        float burstSplashSpeed = .5f;
+        splash.gameObject.SetActive(true);
+        float scale = 1.25f;
+        splash.rectTransform.localScale = Vector3.one * scale;
+        float timer = 0;
+        while (timer <= .8f)
         {
             yield return new WaitForEndOfFrame();
-            splash.rectTransform.anchorMax += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            splash.rectTransform.anchorMin += Vector2.left * burstSplashSpeed * Time.deltaTime;
+            scale -= burstSplashSpeed * Time.deltaTime;
+            splash.rectTransform.localScale = Vector3.one * scale;
             burstSplashSpeed -= Time.deltaTime * ACCELERATION;
+            if (burstSplashSpeed <= .01f)
+                burstSplashSpeed = .01f;
+            timer += Time.deltaTime;
         }
-        while (splash.rectTransform.anchorMin.x > .5f - BURST_IMAGE_WIDTH / 2 - slow_len / 2)
-        {
-            yield return new WaitForEndOfFrame();
-            splash.rectTransform.anchorMax += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            splash.rectTransform.anchorMin += Vector2.left * burstSplashSpeed * Time.deltaTime;
-        }
-        while (splash.rectTransform.anchorMin.x > -BURST_IMAGE_WIDTH)
-        {
-            yield return new WaitForEndOfFrame();
-            splash.rectTransform.anchorMax += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            splash.rectTransform.anchorMin += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            burstSplashSpeed += Time.deltaTime * ACCELERATION;
-        }
+        new WaitForSeconds(.2f);
+        splash.gameObject.SetActive(false);
     }
 
     IEnumerator CloseVideoAfterPlay(double seconds)
     {
+        bgm.Pause();
         screenCanvas.SetActive(false);
         yield return new WaitForSeconds((float)seconds);
         videoPlayer.enabled = false;
         selection.ApplyAction(curCharacter.onBurst);
         curStage = TurnStage.Animation;
         screenCanvas.SetActive(true);
+        bgm.Play();
     }
 
     IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)
