@@ -26,7 +26,7 @@ public class GlobalInfoHolder
     public string enemyDir = Application.streamingAssetsPath + "/enemies";
     public string battleDir = Application.streamingAssetsPath + "/battles";
 
-    public string battleFilePath = Application.streamingAssetsPath + "/battles/default_battle.json";
+    public string battleFilePath = Application.streamingAssetsPath + "/battles/boss.json";
 
     public string mystery = "japard";
 
