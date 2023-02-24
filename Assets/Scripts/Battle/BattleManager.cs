@@ -24,6 +24,7 @@ public class BattleManager : MonoBehaviour
 
     // battle turn state
     public TurnStage curStage { get; protected set; } = TurnStage.Instruction;
+    public int curTurnNumber { get; protected set; } = 0;
     bool isAttackOrSkill = false;
     float animTime = .2f;
     int enmWave = -1;
@@ -307,6 +308,7 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
+                ++curTurnNumber;
                 // 如果我这个回合是刚才被元素爆发打断的回合，不触发 start。
                 if (interrupted && !isAdditional)
                 {
@@ -335,6 +337,7 @@ public class BattleManager : MonoBehaviour
         }
         else if (curCreature is Enemy)
         {
+            ++curTurnNumber;
             // 敌人的回合直接进入结算动画阶段，插入的 burst 要等敌人行动完
             Enemy e = curCreature as Enemy;
             bool skip = e.StartNormalTurn();

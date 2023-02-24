@@ -11,13 +11,18 @@ public class BattleNotEnd : AEquipmentTalents
         refine = _refine;
     }
 
+    int gainSkillPointTurn = -1;
     public override void OnEquiping(Character character)
     {
         character.AddBuff("battleNotEnd", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, (float)(double)config["selfEnergy"][refine]);
         character.onBurst.Add("battleNotEndBurstPoint", c => { 
             if(c is Character)
             {
-                BattleManager.Instance.skillPoint.GainPoint(1);
+                if (gainSkillPointTurn != BattleManager.Instance.curTurnNumber)
+                {
+                    BattleManager.Instance.skillPoint.GainPoint(1);
+                    gainSkillPointTurn = BattleManager.Instance.curTurnNumber;
+                }
             }
         });
         character.onSkill.Add("battleNotEndSkillEnergy", c => {

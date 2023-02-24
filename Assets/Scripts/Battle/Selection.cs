@@ -44,6 +44,13 @@ public class Selection : MonoBehaviour
                 selectedCharacters.Add(BattleManager.Instance.characters[i]);
             }
             characterAction(selectedCharacters);
+            foreach (var t in talent.Values)
+            {
+                foreach (Character c in selectedCharacters)
+                {
+                    t(c);
+                }
+            }
         }
         ClearSelection();
         isDuringSelection = false;

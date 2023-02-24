@@ -15,9 +15,7 @@ public class CreatureMono : MonoBehaviour
         new Color(1, .75f, .25f, 1),  // ÐéÊý
         new Color(0, 0, 0, 1) };      // ºÚÉ«£¬È±Ê¡
 
-    public CreatureMono()
-    {
-    }
+
 
     public int uniqueID { get; protected set; } = -1;
     protected Creature self;
@@ -67,7 +65,7 @@ public class CreatureMono : MonoBehaviour
         hpLine.fillAmount = hpPercentage;
         int dmg = -Mathf.RoundToInt(value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        StartCoroutine(TakeDamangeAnim(content, ElementColors[(int)e], () => {if (self.hp <= 0)  OnDying(); }));
+        ShowMessage(content, ElementColors[(int)e], () => { if (self.hp <= 0) OnDying(); });
     }
 
     public virtual void TakeHeal(float value)
@@ -75,7 +73,7 @@ public class CreatureMono : MonoBehaviour
         hpLine.fillAmount = hpPercentage;
         int dmg = Mathf.RoundToInt(value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        StartCoroutine(TakeDamangeAnim(content, Color.white));
+        ShowMessage(content, Color.white);
     }
 
 
@@ -84,16 +82,34 @@ public class CreatureMono : MonoBehaviour
 
     }
 
-    public virtual void ShowMessage(string content, Color c)
+    Queue<string> messages = new Queue<string>();
+    Queue<Color> colors = new Queue<Color>();
+    Queue<Then> thens = new Queue<Then>();
+    bool isMessageShowing = false; 
+    public virtual void ShowMessage(string content, Color c, Then t = null)
     {
-        StartCoroutine(TakeDamangeAnim(content, c));
+        messages.Enqueue(content);
+        colors.Enqueue(c);
+        thens.Enqueue(t);
+        if (!isMessageShowing)
+        {
+            isMessageShowing = true;
+            StartCoroutine(ConsumeMessage());
+        }
+    }
+
+    public virtual IEnumerator ConsumeMessage()
+    {
+        while (messages.Count > 0) { 
+            StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), thens.Dequeue()));
+            yield return new WaitForSeconds(.3f);
+        }
+        isMessageShowing = false;
     }
 
     protected virtual IEnumerator TakeDamangeAnim(string content, Color c, Then then = null)
     {
         isAnimFinished = false;
-        //if (dmg < 0)
-        //    PlayAudio(AudioType.TakeDamage);
         GameObject go = Instantiate(dmgGO);
         go.SetActive(true);
         go.transform.SetParent(canvas, false);

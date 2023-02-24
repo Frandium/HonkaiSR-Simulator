@@ -22,20 +22,22 @@ public class Japard : ACharacterTalents
         Enemy e = enemies[0];
         float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 100, DamageType.Skill);
         self.DealDamage(e, Element.Cryo, DamageType.Skill, dmg);
-        float p = .6f * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill)) / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
-        if (Utils.TwoRandom(p))
+        float hit = .6f * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
+        float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
+        if (Utils.TwoRandom(hit) && !Utils.TwoRandom(resist))
         {
             // ∂≥Ω·µ–»À
             e.AddState(self, new State(StateType.Frozen, 1));
             e.mono?.ShowMessage("∂≥Ω·", Color.blue);
-            e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("japardFreeze", () =>
-            {
-                if (e.IsUnderState(StateType.Frozen))
+            if(e.onTurnStart.Find(t => t.tag == "japardFreeze") == null)
+                e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("japardFreeze", () =>
                 {
-                    float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 25, DamageType.Continue);
-                    self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
-                }
-            }));
+                    if (e.IsUnderState(StateType.Frozen))
+                    {
+                        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 25, DamageType.Continue);
+                        self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
+                    }
+                }));
         }
         base.SkillEnemyAction(enemies);
     }

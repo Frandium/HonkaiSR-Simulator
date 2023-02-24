@@ -14,6 +14,7 @@ public class Bronya : ACharacterTalents
         self.onNormalAttack.Add("talent", e =>
         {
             talent_activated = true;
+            self.mono?.ShowMessage("行动提前", Color.green);
         });
         self.onTurnEnd.Add(new TriggerEvent<Creature.TurnStartEndEvent>("talent_inner", () =>
         {
@@ -52,6 +53,8 @@ public class Bronya : ACharacterTalents
             {
                 return 0.12f + self.GetBaseAttr(CommonAttribute.CriticalDamage) * 0.12f;
             }));
+            c.mono?.ShowMessage("攻击提升", Color.green);
+            c.mono?.ShowMessage("暴击伤害提升", Color.green);
         }
         base.BurstCharacterAction(characters);
     }

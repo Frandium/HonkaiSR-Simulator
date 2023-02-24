@@ -72,6 +72,8 @@ public class Tingyun : ACharacterTalents
         }, 3));
         curSkill = c;
         c.mono?.ShowMessage("´Í¸£", Color.red);
+        c.mono?.ShowMessage("¹¥»÷ÌáÉý", Color.red);
+        c.mono?.ShowMessage("Ð­Í¬ÉËº¦", Color.red);
         base.SkillCharacterAction(characters);
     }
 

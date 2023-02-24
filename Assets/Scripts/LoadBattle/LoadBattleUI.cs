@@ -19,7 +19,8 @@ public class LoadBattleUI : MonoBehaviour
     void Start()
     {
         ScanBattles();
-        battleList.onValueChanged.AddListener(onBattleSelected);
+        battleList.onValueChanged.AddListener(OnBattleSelected);
+        mysteryList.onValueChanged.AddListener(OnMysterySelected);
     }
 
     // Update is called once per frame
@@ -44,10 +45,10 @@ public class LoadBattleUI : MonoBehaviour
             options.Add(dbname);
         }
         battleList.AddOptions(options);
-        onBattleSelected(0);
+        OnBattleSelected(0);
     }
 
-    public void onBattleSelected(int o)
+    public void OnBattleSelected(int o)
     {
         string file = files[o];
         GlobalInfoHolder.Instance.battleFilePath = file;

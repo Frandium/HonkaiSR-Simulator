@@ -51,7 +51,9 @@ public class Seele : ACharacterTalents
         Enemy e = enemies[0];
         float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, 110, DamageType.Skill);
         self.DealDamage(e, Element.Quantus, DamageType.Skill, dmg);
+        self.RemoveBuff("seeleSkillSpeed");
         self.AddBuff("seeleSkillSpeed", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .25f, 2);
+        self.mono?.ShowMessage("ÀŸ∂»Ã·…˝", Color.blue);
         base.SkillEnemyAction(enemies);
     }
 

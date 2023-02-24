@@ -82,7 +82,7 @@ public class Creature
     {
         if (removeIfExists)
             shields.RemoveAll(s => s.tag == shield.tag);
-        
+        mono?.ShowMessage("护盾+" + shield.maxHp, Color.black);
         shields.Add(shield);
     }
 
@@ -109,7 +109,7 @@ public class Creature
         // value 是正数
         foreach (var p in onTakingDamage)
         {
-            p.trigger(source, value, element, type);
+            value = p.trigger(source, value, element, type);
         }
         onTakingDamage.RemoveAll(p => p.CountDown());
 
