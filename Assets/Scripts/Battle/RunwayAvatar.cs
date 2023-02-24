@@ -18,7 +18,7 @@ public class RunwayAvatar : MonoBehaviour
     {
         creature = _c;
         IsBurst = isBurst;
-        avatarImage.sprite = creature.runwayAvatar;
+        avatarImage.sprite = creature.mono.runwayAvatar;
     }
 
     public void MoveTowards(Vector3 pos, AnyAction nextToDo = null)

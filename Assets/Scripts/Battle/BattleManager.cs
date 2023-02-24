@@ -7,23 +7,6 @@ using System.IO;
 using LitJson;
 using UnityEngine.SceneManagement;
 
-public enum SelectionType
-{
-    Self,
-    One,
-    OneExceptSelf,
-    All,
-    AllExceptSelf,
-    Count
-}
-
-public enum TurnStage
-{
-    Instruction,
-    Animation,
-    GameEnd,
-    Count
-}
 
 public class BattleManager : MonoBehaviour
 {
@@ -38,21 +21,25 @@ public class BattleManager : MonoBehaviour
         Instance = this;
     }
 
-    public ObjectPool<ValueBuff> valueBuffPool;
-    public ObjectPool<TriggerBuff> triggerBuffPool;
 
     // battle turn state
     public TurnStage curStage { get; protected set; } = TurnStage.Instruction;
+    public int curTurnNumber { get; protected set; } = 0;
     bool isAttackOrSkill = false;
     float animTime = .2f;
     int enmWave = -1;
-    int unitCount = 0;
     float turnTime = 0;
     float minTurnTime = 3; // 每个回合最少 3 秒，防止操作输入太快出 bug
     private bool isBurst = false;
-    public List<Character> characters;
-    public List<Enemy> enemies { get; private set; } = new List<Enemy>();
+    bool chaDetailActivated = false;
+    public List<Character> characters { get; protected set; } = new List<Character>();
+    public List<Character> deadCharacters { get; protected set; } = new List<Character>();
+    public List<CharacterMono> cMonos = new List<CharacterMono>();
+    public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
+
     public GameObject enemyPrefab;
+    public GameObject screenCanvas;
+    public GameObject characterDetail;
 
     // battle configuration
     List<string> chaNames;
@@ -88,16 +75,23 @@ public class BattleManager : MonoBehaviour
     public Sprite buffSprite;
     public Sprite debuffSprite;
     public Sprite nullBuffSprite;
-    Vector3 enmOriginal = new Vector3(147.2f, 8.1f, 99); // 第 0 个敌人的位置
-    Vector3 enmInternal = new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
+    Vector3 enmInternal = - new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
+    Vector3 enmOriginal = new Vector3(185.6f, 8.1f, 121.2f);
+    bool interrupted = false;
+    string mystery = "";
+
+    int curShowingDetail = -1; 
+    Dictionary<KeyCode, int> detailKey2Character = new Dictionary<KeyCode, int>() {
+        {KeyCode.Z, 0 },
+        {KeyCode.X, 1 },
+        {KeyCode.C, 2 },
+        {KeyCode.V, 3 }
+    };
 
     // Start is called before the first frame update
     void Start()
     {
-        valueBuffPool = new ObjectPool<ValueBuff>(30);
-        triggerBuffPool = new ObjectPool<TriggerBuff>(30);
         Application.targetFrameRate = 60;
-
         LoadBattle();
         skillPoint.GainPoint(2);
         NextTurn();
@@ -123,9 +117,9 @@ public class BattleManager : MonoBehaviour
 
                         isAttackOrSkill = false;
                         if (curCharacter.isSkillTargetEnemy)
-                            selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.characterTalents.SkillEnemyAction);
+                            selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.talents.SkillEnemyAction);
                         else
-                            selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.characterTalents.SkillCharacterAction);
+                            selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.talents.SkillCharacterAction);
                     }
                     else
                     {
@@ -145,25 +139,30 @@ public class BattleManager : MonoBehaviour
                     if (isBurst)
                     {
                         // 元素爆发回合，播放完 video 后才进 animation stage
-                        curCharacter.PlayAudio(AudioType.Burst);
+                        curCharacter.mono.PlayAudio(AudioType.Burst);
                         videoPlayer.enabled = true;
-                        videoPlayer.clip = curCharacter.burstVideo;
+                        videoPlayer.clip = curCharacter.mono.burstVideo;
                         videoPlayer.Play();
-                        StartCoroutine(CloseVideoAfterPlay(curCharacter.burstVideo.length));
+                        StartCoroutine(CloseVideoAfterPlay(curCharacter.mono.burstVideo.length));
                     }
                     else
                     {
                         curStage = TurnStage.Animation;
-                        selection.ApplyAction();
                         if (isAttackOrSkill)
-                            curCharacter.PlayAudio(AudioType.Attack);
+                        {
+                            curCharacter.mono.PlayAudio(AudioType.Attack);
+                            selection.ApplyAction(curCharacter.onNormalAttack);
+                        }
                         else
-                            curCharacter.PlayAudio(AudioType.Skill);
+                        {
+                            curCharacter.mono.PlayAudio(AudioType.Skill);
+                            selection.ApplyAction(curCharacter.onSkill);
+                        }
                     }
                 }
                 break;
             case TurnStage.Animation:
-                if (turnTime > minTurnTime && characters.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.IsPerformanceFinished))
+                if (turnTime > minTurnTime && cMonos.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.mono.IsPerformanceFinished))
                 {
                     NextTurn();
                 }
@@ -184,6 +183,22 @@ public class BattleManager : MonoBehaviour
                 TestAndInsertBurst(i);
             } 
         }
+
+
+        foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
+        {
+            if (Input.GetKeyDown(p.Key)) {
+                chaDetailActivated = false;
+                ShowCharacterDetail(p.Value);
+                curShowingDetail = p.Value;
+            }
+            if (Input.GetKeyUp(p.Key) && curShowingDetail == p.Value)
+            {
+                characterDetail.SetActive(false);
+                chaDetailActivated = false;
+                curShowingDetail = -1;
+            }
+        }
     }
 
     // Game process
@@ -193,7 +208,7 @@ public class BattleManager : MonoBehaviour
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // load json
-       chaNames = new List<string>();
+        chaNames = new List<string>();
         for(int i = 0; i < data["characters"].Count; ++i)
         {
             chaNames.Add((string)data["characters"][i]);
@@ -209,10 +224,14 @@ public class BattleManager : MonoBehaviour
             enmNames.Add(enm);
         }
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < characters.Count; ++i)
+        for (int i = 0; i < chaNames.Count; ++i)
         {
-            characters[i].Initialize(chaNames[i], unitCount++);
+            Character c = new Character(chaNames[i]);
+            characters.Add(c);
+            c.SetMono(cMonos[i]);
+            runway.AddCreature(c);
         }
+        mystery = GlobalInfoHolder.Instance.mystery;
     }
 
     public void NextTurn()
@@ -233,22 +252,24 @@ public class BattleManager : MonoBehaviour
                 StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enmNames.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
                 for (int i = 0; i < enmNames[enmWave].Count; ++i)
                 {
-                    Enemy e = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -30, 0)).GetComponent<Enemy>();
-                    e.Initialize(enmNames[enmWave][i], unitCount++);
+                    EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -65, 0)).GetComponent<EnemyMono>();
+                    Enemy e = new Enemy(enmNames[enmWave][i]);
                     enemies.Add(e);
+                    e.SetMono(em);
+                    runway.AddCreature(e);
                 }
             }
         }
         if (characters.Count == 0)
         {
-            StartCoroutine(ShowBanner("挑 战 失败", new Color(1, .5f, 0, .875f), 1, true));
+            StartCoroutine(ShowBanner("挑 战 失 败", new Color(1, .5f, 0, .875f), 1, true));
             bgm.Stop();
             curStage = TurnStage.GameEnd;
             return;
         }
 
         // 对上一回合进行收尾，= null 时是第一回合，跳过这个阶段
-        if (curCharacter != null)
+        if (curCreature != null)
         {
             // 刚结束的回合是元素爆发回合
             if (isBurst && curCreature is Character)
@@ -258,62 +279,83 @@ public class BattleManager : MonoBehaviour
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.SetLocation(0);
-                curCreature.EndMyTurn();
+                curCreature.ChangePercentageLocation(-100);
+                curCreature.EndNormalTurn();
+            }
+        }
+        else
+        {
+            // 第一回合发动秘技
+            if (mystery != "none")
+            {
+                Character c = characters.Find(x => x.dbname == mystery);
+                c.talents.Mystery(characters, enemies);
             }
         }
 
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
-        curCreature = runway.UpdateRunway(out isBurst);
-
+        bool isAdditional = false;
+        curCreature = runway.UpdateRunway(out isBurst, out isAdditional);
         if (curCreature is Character) // 玩家的回合
         {
             curStage = TurnStage.Instruction;
             curCharacter = curCreature as Character;
             // 先进入输入指令阶段
             if (isBurst)
-            { // 元素爆发回合不触发 turn start hook
+            { // 元素爆发回合触发 burst start hook
                 BurstTurn();
             }
             else
             {
-                bool skip = curCreature.StartMyTurn();
-                curCharacter.PlayAudio(AudioType.Change);
-                attackImage.sprite = curCharacter.attackIcon;
-                skillImage.sprite = curCharacter.skillIcon;
-                if (skip)
+                ++curTurnNumber;
+                // 如果我这个回合是刚才被元素爆发打断的回合，不触发 start。
+                if (interrupted && !isAdditional)
                 {
-                    curStage = TurnStage.Animation;
+                    curCharacter.mono.StartMyTurn();
+                    selection.StartNewTurn(curCharacter.mono);
+                    SelectTarget();
+                    interrupted = false;
                 }
                 else
                 {
-                    selection.StartNewTurn(curCharacter);
-                    SelectTarget();
+                    bool skip = curCharacter.StartNormalTurn();
+                    if (skip)
+                    {
+                        curStage = TurnStage.Animation;
+                    }
+                    else
+                    {
+                        selection.StartNewTurn(curCharacter.mono);
+                        SelectTarget();
+                    }
                 }
+                curCreature.mono.PlayAudio(AudioType.Change);
+                attackImage.sprite = curCharacter.mono.attackIcon;
+                skillImage.sprite = curCharacter.mono.skillIcon;
             }
         }
         else if (curCreature is Enemy)
         {
+            ++curTurnNumber;
             // 敌人的回合直接进入结算动画阶段，插入的 burst 要等敌人行动完
-
-            bool skip = curCreature.StartMyTurn();
-            curStage = TurnStage.Animation;
             Enemy e = curCreature as Enemy;
+            bool skip = e.StartNormalTurn();
+            curStage = TurnStage.Animation;
             if(!skip)
-                e.enemyTalents.MyTurn();
+                e.talents.MyTurn();
         }
     }
 
     protected void BurstTurn()
     {
         curCharacter.StartBurstTurn();
-        BurstSplash(curCharacter);
-        curCharacter.PlayAudio(AudioType.BurstPrepare);
+        BurstSplash(curCharacter.mono);
+        curCharacter.mono.PlayAudio(AudioType.BurstPrepare);
         if (curCharacter.isBurstTargetEnemy)
-            selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.characterTalents.BurstEnemyAction);
+            selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.talents.BurstEnemyAction);
         else
-            selection.StartCharacterSelection(curCharacter.burstSelectionType, curCharacter.characterTalents.BurstCharacterAction);
+            selection.StartCharacterSelection(curCharacter.burstSelectionType, curCharacter.talents.BurstCharacterAction);
     }
 
     protected void SelectTarget()
@@ -324,27 +366,28 @@ public class BattleManager : MonoBehaviour
         isAttackOrSkill = true;
         if (curCharacter.isAttackTargetEnemy)
         {
-            selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.characterTalents.AttackEnemyAction);
+            selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.talents.AttackEnemyAction);
         }
         else
-            selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.characterTalents.AttackCharacterAction);
+            selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.talents.AttackCharacterAction);
     }
 
     private void TestAndInsertBurst(int i)
     {
         Character c = characters[i];
-        if (c.isBurstActivated || !c.isAlive || !c.isFullyCharged)
+        if (c.mono.isBurstActivated || !(c.hp > 0) || c.energy < c.maxEnergy)
             return;
 
-        c.ActivateBurst();
+        c.mono.ActivateBurst();
         audioSource.clip = burstInsert;
         audioSource.Play();
         // 只有在目前不是 burst 回合，且仍处于 instruction 阶段时，才能打断别人的行动
         if (!isBurst && curStage == TurnStage.Instruction)
         {
+            interrupted = true;
+            curCharacter.mono.InterruptedByBurst();
             runway.InsertBurst(c, true);
             isBurst = true;
-            curCharacter.InterruptedByBurst();
             curCharacter = c;
             curCreature = c;
             BurstTurn();
@@ -355,29 +398,54 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    private void ShowCharacterDetail(int x)
+    {
+        if (chaDetailActivated)
+            return;
+        Character c = characters[x];
+        chaDetailActivated = true;
+        characterDetail.SetActive(true);
+        Text t = characterDetail.GetComponentInChildren<Text>();
+        string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
+            + "  " + Utils.CareerName[(int)c.career];
+        show += "\n" + c.atkName + "：" + c.atkDescription;
+        show += "\n" + c.skillName + "：" + c.skillDescription;
+        show += "\n" + c.burstName + "：" + c.burstDescription;
+        show += "\n" + c.talentName + "：" + c.talentDescription;
+
+        show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
+        show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;
+        show += "\n生命值：" + c.hp + "  位置：" + (c.location / Runway.Length * 100) + "%";
+
+        for(int i = 0; i < (int)CommonAttribute.Count; ++i)
+        {
+            float b = c.GetBaseAttr((CommonAttribute)i);
+            float f = c.GetFinalAttr((CommonAttribute)i);
+            show += "\n" + Utils.attributeNames[i] + "：" +
+                 b + " + <color=green>" + (f-b) + "</color> = " + f;
+        }
+        t.text = show;
+    }
+
     public void RemoveEnemy(Enemy e)
     {
+        if (!enemies.Contains(e))
+            return;
         enemies.Remove(e);
+        runway.RemoveCreature(e);
     }
 
     public void RemoveCharacter(Character c)
     {
+        if (!characters.Contains(c))
+            return;
+        runway.RemoveCreature(c);
         characters.Remove(c);
+        deadCharacters.Add(c);
     }
 
-    public void DealDamage(Creature source, Creature target, Element element, DamageType type, float value)
-    {
-        source.talents.OnDealingDamage(target, value, element, type);
-        target.TakeDamage(source, value, element, type);
-    }
 
     // Animation Settings
-    float burstSplashSpeed = .01f;
-    const float BURST_INIT_SPEED = 3f;
-    const float BURST_FINAL_SPEED = .1f;
-    const float BURST_IMAGE_HALF_DISTANCE = .48f; // 速度变化的长度
-    const float BURST_IMAGE_WIDTH = 1.5f;  // 图片宽度
-    const float ACCELERATION = (BURST_INIT_SPEED * BURST_INIT_SPEED - BURST_FINAL_SPEED * BURST_FINAL_SPEED) / (BURST_IMAGE_HALF_DISTANCE * (1 + BURST_IMAGE_WIDTH)) / 2; // 加速度
 
     IEnumerator ChangeLocalScale(RectTransform tran, Vector3 target, float time)
     {
@@ -394,47 +462,46 @@ public class BattleManager : MonoBehaviour
         tran.localScale = target;
     }
 
-    public void BurstSplash(Character c)
+    public void BurstSplash(CharacterMono c)
     {
         splash.sprite = c.burstSplash;
         StopCoroutine(BurstSplashAnim());
         StartCoroutine(BurstSplashAnim());
     }
 
+    const float ACCELERATION = .5f; // 加速度
+
     IEnumerator BurstSplashAnim()
     {
-        splash.rectTransform.anchorMin = new Vector2(1f, -.5f);
-        splash.rectTransform.anchorMax = new Vector2(1 + BURST_IMAGE_WIDTH, 1.05f);
-        burstSplashSpeed = BURST_INIT_SPEED;
-        float slow_len = (1 + BURST_IMAGE_WIDTH) * (1 - 2 * BURST_IMAGE_HALF_DISTANCE);
-        while (splash.rectTransform.anchorMin.x > .5f - BURST_IMAGE_WIDTH / 2 + slow_len / 2)
+        float burstSplashSpeed = .5f;
+        splash.gameObject.SetActive(true);
+        float scale = 1.25f;
+        splash.rectTransform.localScale = Vector3.one * scale;
+        float timer = 0;
+        while (timer <= .8f)
         {
             yield return new WaitForEndOfFrame();
-            splash.rectTransform.anchorMax += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            splash.rectTransform.anchorMin += Vector2.left * burstSplashSpeed * Time.deltaTime;
+            scale -= burstSplashSpeed * Time.deltaTime;
+            splash.rectTransform.localScale = Vector3.one * scale;
             burstSplashSpeed -= Time.deltaTime * ACCELERATION;
+            if (burstSplashSpeed <= .01f)
+                burstSplashSpeed = .01f;
+            timer += Time.deltaTime;
         }
-        while (splash.rectTransform.anchorMin.x > .5f - BURST_IMAGE_WIDTH / 2 - slow_len / 2)
-        {
-            yield return new WaitForEndOfFrame();
-            splash.rectTransform.anchorMax += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            splash.rectTransform.anchorMin += Vector2.left * burstSplashSpeed * Time.deltaTime;
-        }
-        while (splash.rectTransform.anchorMin.x > -BURST_IMAGE_WIDTH)
-        {
-            yield return new WaitForEndOfFrame();
-            splash.rectTransform.anchorMax += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            splash.rectTransform.anchorMin += Vector2.left * burstSplashSpeed * Time.deltaTime;
-            burstSplashSpeed += Time.deltaTime * ACCELERATION;
-        }
+        new WaitForSeconds(.2f);
+        splash.gameObject.SetActive(false);
     }
 
     IEnumerator CloseVideoAfterPlay(double seconds)
     {
+        bgm.Pause();
+        screenCanvas.SetActive(false);
         yield return new WaitForSeconds((float)seconds);
         videoPlayer.enabled = false;
-        selection.ApplyAction();
+        selection.ApplyAction(curCharacter.onBurst);
         curStage = TurnStage.Animation;
+        screenCanvas.SetActive(true);
+        bgm.Play();
     }
 
     IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)

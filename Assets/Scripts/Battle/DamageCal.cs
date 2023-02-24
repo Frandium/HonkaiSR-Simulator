@@ -4,47 +4,35 @@ using UnityEngine;
 
 public class DamageCal
 {
-    public static float DamageCharacter(Character source, CommonAttribute attr, Element element, float rate, float offset = 0)
+    public static float NormalDamage(Creature source, Creature target, CommonAttribute attr, 
+        Element element, float rate, DamageType damageType, float offset = 0)
     {
-        float dmgBase = source.GetFinalAttr(attr) * rate / 100.0f + offset;
-        float elebonus = source.GetFinalAttr((int)CharacterAttribute.AnemoBonus + (int)element);
-        float genebonus = source.GetFinalAttr(CharacterAttribute.GeneralBonus);
+        float dmgBase = source.GetFinalAttr(source, target, attr, damageType) * rate / 100.0f + offset;
+        float elebonus = source.GetFinalAttr(source, target, CommonAttribute.PhysicalBonus + (int)element, damageType);
+        float genebonus = source.GetFinalAttr(source, target, CommonAttribute.GeneralBonus, damageType);
         float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限
         float dmg = dmgBase * overallBonus;
-        if (Random.Range(0, 1000) < source.GetFinalAttr((int)CharacterAttribute.CriticalRate) * 1000)
+        if (Random.Range(0, 1000) < source.GetFinalAttr(source, target, CommonAttribute.CriticalRate, damageType) * 1000)
         {
-            dmg *= source.GetFinalAttr((int)CharacterAttribute.CriticalDmg);
+            dmg *= source.GetFinalAttr(source, target, CommonAttribute.CriticalDamage, damageType);
         }
-        return dmg;
-    }
-    public static float ATKDamageEnemy(Enemy source, Element element, float rate)
-    {
-        int type = (int)element;
-        float dmgBase = source.GetFinalAttr((int)CommonAttribute.ATK) * rate / 100.0f;
-        float overallBonus = 1; // + Mathf.Max(0, source.GetFinalAttr((int)CharacterAttribute.AnemoBonus + (int)element) + source.GetFinalAttr((int)CharacterAttribute.GeneralBonus)); // 伤害加成下限 0，无上限
-        float dmg = dmgBase * overallBonus;
-        //if (Random.Range(0, 1000) < source.GetFinalAttr((int)CharacterAttribute.CriticalRate) * 1000)
-        //{
-        //    dmg *= source.GetFinalAttr((int)CharacterAttribute.CriticalDmg);
-        //}
-        return dmg;
-    }
 
-    public static float ResistDamage(float value, Element element, Creature target)
-    {
-        int type = (int)element;
-        float defRate = 1 - target.GetFinalAttr((int)CommonAttribute.DEF) / (target.GetFinalAttr((int)CommonAttribute.DEF) + 2000);
-        float overallResist = 1 - (target.GetFinalAttr((int)CommonAttribute.AnemoResist + (int)element) + target.GetFinalAttr((int)CommonAttribute.GeneralResist));
+        float def = target.GetFinalAttr(source, target, CommonAttribute.DEF, damageType);
+        float defRate = 1 - def / (def + 2000);
+        float overallResist = 1 
+            - target.GetFinalAttr(source, target, CommonAttribute.PhysicalResist + (int)element, damageType) 
+            - target.GetFinalAttr(source, target, CommonAttribute.GeneralResist, damageType);
         if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
         if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
-        value *= overallResist * defRate;
-        return value;
+        dmg *= overallResist * defRate;
+        return dmg;
     }
 
-    public static float Heal(Creature source, CommonAttribute attr, float rate, float offset)
+    public static float Heal(CreatureMono source, CreatureMono target, CommonAttribute attr, float rate, float offset)
     {
-        float heal_base = source.GetFinalAttr(attr) * rate / 100 + offset;
-        // 治疗加成
-        return heal_base;
+        return 0;
+        //float heal_base = source.GetFinalAttr(source, target, attr) * rate / 100 + offset;
+        //// 治疗加成
+        //return heal_base;
     }
 }

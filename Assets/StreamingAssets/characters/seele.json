@@ -1,0 +1,261 @@
+{
+    "dbname": "seele",
+    "disname": "希儿",
+    "element": 5,
+    "career": 1,
+    "maxEnergy": 60.0,
+    "level": 30,
+    "breakLevel": 2,
+    "constellation": 0,
+    "atkLevel": 1,
+    "skillLevel": 1,
+    "burstLevel": 1,
+    "attrs": [
+        [79.0, 154.0, 186.0, 225.0, 235.0, 297.0, 328.0, 368.0, 399.0, 399.0, 399.0, 399.0, 399.0, 896.0],
+        [72.0, 141.0, 170.0, 206.0, 235.0, 272.0, 301.0, 337.0, 366.0, 366.0, 366.0, 366.0, 366.0, 821.0],
+        [168.0, 329.0, 397.0, 481.0, 549.0, 633.0, 701.0, 785.0, 853.0, 853.0, 853.0, 853.0, 853.0, 1912.0],
+        115.0,
+        0.05,
+        0.5,
+        0.0,
+        0.0,
+        1.0,
+        100.0,
+        0.05,
+        0.05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "isAttackTargetEnemy": true,
+    "attackSelectionType": 1,
+    "attackGainEnergy": 5.0,
+    "attackGainPointCount": 1,
+    "isSkillTargetEnemy": true,
+    "skillSelectionType": 1,
+    "skillConsumePointCount": 1,
+    "skillGainEnergy": 10.0,
+    "isBurstTargetEnemy": true,
+    "burstSelectionType": 1,
+    "takeDmgGainEnergy": 5.0,
+    "weapon": {
+        "name": "inTheNight",
+        "level": 30,
+        "breakLevel": 2,
+        "refine": 1
+    },
+    "artifacts": [{
+            "suitName": "default",
+            "position": 0,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [{
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 1,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [{
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 2,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [{
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 3,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [{
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 4,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [{
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 5,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [{
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        }
+    ],
+    "atk": {
+        "name": "强袭",
+        "description": "对指定敌方单体造成等同于希儿50%攻击力的量子属性伤害。"
+    },
+    "skill": {
+        "name": "归刃",
+        "description": "对指定敌方单体造成等同于希儿110%攻击力的量子属性伤害，并使自身速度提高25%，持续2回合。"
+    },
+    "burst": {
+        "name": "乱蝶",
+        "description": "立即进入增幅状态，并对指定敌方单体造成等同于希儿240%攻击力的量子属性伤害。"
+    },
+    "talent": {
+        "name": "再现",
+        "description": "消灭敌方目标时立即获得一个再次行动的机会并进人增幅状态，增幅状态下希儿攻击造成的伤害提高40%，持续1回合。 若希儿在因天赋【再现】获得的额外行动机会中消灭敌方目标，此天赋不会生效。"
+    },
+    "mystery": {
+        "name": "幻身",
+        "description": "希儿立即进入增幅状态。"
+    }
+}

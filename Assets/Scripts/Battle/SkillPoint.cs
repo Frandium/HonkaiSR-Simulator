@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class SkillPoint : MonoBehaviour
 {
-    int maxPoint = 4;
+    int maxPoint = 5;
     int pointCount = 0;
 
     public Image[] pointImage;
