@@ -1,0 +1,313 @@
+{
+    "dbname": "japard",
+    "disname": "杰帕德",
+    "element": 2,
+    "career": 5,
+    "maxEnergy": 60.0,
+    "level": 30,
+    "breakLevel": 2,
+    "constellation": 0,
+    "atkLevel": 1,
+    "skillLevel": 1,
+    "burstLevel": 1,
+    "attrs": [
+        [
+            73.0,
+            144.0,
+            173.0,
+            210.0,
+            240.0,
+            277.0,
+            306.0,
+            343.0,
+            373.0,
+            410.0,
+            410.0,
+            410.0,
+            410.0,
+            410.0
+        ],
+        [
+            89.0,
+            173.0,
+            209.0,
+            253.0,
+            289.0,
+            334.0,
+            369.0,
+            414.0,
+            449.0,
+            494.0,
+            494.0,
+            494.0,
+            494.0,
+            494.0
+        ],
+        [
+            190.0,
+            370.0,
+            446.0,
+            541.0,
+            617.0,
+            712.0,
+            788.0,
+            883.0,
+            959.0,
+            1054.0,
+            1054.0,
+            1054.0,
+            1054.0,
+            1054.0
+        ],
+        92.0,
+        0.05,
+        0.5,
+        0.0,
+        0.0,
+        1.0,
+        100.0,
+        0.05,
+        0.05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "isAttackTargetEnemy": true,
+    "attackSelectionType": 1,
+    "attackGainEnergy": 5.0,
+    "attackGainPointCount": 1,
+    "isSkillTargetEnemy": true,
+    "skillSelectionType": 1,
+    "skillConsumePointCount": 1,
+    "skillGainEnergy": 10.0,
+    "isBurstTargetEnemy": false,
+    "burstSelectionType": 3,
+    "takeDmgGainEnergy": 15.0,
+    "weapon": {
+        "name": "victoryMoment",
+        "level": 30,
+        "breakLevel": 2,
+        "refine": 1
+    },
+    "artifacts": [
+        {
+            "suitName": "default",
+            "position": 0,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 1,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 2,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 3,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 4,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 5,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        }
+    ],
+    "atk": {
+        "name": "一意之拳",
+        "description": "对指定敌方单体造成等同于杰帕德50%攻击力的冰属性伤害。"
+    },
+    "skill": {
+        "name": "震撼之击",
+        "description": "对指定敌方单体造成等同于杰帕德100%攻击力的冰属性伤害，同时有65%的基础概率使受到攻击的敌方目标陷入冻结状态，持续1回合。冻结状态下，敌方不能行动同时每回合受到等同于杰帕德25%攻击力的冰属性持续伤害。"
+    },
+    "burst": {
+        "name": "永屹之壁",
+        "description": "为我方全体提供能够抵消等同于杰帕德36%防御力+120伤害的护盾，持续3回合。"
+    },
+    "talent": {
+        "name": "不屈之身",
+        "description": "受到致命攻击时杰帕德不会陷入无法战斗状态，并立即回复等同于自身生命上限25%的生命值。该效果单场战斗中只触发次。"
+    },
+    "mystery": {
+        "name": "有情之证",
+        "description": "我方全体获得等同于杰帕德25%防御力的防御力加成，持续2回合。"
+    }
+}

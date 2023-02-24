@@ -1,0 +1,313 @@
+{
+    "dbname": "tingyun",
+    "disname": "停云",
+    "element": 3,
+    "career": 3,
+    "maxEnergy": 60.0,
+    "level": 30,
+    "breakLevel": 2,
+    "constellation": 0,
+    "atkLevel": 1,
+    "skillLevel": 1,
+    "burstLevel": 1,
+    "attrs": [
+        [
+            72.0,
+            140.0,
+            169.0,
+            205.0,
+            234.0,
+            270.0,
+            298.0,
+            334.0,
+            363.0,
+            363.0,
+            363.0,
+            363.0,
+            363.0,
+            363.0
+        ],
+        [
+            54.0,
+            105.0,
+            126.0,
+            153.0,
+            175.0,
+            202.0,
+            224.0,
+            251.0,
+            272.0,
+            272.0,
+            272.0,
+            272.0,
+            272.0,
+            272.0
+        ],
+        [
+            115.0,
+            224.0,
+            270.0,
+            328.0,
+            374.0,
+            432.0,
+            478.0,
+            535.0,
+            581.0,
+            581.0,
+            581.0,
+            581.0,
+            581.0,
+            581.0
+        ],
+        112.0,
+        0.05,
+        0.5,
+        0.0,
+        0.0,
+        1.0,
+        100.0,
+        0.05,
+        0.05,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+    ],
+    "isAttackTargetEnemy": true,
+    "attackSelectionType": 1,
+    "attackGainEnergy": 5.0,
+    "attackGainPointCount": 1,
+    "isSkillTargetEnemy": false,
+    "skillSelectionType": 1,
+    "skillConsumePointCount": 1,
+    "skillGainEnergy": 10.0,
+    "isBurstTargetEnemy": false,
+    "burstSelectionType": 1,
+    "takeDmgGainEnergy": 15.0,
+    "weapon": {
+        "name": "battleNotEnd",
+        "level": 30,
+        "breakLevel": 2,
+        "refine": 1
+    },
+    "artifacts": [
+        {
+            "suitName": "default",
+            "position": 0,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 1,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 2,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 3,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 4,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        },
+        {
+            "suitName": "default",
+            "position": 5,
+            "main": {
+                "attr": 1,
+                "value": 0.0,
+                "type": 0
+            },
+            "vice": [
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                },
+                {
+                    "attr": 1,
+                    "value": 0.0,
+                    "type": 0
+                }
+            ]
+        }
+    ],
+    "atk": {
+        "name": "逐客令",
+        "description": "对指定敌方单体造成等同于停云50%攻击力的雷属性伤害。"
+    },
+    "skill": {
+        "name": "祥音和韵",
+        "description": "使指定我方单体攻击力提高25%，最高不超过停云当前攻击力的15%，并对其【赐福】。得到【赐福】的我方单体3回合内对敌方目标造成伤害后，会额外造成1次等同于自身20%攻击力的雷属性附加伤害。【赐福】仅对停云战技最新的施放目标生效。"
+    },
+    "burst": {
+        "name": "庆云光覆仪祷",
+        "description": "为我方目标恢复50点能量，同时使目标造成的伤害提高20%，持续3回合。"
+    },
+    "talent": {
+        "name": "紫电扶摇",
+        "description": "停云对敌方目标造成伤害时，会额外造成等同于被【赐福】目标30%攻击力的雷属性附加伤害。"
+    },
+    "mystery": {
+        "name": "惠风和畅",
+        "description": "战斗开始时具有50点能量。"
+    }
+}
