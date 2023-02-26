@@ -66,7 +66,7 @@ public class Creature
 
     public void ChangePercentageLocation(float offset)
     {
-        location += offset * Runway.Length / 100.0f;
+        location += offset * Runway.Length;
         if (location < 0)
             location = 0;
         if (location > Runway.Length)

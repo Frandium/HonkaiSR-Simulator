@@ -7,7 +7,7 @@ public class DamageCal
     public static float NormalDamage(Creature source, Creature target, CommonAttribute attr, 
         Element element, float rate, DamageType damageType, float offset = 0)
     {
-        float dmgBase = source.GetFinalAttr(source, target, attr, damageType) * rate / 100.0f + offset;
+        float dmgBase = source.GetFinalAttr(source, target, attr, damageType) * rate+ offset;
         float elebonus = source.GetFinalAttr(source, target, CommonAttribute.PhysicalBonus + (int)element, damageType);
         float genebonus = source.GetFinalAttr(source, target, CommonAttribute.GeneralBonus, damageType);
         float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限

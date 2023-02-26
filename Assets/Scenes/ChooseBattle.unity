@@ -2383,7 +2383,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u9009\u62E9\u6218\u6597\u914D\u7F6E\u6587\u4EF6"
+  m_Text: "\u9009\u62E9<color=#f08>\u6218\u6597</color>\u914D\u7F6E\u6587\u4EF6"
 --- !u!222 &1423857004
 CanvasRenderer:
   m_ObjectHideFlags: 0

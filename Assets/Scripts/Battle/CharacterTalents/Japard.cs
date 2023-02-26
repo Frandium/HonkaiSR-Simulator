@@ -8,11 +8,12 @@ public class Japard : ACharacterTalents
     {
 
     }
+    float atkDmg, skillAtk, skillFreeze, burstDefPer, burstDefIns, talentHp;
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 50, DamageType.Attack);
+        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, atkDmg, DamageType.Attack);
         self.DealDamage(e, Element.Cryo, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -20,9 +21,9 @@ public class Japard : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 100, DamageType.Skill);
+        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
         self.DealDamage(e, Element.Cryo, DamageType.Skill, dmg);
-        float hit = .6f * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
+        float hit = .65f * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
         float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
         if (Utils.TwoRandom(hit) && !Utils.TwoRandom(resist))
         {
@@ -34,7 +35,7 @@ public class Japard : ACharacterTalents
                 {
                     if (e.IsUnderState(StateType.Frozen))
                     {
-                        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 25, DamageType.Continue);
+                        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillFreeze, DamageType.Continue);
                         self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
                     }
                 }));
@@ -44,7 +45,7 @@ public class Japard : ACharacterTalents
 
     public override void BurstCharacterAction(List<Character> characters)
     {
-        float shield = .36f * self.GetFinalAttr(CommonAttribute.DEF) + 120;
+        float shield = burstDefPer * self.GetFinalAttr(CommonAttribute.DEF) + burstDefIns;
         foreach(Character c in characters)
         {
             c.GetShield(new Shield("japardBurst", shield, 3));
@@ -54,6 +55,13 @@ public class Japard : ACharacterTalents
 
     public override void OnEquipping()
     {
+        atkDmg = (float)(double)self.config["atk"]["dmg"]["value"][self.atkLevel];
+        skillAtk = (float)(double)self.config["skill"]["atk"]["value"][self.skillLevel];
+        skillFreeze = (float)(double)self.config["skill"]["freeze"]["value"][self.skillLevel];
+        burstDefPer = (float)(double)self.config["burst"]["defPer"]["value"][self.burstLevel];
+        burstDefIns = (int)self.config["burst"]["defIns"]["value"][self.burstLevel];
+        talentHp = (float)(double)self.config["talent"]["hp"]["value"][self.burstLevel];
+        
         TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
         t.trigger = (s, v, e, dt) =>
         {

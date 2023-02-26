@@ -20,7 +20,8 @@ public class Character: Creature
     public int constellation { get; protected set; } = 0; // 命之座
     public int atkLevel { get; protected set; } = 1; 
     public int skillLevel { get; protected set; } = 1; 
-    public int burstLevel { get; protected set; } = 1; 
+    public int burstLevel { get; protected set; } = 1;
+    public int talentLevel { get; protected set; } = 1;
 
     public Element element { get; protected set; } = Element.Count;
     public Career career { get; protected set; } = Career.Count;
@@ -82,6 +83,7 @@ public class Character: Creature
         atkLevel = (int)config["atkLevel"];
         skillLevel = (int)config["skillLevel"];
         burstLevel = (int)config["burstLevel"];
+        talentLevel = (int)config["talentLevel"];
         for(int i = 0; i < (int)CommonAttribute.Speed; ++i)
         {
             // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
@@ -109,13 +111,13 @@ public class Character: Creature
             attrs[i] = (float)(double)config["attrs"][i];
         }
         atkName = (string)config["atk"]["name"];
-        atkDescription = (string)config["atk"]["description"];
+        atkDescription = Utils.FormatDescription((string)config["atk"]["description"], config["atk"], atkLevel);
         skillName = (string)config["skill"]["name"];
-        skillDescription = (string)config["skill"]["description"];
+        skillDescription = Utils.FormatDescription((string)config["skill"]["description"], config["skill"], skillLevel);
         burstName = (string)config["burst"]["name"];
-        burstDescription = (string)config["burst"]["description"];
+        burstDescription = Utils.FormatDescription((string)config["burst"]["description"], config["burst"], burstLevel);
         talentName = (string)config["talent"]["name"];
-        talentDescription = (string)config["talent"]["description"];
+        talentDescription = Utils.FormatDescription((string)config["talent"]["description"], config["talent"], talentLevel);
         mysteryName = (string)config["mystery"]["name"];
         mysteryDescription = (string)config["mystery"]["description"];
 
@@ -181,6 +183,7 @@ public class Character: Creature
         talents.OnEquipping();
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
+
 
     public override float GetBaseAttr(CommonAttribute attr)
     {

@@ -74,7 +74,7 @@ public class Weapon: Equipment
         }
 
         effectName = (string)data["effect"]["name"];
-        effectDescription = (string)data["effect"]["description"][refineLevel];
+        effectDescription = Utils.FormatDescription((string)data["effect"]["description"], data["effect"], refine);
         career = (Career)(int)data["career"];
 
         switch (_dbname)

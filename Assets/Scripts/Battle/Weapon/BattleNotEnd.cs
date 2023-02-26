@@ -12,9 +12,12 @@ public class BattleNotEnd : AEquipmentTalents
     }
 
     int gainSkillPointTurn = -1;
+    float selfEnergy, burstEnergy;
     public override void OnEquiping(Character character)
     {
-        character.AddBuff("battleNotEnd", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, (float)(double)config["selfEnergy"][refine]);
+        selfEnergy = (float)(double)config["effect"]["selfEnergy"]["value"][refine];
+        burstEnergy = (float)(double)config["effect"]["burstEnergy"]["value"][refine];
+        character.AddBuff("battleNotEnd", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, selfEnergy);
         character.onBurst.Add("battleNotEndBurstPoint", c => { 
             if(c is Character)
             {
@@ -31,7 +34,7 @@ public class BattleNotEnd : AEquipmentTalents
                 Character cha = c as Character;
                 if(cha != character)
                 {
-                    cha.ChangeEnergy((float)(double)config["burstEnergy"][refine]);
+                    cha.ChangeEnergy(burstEnergy);
                 }
             }
         }

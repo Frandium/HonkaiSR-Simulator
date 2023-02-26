@@ -71,7 +71,7 @@ public class Enemy : Creature
             if (weakHp <= 0)
             {
                 weakHp = 0;
-                ChangePercentageLocation(25f);
+                ChangePercentageLocation(.25f);
                 mono?.ShowMessage("Èõµã»÷ÆÆ", Color.green);
                 mono?.ShowMessage("»÷ÍË25%", Color.green);
                 mono?.ShowMessage("¼õ·À30%", Color.green);

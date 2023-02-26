@@ -279,7 +279,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.ChangePercentageLocation(-100);
+                curCreature.ChangePercentageLocation(-1);
                 curCreature.EndNormalTurn();
             }
         }
@@ -408,10 +408,10 @@ public class BattleManager : MonoBehaviour
         Text t = characterDetail.GetComponentInChildren<Text>();
         string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
             + "  " + Utils.CareerName[(int)c.career];
-        show += "\n" + c.atkName + "：" + c.atkDescription;
-        show += "\n" + c.skillName + "：" + c.skillDescription;
-        show += "\n" + c.burstName + "：" + c.burstDescription;
-        show += "\n" + c.talentName + "：" + c.talentDescription;
+        show += "\n" + c.atkName + "(Lv.<color=#0f8>"+ c.atkLevel + "</color>)：" + c.atkDescription;
+        show += "\n" + c.skillName + "(Lv.<color=#0f8>" + c.skillLevel + "</color>)：" + c.skillDescription;
+        show += "\n" + c.burstName + "(Lv.<color=#0f8>" + c.burstLevel + "</color>)：" + c.burstDescription;
+        show += "\n" + c.talentName + "(Lv.<color=#0f8>" + c.talentLevel + "</color>)：" + c.talentDescription;
 
         show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
         show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;

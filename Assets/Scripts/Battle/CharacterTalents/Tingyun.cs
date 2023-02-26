@@ -9,8 +9,16 @@ public class Tingyun : ACharacterTalents
 
     }
 
+    float atkDmg, skillAtkUp, skillAtkMax, skillDmg, burstDmgUp, talentAtk;
+
     public override void OnEquipping()
     {
+        atkDmg = (float)(double)self.config["atk"]["dmg"]["value"][self.atkLevel];
+        skillAtkUp = (float)(double)self.config["skill"]["atkUp"]["value"][self.atkLevel];
+        skillAtkMax = (float)(double)self.config["skill"]["atkMax"]["value"][self.atkLevel];
+        skillDmg = (float)(double)self.config["skill"]["dmg"]["value"][self.atkLevel];
+        burstDmgUp = (float)(double)self.config["burst"]["dmgUp"]["value"][self.atkLevel];
+        talentAtk = (float)(double)self.config["talent"]["atk"]["value"][self.atkLevel];
         base.OnEquipping();
         self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, v, e, d) =>
         {
@@ -43,7 +51,7 @@ public class Tingyun : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Electro, 50, DamageType.Attack);
+        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Electro, 0.5f, DamageType.Attack);
         self.DealDamage(e, Element.Electro, DamageType.Attack, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -66,7 +74,7 @@ public class Tingyun : ACharacterTalents
         }));
         c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, v, e, d) =>
         {
-            float dmg = DamageCal.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, 20f, d);
+            float dmg = DamageCal.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, 0.2f, d);
             t.TakeDamage(c, dmg, Element.Electro, d);
             return v;
         }, 3));
