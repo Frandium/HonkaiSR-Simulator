@@ -8,25 +8,26 @@ public class Weapon: Equipment
 {
     // Weapon 的 Buff 的特点是没办法被解增益效果清除
 
-    public string dbName;
-    public string disName;
-    public float atk;
-    public float def;
-    public float maxHp;
+    public string dbName { get; protected set; }
+    public string disName { get; protected set; }
+    public float atk { get; protected set; }
+    public float def { get; protected set; }
+    public float maxHp { get; protected set; }
 
-    public int level { get; protected set; }
-    public int breakLevel { get; protected set; }
+    public int level { get { return config.level; } }
+    public int breakLevel { get { return config.breakLevel; } }
+    public int refine { get { return config.refine; } }
     public string effectName { get; protected set; }
     public string effectDescription { get; protected set; }
-    int refine = 1;
     public Career career { get; protected set; } = Career.Count;
 
-
+    WeaponConfig config;
     AEquipmentTalents talents;
 
-    public Weapon(string _dbname, int level, int breakLevel, int refineLevel)
+    public Weapon(WeaponConfig c)
     {
-        LoadJson(_dbname, level, breakLevel, refineLevel);
+        config = c;
+        LoadJson(c.dbname);
     }
 
     public override float CalBuffValue(Creature source, Creature target, CommonAttribute a, DamageType damageType)
@@ -41,19 +42,14 @@ public class Weapon: Equipment
         return res + base.CalBuffValue(source, target, a, damageType);
     }
 
-    public void LoadJson(string _dbname, int _level, int blevel, int refineLevel)
+    public void LoadJson(string _dbname)
     {
         dbName = _dbname;
-        level = _level;
-        refine = refineLevel;
-        breakLevel = blevel;
-
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbName + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // set character template
         disName = (string)data["disname"];
-        int maxLevel = data["atk"].Count;
         if (level < 20)
         {
             atk = (float)Utils.Lerp((double)data["atk"][0], (double)data["atk"][1], 19, level % 20);
@@ -63,7 +59,7 @@ public class Weapon: Equipment
         else if (level >= 20)
         {
             int l = 2 * (level / 10 - 2);
-            if (level % 10 == 0 && blevel == (level / 10 - 1))
+            if (level % 10 == 0 && breakLevel == (level / 10 - 1))
             {
                 l++;
             }

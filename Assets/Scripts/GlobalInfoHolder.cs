@@ -22,9 +22,10 @@ public class GlobalInfoHolder
 
     static GlobalInfoHolder _instance;
 
-    public string characterDir = Application.streamingAssetsPath + "/characters";
-    public string enemyDir = Application.streamingAssetsPath + "/enemies";
-    public string battleDir = Application.streamingAssetsPath + "/battles";
+    public string characterDir { get; protected set; } = Application.streamingAssetsPath + "/characters";
+    public string enemyDir { get; protected set; } = Application.streamingAssetsPath + "/enemies";
+    public string battleDir { get; protected set; } = Application.streamingAssetsPath + "/battles";
+    public string characterConfigDir { get; protected set; } = Application.streamingAssetsPath + "/user";
 
     public string battleFilePath = Application.streamingAssetsPath + "/battles/boss.json";
 

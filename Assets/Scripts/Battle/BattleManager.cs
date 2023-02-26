@@ -402,29 +402,29 @@ public class BattleManager : MonoBehaviour
     {
         if (chaDetailActivated)
             return;
-        Character c = characters[x];
         chaDetailActivated = true;
         characterDetail.SetActive(true);
-        Text t = characterDetail.GetComponentInChildren<Text>();
-        string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
-            + "  " + Utils.CareerName[(int)c.career];
-        show += "\n" + c.atkName + "(Lv.<color=#0f8>"+ c.atkLevel + "</color>)：" + c.atkDescription;
-        show += "\n" + c.skillName + "(Lv.<color=#0f8>" + c.skillLevel + "</color>)：" + c.skillDescription;
-        show += "\n" + c.burstName + "(Lv.<color=#0f8>" + c.burstLevel + "</color>)：" + c.burstDescription;
-        show += "\n" + c.talentName + "(Lv.<color=#0f8>" + c.talentLevel + "</color>)：" + c.talentDescription;
+        characterDetail.GetComponent<CharacterDetailUI>().ShowDetail(characters[x]);
+        //Text t = characterDetail.GetComponentInChildren<Text>();
+        //string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
+        //    + "  " + Utils.CareerName[(int)c.career];
+        //show += "\n" + c.atkName + "(Lv.<color=#0f8>"+ c.atkLevel + "</color>)：" + c.atkDescription;
+        //show += "\n" + c.skillName + "(Lv.<color=#0f8>" + c.skillLevel + "</color>)：" + c.skillDescription;
+        //show += "\n" + c.burstName + "(Lv.<color=#0f8>" + c.burstLevel + "</color>)：" + c.burstDescription;
+        //show += "\n" + c.talentName + "(Lv.<color=#0f8>" + c.talentLevel + "</color>)：" + c.talentDescription;
 
-        show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
-        show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;
-        show += "\n生命值：" + c.hp + "  位置：" + (c.location / Runway.Length * 100) + "%";
+        //show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
+        //show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;
+        //show += "\n生命值：" + c.hp + "  位置：" + (c.location / Runway.Length * 100) + "%";
 
-        for(int i = 0; i < (int)CommonAttribute.Count; ++i)
-        {
-            float b = c.GetBaseAttr((CommonAttribute)i);
-            float f = c.GetFinalAttr((CommonAttribute)i);
-            show += "\n" + Utils.attributeNames[i] + "：" +
-                 b + " + <color=green>" + (f-b) + "</color> = " + f;
-        }
-        t.text = show;
+        //for(int i = 0; i < (int)CommonAttribute.Count; ++i)
+        //{
+        //    float b = c.GetBaseAttr((CommonAttribute)i);
+        //    float f = c.GetFinalAttr((CommonAttribute)i);
+        //    show += "\n" + Utils.attributeNames[i] + "：" +
+        //         b + " + <color=green>" + (f-b) + "</color> = " + f;
+        //}
+        //t.text = show;
     }
 
     public void RemoveEnemy(Enemy e)

@@ -211,7 +211,7 @@ public class Creature
         ValueType vt = valueType;
         float v = value;
         CommonAttribute a = attr;
-        Buff b = Utils.valueBuffPool.GetOne().Set("default", buffType, attr, duration, (s, t, d) =>
+        Buff b = Utils.valueBuffPool.GetOne().Set(tag, buffType, attr, duration, (s, t, d) =>
         {
             if(dt != DamageType.All && d != dt)
                 return 0;
@@ -219,7 +219,7 @@ public class Creature
                 return v;
             return s.GetBaseAttr(a) * v;
         });
-        AddBuff(b, false);
+        AddBuff(b);
     }
 
     public virtual void RemoveBuff(string tag)

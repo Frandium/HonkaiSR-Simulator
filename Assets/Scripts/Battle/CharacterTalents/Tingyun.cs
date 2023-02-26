@@ -13,12 +13,12 @@ public class Tingyun : ACharacterTalents
 
     public override void OnEquipping()
     {
-        atkDmg = (float)(double)self.config["atk"]["dmg"]["value"][self.atkLevel];
-        skillAtkUp = (float)(double)self.config["skill"]["atkUp"]["value"][self.atkLevel];
-        skillAtkMax = (float)(double)self.config["skill"]["atkMax"]["value"][self.atkLevel];
-        skillDmg = (float)(double)self.config["skill"]["dmg"]["value"][self.atkLevel];
-        burstDmgUp = (float)(double)self.config["burst"]["dmgUp"]["value"][self.atkLevel];
-        talentAtk = (float)(double)self.config["talent"]["atk"]["value"][self.atkLevel];
+        atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
+        skillAtkUp = (float)(double)self.metaData["skill"]["atkUp"]["value"][self.atkLevel];
+        skillAtkMax = (float)(double)self.metaData["skill"]["atkMax"]["value"][self.atkLevel];
+        skillDmg = (float)(double)self.metaData["skill"]["dmg"]["value"][self.atkLevel];
+        burstDmgUp = (float)(double)self.metaData["burst"]["dmgUp"]["value"][self.atkLevel];
+        talentAtk = (float)(double)self.metaData["talent"]["atk"]["value"][self.atkLevel];
         base.OnEquipping();
         self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, v, e, d) =>
         {

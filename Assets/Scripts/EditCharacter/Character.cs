@@ -16,23 +16,24 @@ public class Character: Creature
     public string mysteryName = "秘技";
     public string mysteryDescription = "秘技效果";
 
-    public int breakLevel { get; protected set; } = 4;
-    public int constellation { get; protected set; } = 0; // 命之座
-    public int atkLevel { get; protected set; } = 1; 
-    public int skillLevel { get; protected set; } = 1; 
-    public int burstLevel { get; protected set; } = 1;
-    public int talentLevel { get; protected set; } = 1;
+    public int breakLevel { get { return config.breakLevel; } }
+    public int constellaLevel { get { return config.constellaLevel; }} // 命之座
+    public int atkLevel { get { return config.atkLevel; } }
+    public int skillLevel { get { return config.skillLevel; } }
+    public int burstLevel { get { return config.burstLevel; } }
+    public int talentLevel { get { return config.talentLevel; } }
 
     public Element element { get; protected set; } = Element.Count;
     public Career career { get; protected set; } = Career.Count;
     public float energy { get; protected set; } = 0;
     public float maxEnergy { get; protected set; } = 60;
     public ACharacterTalents talents { get; protected set; }
-    public JsonData config { get; protected set; }
+    public JsonData metaData { get; protected set; }
     public new CharacterMono mono { get; protected set; }
+    public CharacterConfig config { get; protected set; }
     public Weapon weapon;
     public List<AEquipmentTalents> artifactsSuit = new List<AEquipmentTalents>();
-    public Artifact[] artifacts = new Artifact[(int)ArtifactPosition.Count];
+    public List<Artifact> artifacts = new List<Artifact>((int)ArtifactPosition.Count);
 
     public bool isAttackTargetEnemy { get; protected set; } = true;
     public SelectionType attackSelectionType { get; protected set; } = SelectionType.One;
@@ -67,29 +68,24 @@ public class Character: Creature
         }
         artifactsSuit.Clear();
 
+         config = new CharacterConfig(name);
+
         // Load 角色基本属性
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
-        config = JsonMapper.ToObject(jsonString);
+        metaData = JsonMapper.ToObject(jsonString);
 
         // set character template
         dbname = name;
-        disname = (string)config["disname"];
-        level = (int)config["level"];
-        element = (Element)(int)config["element"];
-        career = (Career)(int)config["career"];
-        breakLevel = (int)config["breakLevel"];
-        maxEnergy = (float)(double)config["maxEnergy"];
-        constellation = (int)config["constellation"];
-        atkLevel = (int)config["atkLevel"];
-        skillLevel = (int)config["skillLevel"];
-        burstLevel = (int)config["burstLevel"];
-        talentLevel = (int)config["talentLevel"];
+        disname = (string)metaData["disname"];
+        element = (Element)(int)metaData["element"];
+        career = (Career)(int)metaData["career"];
+        maxEnergy = (float)(double)metaData["maxEnergy"];
         for(int i = 0; i < (int)CommonAttribute.Speed; ++i)
         {
             // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
             if(level < 20)
             {
-                attrs[i] = Utils.Lerp((float)(double)config["attrs"][i][0], (float)(double)config["attrs"][i][0], 19, level - 1);
+                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][0], (float)(double)metaData["attrs"][i][0], 19, level - 1);
                 continue;
             }
             int levelRate = level % 10;
@@ -97,68 +93,63 @@ public class Character: Creature
             {
                 // 突破等级最低为0， 最高为 6
                 if(breakLevel == level / 10 - 1)
-                    attrs[i] = (float)(double)config["attrs"][i][2 * breakLevel];
+                    attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel];
                 else
-                    attrs[i] = (float)(double)config["attrs"][i][2 * breakLevel - 1];
+                    attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel - 1];
             }
             else
             {
-                attrs[i] = Utils.Lerp((float)(double)config["attrs"][i][2 * breakLevel - 2], (float)(double)config["attrs"][i][2 * breakLevel - 1], levelRate, 10);
+                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][2 * breakLevel - 2], (float)(double)metaData["attrs"][i][2 * breakLevel - 1], levelRate, 10);
             }
         }
         for(int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
         {
-            attrs[i] = (float)(double)config["attrs"][i];
+            attrs[i] = (float)(double)metaData["attrs"][i];
         }
-        atkName = (string)config["atk"]["name"];
-        atkDescription = Utils.FormatDescription((string)config["atk"]["description"], config["atk"], atkLevel);
-        skillName = (string)config["skill"]["name"];
-        skillDescription = Utils.FormatDescription((string)config["skill"]["description"], config["skill"], skillLevel);
-        burstName = (string)config["burst"]["name"];
-        burstDescription = Utils.FormatDescription((string)config["burst"]["description"], config["burst"], burstLevel);
-        talentName = (string)config["talent"]["name"];
-        talentDescription = Utils.FormatDescription((string)config["talent"]["description"], config["talent"], talentLevel);
-        mysteryName = (string)config["mystery"]["name"];
-        mysteryDescription = (string)config["mystery"]["description"];
+        atkName = (string)metaData["atk"]["name"];
+        atkDescription = Utils.FormatDescription((string)metaData["atk"]["description"], metaData["atk"], atkLevel);
+        skillName = (string)metaData["skill"]["name"];
+        skillDescription = Utils.FormatDescription((string)metaData["skill"]["description"], metaData["skill"], skillLevel);
+        burstName = (string)metaData["burst"]["name"];
+        burstDescription = Utils.FormatDescription((string)metaData["burst"]["description"], metaData["burst"], burstLevel);
+        talentName = (string)metaData["talent"]["name"];
+        talentDescription = Utils.FormatDescription((string)metaData["talent"]["description"], metaData["talent"], talentLevel);
+        mysteryName = (string)metaData["mystery"]["name"];
+        mysteryDescription = (string)metaData["mystery"]["description"];
 
-        isAttackTargetEnemy = (bool)config["isAttackTargetEnemy"];
-        attackSelectionType = (SelectionType)(int)config["attackSelectionType"];
-        isSkillTargetEnemy = (bool)config["isSkillTargetEnemy"];
-        skillSelectionType = (SelectionType)(int)config["skillSelectionType"];
-        isBurstTargetEnemy = (bool)config["isBurstTargetEnemy"];
-        burstSelectionType = (SelectionType)(int)config["burstSelectionType"];
-        attackGainPointCount = (int)config["attackGainPointCount"];
-        skillConsumePointCount = (int)config["skillConsumePointCount"];
-        attackGainEnergy = (float)(double)config["attackGainEnergy"];
-        skillGainEnergy = (float)(double)config["skillGainEnergy"];
-        takeDmgGainEnergy = (float)(double)config["takeDmgGainEnergy"];
+        isAttackTargetEnemy = (bool)metaData["isAttackTargetEnemy"];
+        attackSelectionType = (SelectionType)(int)metaData["attackSelectionType"];
+        isSkillTargetEnemy = (bool)metaData["isSkillTargetEnemy"];
+        skillSelectionType = (SelectionType)(int)metaData["skillSelectionType"];
+        isBurstTargetEnemy = (bool)metaData["isBurstTargetEnemy"];
+        burstSelectionType = (SelectionType)(int)metaData["burstSelectionType"];
+        attackGainPointCount = (int)metaData["attackGainPointCount"];
+        skillConsumePointCount = (int)metaData["skillConsumePointCount"];
+        attackGainEnergy = (float)(double)metaData["attackGainEnergy"];
+        skillGainEnergy = (float)(double)metaData["skillGainEnergy"];
+        takeDmgGainEnergy = (float)(double)metaData["takeDmgGainEnergy"];
 
         // Load 角色光锥
-        JsonData weaponData = config["weapon"];
-        string weaponName = (string)weaponData["name"];
-        int wLevel = (int)weaponData["level"];
-        int rLevle = (int)weaponData["refine"];
-        int bLevle = (int)weaponData["breakLevel"];
-        weapon = new Weapon(weaponName, wLevel, bLevle, rLevle);
-        weapon.OnEquipping(this);
+        weapon = new Weapon(config.weaponConfig);
+        if(weapon.career == career)
+            weapon.OnEquipping(this);
 
         // Load 角色圣遗物
-        JsonData artsJson = config["artifacts"];
         Dictionary<string, int> suitCount = new Dictionary<string, int>();
-        foreach(JsonData artJson in artsJson)
+        foreach(ArtifactConfig arti in config.artifacts)
         {
             // 套装名
-            string suitName = (string)artJson["suitName"];
+            string suitName = arti.suitName;
             if (!suitCount.ContainsKey(suitName))
                 suitCount[suitName] = 0;
             suitCount[suitName]++;
-            // 位置
-            ArtifactPosition pos = (ArtifactPosition)(int)artJson["position"];
+            // 位置 TODO: 检验位置重复
+            ArtifactPosition pos = arti.position;
             // 主属性
-            SimpleValueBuff b = new SimpleValueBuff((CommonAttribute)(int)artJson["main"]["attr"], (float)(double)artJson["main"]["value"], (ValueType)(int)artJson["main"]["type"]);
+            SimpleValueBuff b = new SimpleValueBuff(arti.mainPhrase.attr, (float)arti.mainPhrase.value, arti.mainPhrase.type);
 
             // 副属性
-            artifacts[(int)pos] = new Artifact(b, new List<SimpleValueBuff>());
+            artifacts.Add(new Artifact(b, new List<SimpleValueBuff>()));
         }
 
         // 之后改成反射 dict?

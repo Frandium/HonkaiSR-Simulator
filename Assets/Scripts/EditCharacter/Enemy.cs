@@ -71,12 +71,11 @@ public class Enemy : Creature
             if (weakHp <= 0)
             {
                 weakHp = 0;
-                ChangePercentageLocation(.25f);
+                ChangePercentageLocation(-.25f);
                 mono?.ShowMessage("Èõµã»÷ÆÆ", Color.green);
                 mono?.ShowMessage("»÷ÍË25%", Color.green);
                 mono?.ShowMessage("¼õ·À30%", Color.green);
-                AddBuff("defBreak", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, .3f);
-                // ÆÆ·ÀÊÂ¼þ
+                AddBuff("defBreak", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, -.3f);
             }
         }
         base.TakeDamage(source, value, element, type);

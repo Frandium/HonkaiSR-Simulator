@@ -14,10 +14,10 @@ public class Seele : ACharacterTalents
 
     public override void OnEquipping()
     {
-        atkDmg = (float)(double)self.config["atk"]["dmg"]["value"][self.atkLevel];
-        skillDmg = (float)(double)self.config["skill"]["atk"]["value"][self.atkLevel];
-        burstDmg = (float)(double)self.config["burst"]["atk"]["value"][self.atkLevel];
-        talentDmgUp = (float)(double)self.config["talent"]["dmgUp"]["value"][self.atkLevel];
+        atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
+        skillDmg = (float)(double)self.metaData["skill"]["atk"]["value"][self.atkLevel];
+        burstDmg = (float)(double)self.metaData["burst"]["atk"]["value"][self.atkLevel];
+        talentDmgUp = (float)(double)self.metaData["talent"]["dmgUp"]["value"][self.atkLevel];
         self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleAdditionalTurn",
             (target, v, e, t) =>
         {
@@ -57,7 +57,6 @@ public class Seele : ACharacterTalents
         Enemy e = enemies[0];
         float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, skillDmg, DamageType.Skill);
         self.DealDamage(e, Element.Quantus, DamageType.Skill, dmg);
-        self.RemoveBuff("seeleSkillSpeed");
         self.AddBuff("seeleSkillSpeed", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .25f, 2);
         self.mono?.ShowMessage("ÀŸ∂»Ã·…˝", Color.blue);
         base.SkillEnemyAction(enemies);

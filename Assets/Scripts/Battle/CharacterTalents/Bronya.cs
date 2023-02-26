@@ -15,12 +15,12 @@ public class Bronya : ACharacterTalents
     float locationUp;
     public override void OnEquipping()
     {
-        atkdmg = (float)(double)self.config["atk"]["dmg"]["value"][self.atkLevel];
-        skilldmgUp = (float)(double)self.config["skill"]["dmgUp"]["value"][self.skillLevel];
-        burstAtkUp = (float)(double)self.config["burst"]["atkUp"]["value"][self.skillLevel];
-        burstCrtDmgIns = (float)(double)self.config["burst"]["crtDmgIns"]["value"][self.burstLevel];
-        burstCrtDmgPct = (float)(double)self.config["burst"]["crtDmgPct"]["value"][self.burstLevel];
-        locationUp = (float)(double)self.config["talent"]["location"]["value"][self.talentLevel];
+        atkdmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
+        skilldmgUp = (float)(double)self.metaData["skill"]["dmgUp"]["value"][self.skillLevel];
+        burstAtkUp = (float)(double)self.metaData["burst"]["atkUp"]["value"][self.skillLevel];
+        burstCrtDmgIns = (float)(double)self.metaData["burst"]["crtDmgIns"]["value"][self.burstLevel];
+        burstCrtDmgPct = (float)(double)self.metaData["burst"]["crtDmgPct"]["value"][self.burstLevel];
+        locationUp = (float)(double)self.metaData["talent"]["location"]["value"][self.talentLevel];
         self.onNormalAttack.Add("talent", e =>
         {
             talent_activated = true;
@@ -47,7 +47,7 @@ public class Bronya : ACharacterTalents
     {
         Character c = characters[0];
         c.ChangePercentageLocation(1);
-        c.AddBuff("bronyaSkill", BuffType.Buff, CommonAttribute.GeneralBonus,  ValueType.InstantNumber, skilldmgUp, 1);
+        c.AddBuff("bronyaSkill", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, skilldmgUp, 1);
         c.mono?.ShowMessage("行动提前", Color.black);
         Buff toRemove = c.buffs.Find(b => b.buffType == BuffType.Debuff);
         c.buffs.Remove(toRemove);

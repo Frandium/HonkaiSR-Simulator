@@ -55,12 +55,12 @@ public class Japard : ACharacterTalents
 
     public override void OnEquipping()
     {
-        atkDmg = (float)(double)self.config["atk"]["dmg"]["value"][self.atkLevel];
-        skillAtk = (float)(double)self.config["skill"]["atk"]["value"][self.skillLevel];
-        skillFreeze = (float)(double)self.config["skill"]["freeze"]["value"][self.skillLevel];
-        burstDefPer = (float)(double)self.config["burst"]["defPer"]["value"][self.burstLevel];
-        burstDefIns = (int)self.config["burst"]["defIns"]["value"][self.burstLevel];
-        talentHp = (float)(double)self.config["talent"]["hp"]["value"][self.burstLevel];
+        atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
+        skillAtk = (float)(double)self.metaData["skill"]["atk"]["value"][self.skillLevel];
+        skillFreeze = (float)(double)self.metaData["skill"]["freeze"]["value"][self.skillLevel];
+        burstDefPer = (float)(double)self.metaData["burst"]["defPer"]["value"][self.burstLevel];
+        burstDefIns = (int)self.metaData["burst"]["defIns"]["value"][self.burstLevel];
+        talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.burstLevel];
         
         TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
         t.trigger = (s, v, e, dt) =>

@@ -4,13 +4,6 @@
     "element": 4,
     "career": 3,
     "maxEnergy": 60.0,
-    "level": 30,
-    "breakLevel": 2,
-    "constellation": 0,
-    "atkLevel": 1,
-    "skillLevel": 1,
-    "burstLevel": 1,
-    "talentLevel": 1,
     "attrs": [
         [79.0, 154.0, 186.0, 225.0, 257.0, 297.0, 328.0, 368.0, 399.0, 399.0, 399.0, 399.0, 399.0, 896.0],
         [72.0, 141.0, 170.0, 206.0, 235.0, 272.0, 301.0, 337.0, 366.0, 366.0, 366.0, 366.0, 366.0, 821.0],
@@ -52,200 +45,6 @@
     "isBurstTargetEnemy": false,
     "burstSelectionType": 3,
     "takeDmgGainEnergy": 5.0,
-    "weapon": {
-        "name": "battleNotEnd",
-        "level": 30,
-        "breakLevel": 2,
-        "refine": 1
-    },
-    "artifacts": [
-        {
-            "suitName": "default",
-            "position": 0,
-            "main": {
-                "attr": 1,
-                "value": 0.0,
-                "type": 0
-            },
-            "vice": [
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                }
-            ]
-        },
-        {
-            "suitName": "default",
-            "position": 1,
-            "main": {
-                "attr": 1,
-                "value": 0.0,
-                "type": 0
-            },
-            "vice": [
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                }
-            ]
-        },
-        {
-            "suitName": "default",
-            "position": 2,
-            "main": {
-                "attr": 1,
-                "value": 0.0,
-                "type": 0
-            },
-            "vice": [
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                }
-            ]
-        },
-        {
-            "suitName": "default",
-            "position": 3,
-            "main": {
-                "attr": 1,
-                "value": 0.0,
-                "type": 0
-            },
-            "vice": [
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                }
-            ]
-        },
-        {
-            "suitName": "default",
-            "position": 4,
-            "main": {
-                "attr": 1,
-                "value": 0.0,
-                "type": 0
-            },
-            "vice": [
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                }
-            ]
-        },
-        {
-            "suitName": "default",
-            "position": 5,
-            "main": {
-                "attr": 1,
-                "value": 0.0,
-                "type": 0
-            },
-            "vice": [
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                },
-                {
-                    "attr": 1,
-                    "value": 0.0,
-                    "type": 0
-                }
-            ]
-        }
-    ],
     "atk": {
         "name": "驭风的子弹",
         "description": "对指定敌方单体造成等同于布洛妮娅#dmg#攻击力的风属性伤害。",
@@ -293,18 +92,38 @@
     "ability":[
         {
             "name": "号令",
-            "description": "普攻的暴击率提高至100%",
-            "activated": true
+            "description": "普攻的暴击率提高至100%"
         },
         {
             "name": "阵地",
-            "description": "战斗开始时，我方全体防御力提高20%，持续2回合",
-            "activated": true
+            "description": "战斗开始时，我方全体防御力提高20%，持续2回合"
         },
         {
             "name": "军势",
-            "description": "布洛妮娅在场时，我方全体造成的伤害提高10%",
-            "activated": true
+            "description": "布洛妮娅在场时，我方全体造成的伤害提高10%"
+        }
+    ],
+    "constellation":[
+        {
+            "name": "养精蓄锐",
+            "content": "施放战技时，有50%固定概率恢复1战技点，该效果有1回合的触发冷却。"
+        },
+        {
+            "name": "快速行军",
+            "content": "施放战技指向的我方目标在行动后速度提高30%，持续1回合。"
+        },
+        {
+            "name": "鼓炮齐鸣",
+            "content": "终结技等级+2，最多不超过15级；普攻等级+1，最多不超过15级。"
+        },{
+            "name": "攻其不备",
+            "content": "我方其他角色对弱点为风属性的敌方目标释放普攻后，布洛妮娅立即进行一次追加攻击，对该目标造成等同于普攻伤害80%的风属性伤害，该效果每回合可触发1次。"
+        },{
+            "name": "所向克捷",
+            "content": "战技等级+2，最多不超过15级；天赋等级+2，最多不超过10级。"
+        },{
+            "name": "气贯长虹",
+            "content": "战技对指定我方目标伤害提升效果的持续时间增加1回合。"
         }
     ]
 }

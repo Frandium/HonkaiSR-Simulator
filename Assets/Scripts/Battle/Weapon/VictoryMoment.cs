@@ -33,6 +33,5 @@ public class VictoryMoment : AEquipmentTalents
         character.RemoveBuff("victoryMomentEffectHit");
         character.RemoveBuff("victoryMomentTaunt");
         character.onTakingDamage.RemoveAll(r => r.tag == "victoryMomentDEF2");
-        throw new System.NotImplementedException();
     }
 }
