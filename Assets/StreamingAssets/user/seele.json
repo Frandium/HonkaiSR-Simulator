@@ -2,7 +2,7 @@
     "dbname": "bronya",
     "level": 30,
     "breakLevel": 2,
-    "constellaLevel": 1,
+    "constellaLevel": 6,
     "atkLevel": 2,
     "skillLevel": 2,
     "burstLevel": 2,
@@ -202,8 +202,8 @@
         }
     ],
     "abilityActivated": [
-        false,
-        false,
-        false
+        true,
+        true,
+        true
     ]
 }

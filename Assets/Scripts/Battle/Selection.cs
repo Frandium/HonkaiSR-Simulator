@@ -17,7 +17,7 @@ public class Selection : MonoBehaviour
         }
     }
 
-    public void ApplyAction(Dictionary<string, Character.TalentUponTarget> talent)
+    public void ApplyAction(List<TriggerEvent<Character.TalentUponTarget>> talent)
     {
         if (isTargetEnemy)
         {
@@ -27,11 +27,11 @@ public class Selection : MonoBehaviour
                 selectedEnemies.Add(BattleManager.Instance.enemies[i]);
             }
             enemyAction(selectedEnemies);
-            foreach (var t in talent.Values)
+            foreach (var t in talent)
             {
                 foreach(Enemy e in selectedEnemies)
                 {
-                    t(e);
+                    t.trigger(e);
                 }
             }
 
@@ -44,11 +44,11 @@ public class Selection : MonoBehaviour
                 selectedCharacters.Add(BattleManager.Instance.characters[i]);
             }
             characterAction(selectedCharacters);
-            foreach (var t in talent.Values)
+            foreach (var t in talent)
             {
                 foreach (Character c in selectedCharacters)
                 {
-                    t(c);
+                    t.trigger(c);
                 }
             }
         }

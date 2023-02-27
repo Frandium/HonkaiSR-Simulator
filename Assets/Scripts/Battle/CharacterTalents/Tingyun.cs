@@ -20,15 +20,16 @@ public class Tingyun : ACharacterTalents
         burstDmgUp = (float)(double)self.metaData["burst"]["dmgUp"]["value"][self.atkLevel];
         talentAtk = (float)(double)self.metaData["talent"]["atk"]["value"][self.atkLevel];
         base.OnEquipping();
-        self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, v, e, d) =>
+        self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, d) =>
         {
             if (curSkill != null) {
-                float dmgBase = curSkill.GetFinalAttr(CommonAttribute.ATK) * 30 / 100.0f;
+                float dmgBase = curSkill.GetFinalAttr(CommonAttribute.ATK) * talentAtk;
                 float elebonus = self.GetFinalAttr(self, t, CommonAttribute.PhysicalBonus + (int)Element.Electro, DamageType.All);
                 float genebonus = self.GetFinalAttr(self, t, CommonAttribute.GeneralBonus, DamageType.All);
                 float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限
                 float dmg = dmgBase * overallBonus;
-                if (Random.Range(0, 1000) < self.GetFinalAttr(self, t, CommonAttribute.CriticalRate, DamageType.All) * 1000)
+                bool critical = Utils.TwoRandom(self.GetFinalAttr(self, t, CommonAttribute.CriticalRate, DamageType.All));
+                if (critical)
                 {
                     dmg *= self.GetFinalAttr(self, t, CommonAttribute.CriticalDamage, DamageType.All);
                 }
@@ -42,17 +43,17 @@ public class Tingyun : ACharacterTalents
                 if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
                 dmg *= overallResist * defRate;
 
-                t.TakeDamage(self, dmg, Element.Electro, DamageType.All);
+                t.TakeDamage(self, new Damage(dmg, Element.Electro, DamageType.All, critical));
             }
-            return v;
+            return d;
         }));
     }
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Electro, 0.5f, DamageType.Attack);
-        self.DealDamage(e, Element.Electro, DamageType.Attack, dmg);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Electro, atkDmg, DamageType.Attack);
+        self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -68,15 +69,15 @@ public class Tingyun : ACharacterTalents
         Character c = characters[0];
         c.AddBuff(Utils.valueBuffPool.GetOne().Set("tingyunSkillATK", BuffType.Buff, CommonAttribute.ATK, 3, (s, t, d) =>
         {
-            float res = t.GetBaseAttr(CommonAttribute.ATK) * .25f;
-            res = Mathf.Min(res, self.GetFinalAttr(CommonAttribute.ATK) * .15f);
+            float res = t.GetBaseAttr(CommonAttribute.ATK) * skillAtkUp;
+            res = Mathf.Min(res, self.GetFinalAttr(CommonAttribute.ATK) * skillAtkMax);
             return res;
         }));
-        c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, v, e, d) =>
+        c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
         {
-            float dmg = DamageCal.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, 0.2f, d);
-            t.TakeDamage(c, dmg, Element.Electro, d);
-            return v;
+            Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg, d.type);
+            t.TakeDamage(c, dmg);
+            return d;
         }, 3));
         curSkill = c;
         c.mono?.ShowMessage("赐福", Color.red);
@@ -89,7 +90,7 @@ public class Tingyun : ACharacterTalents
     {
         Character c = characters[0];
         c.ChangeEnergy(50);
-        c.AddBuff("tingyunBurstBonus", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .2f, 3);
+        c.AddBuff("tingyunBurstBonus", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, burstDmgUp, 3);
         c.mono?.ShowMessage("造成伤害提高", Color.red);
         base.BurstCharacterAction(characters);
     }

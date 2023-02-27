@@ -60,12 +60,12 @@ public class CreatureMono : MonoBehaviour
     }
 
     //Battle functions
-    public virtual void TakeDamage(float value, Element e)
+    public virtual void TakeDamage(Damage d)
     {
         hpLine.fillAmount = hpPercentage;
-        int dmg = -Mathf.RoundToInt(value);
+        int dmg = -Mathf.RoundToInt(d.value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        ShowMessage(content, ElementColors[(int)e], () => { if (self.hp <= 0) OnDying(); });
+        ShowMessage(content, ElementColors[(int)d.element], d.isCritical?2:1, () => { if (self.hp <= 0) OnDying(); });
     }
 
     public virtual void TakeHeal(float value)
@@ -85,11 +85,13 @@ public class CreatureMono : MonoBehaviour
     Queue<string> messages = new Queue<string>();
     Queue<Color> colors = new Queue<Color>();
     Queue<Then> thens = new Queue<Then>();
+    Queue<int> fontSize = new Queue<int>();
     bool isMessageShowing = false; 
-    public virtual void ShowMessage(string content, Color c, Then t = null)
+    public virtual void ShowMessage(string content, Color c, int fontsize = 1, Then t = null)
     {
         messages.Enqueue(content);
         colors.Enqueue(c);
+        fontSize.Enqueue(fontsize);
         thens.Enqueue(t);
         if (!isMessageShowing)
         {
@@ -101,13 +103,13 @@ public class CreatureMono : MonoBehaviour
     public virtual IEnumerator ConsumeMessage()
     {
         while (messages.Count > 0) { 
-            StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), thens.Dequeue()));
+            StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), fontSize.Dequeue(), thens.Dequeue()));
             yield return new WaitForSeconds(.3f);
         }
         isMessageShowing = false;
     }
 
-    protected virtual IEnumerator TakeDamangeAnim(string content, Color c, Then then = null)
+    protected virtual IEnumerator TakeDamangeAnim(string content, Color c, int fontsize, Then then = null)
     {
         isAnimFinished = false;
         GameObject go = Instantiate(dmgGO);
@@ -120,6 +122,7 @@ public class CreatureMono : MonoBehaviour
         dmgBgImg.color = new Color(1, 1, 1, dmgBgBaseAlpha);
         rect.localPosition = new Vector3(0, 0, 0);
         t.color = c;
+        t.fontSize = fontsize;
         float dmgAlpha = 1;
         float alphaFadeSpeed = 1 / dmgAnimTime;
         float dmgBgSpeed = (6 - 2.5f) / dmgAnimTime;

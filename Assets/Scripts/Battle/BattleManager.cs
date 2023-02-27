@@ -286,16 +286,17 @@ public class BattleManager : MonoBehaviour
         else
         {
             // 第一回合发动秘技
-            if (mystery != "none")
+            foreach(Character c in characters)
             {
-                Character c = characters.Find(x => x.dbname == mystery);
-                c.talents.Mystery(characters, enemies);
+                c.talents.OnBattleStart(characters, enemies);
+                if (c.dbname == mystery)
+                    c.talents.Mystery(characters, enemies);
             }
         }
 
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
-        bool isAdditional = false;
+        bool isAdditional;
         curCreature = runway.UpdateRunway(out isBurst, out isAdditional);
         if (curCreature is Character) // 玩家的回合
         {
@@ -405,26 +406,6 @@ public class BattleManager : MonoBehaviour
         chaDetailActivated = true;
         characterDetail.SetActive(true);
         characterDetail.GetComponent<CharacterDetailUI>().ShowDetail(characters[x]);
-        //Text t = characterDetail.GetComponentInChildren<Text>();
-        //string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
-        //    + "  " + Utils.CareerName[(int)c.career];
-        //show += "\n" + c.atkName + "(Lv.<color=#0f8>"+ c.atkLevel + "</color>)：" + c.atkDescription;
-        //show += "\n" + c.skillName + "(Lv.<color=#0f8>" + c.skillLevel + "</color>)：" + c.skillDescription;
-        //show += "\n" + c.burstName + "(Lv.<color=#0f8>" + c.burstLevel + "</color>)：" + c.burstDescription;
-        //show += "\n" + c.talentName + "(Lv.<color=#0f8>" + c.talentLevel + "</color>)：" + c.talentDescription;
-
-        //show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
-        //show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;
-        //show += "\n生命值：" + c.hp + "  位置：" + (c.location / Runway.Length * 100) + "%";
-
-        //for(int i = 0; i < (int)CommonAttribute.Count; ++i)
-        //{
-        //    float b = c.GetBaseAttr((CommonAttribute)i);
-        //    float f = c.GetFinalAttr((CommonAttribute)i);
-        //    show += "\n" + Utils.attributeNames[i] + "：" +
-        //         b + " + <color=green>" + (f-b) + "</color> = " + f;
-        //}
-        //t.text = show;
     }
 
     public void RemoveEnemy(Enemy e)

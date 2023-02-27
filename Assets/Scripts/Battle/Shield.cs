@@ -13,9 +13,9 @@ public class Shield : AProgressWithTurn
         hp = maxHp;
     }
 
-    public float TakeDamage(float v)
+    public float TakeDamage(Damage d)
     {
-        hp -= v;
+        hp -= d.value;
         return hp;
     }
 }

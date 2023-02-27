@@ -2,9 +2,22 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DamageCal
+public class Damage
 {
-    public static float NormalDamage(Creature source, Creature target, CommonAttribute attr, 
+    public float value { get; set; }
+    public Element element { get; protected set; }
+    public DamageType type { get; protected set; }
+    public bool isCritical { get; protected set; }
+
+    public Damage(float v, Element e, DamageType t, bool b)
+    {
+        value = v;
+        element = e;
+        type = t;
+        isCritical = b;
+    }
+
+    public static Damage NormalDamage(Creature source, Creature target, CommonAttribute attr, 
         Element element, float rate, DamageType damageType, float offset = 0)
     {
         float dmgBase = source.GetFinalAttr(source, target, attr, damageType) * rate+ offset;
@@ -12,7 +25,8 @@ public class DamageCal
         float genebonus = source.GetFinalAttr(source, target, CommonAttribute.GeneralBonus, damageType);
         float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限
         float dmg = dmgBase * overallBonus;
-        if (Random.Range(0, 1000) < source.GetFinalAttr(source, target, CommonAttribute.CriticalRate, damageType) * 1000)
+        bool critical = Utils.TwoRandom(source.GetFinalAttr(source, target, CommonAttribute.CriticalRate, damageType));
+        if (critical)
         {
             dmg *= source.GetFinalAttr(source, target, CommonAttribute.CriticalDamage, damageType);
         }
@@ -25,7 +39,7 @@ public class DamageCal
         if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
         if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
         dmg *= overallResist * defRate;
-        return dmg;
+        return new Damage(dmg, element, damageType, critical);
     }
 
     public static float Heal(CreatureMono source, CreatureMono target, CommonAttribute attr, float rate, float offset)

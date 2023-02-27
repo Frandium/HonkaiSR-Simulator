@@ -20,10 +20,10 @@ public class VictoryMoment : AEquipmentTalents
         character.AddBuff("victoryMomentEffectHit", BuffType.Permanent, CommonAttribute.EffectHit, ValueType.InstantNumber, effHit);
         character.AddBuff("victoryMomentTaunt", BuffType.Permanent, CommonAttribute.Taunt, ValueType.InstantNumber, 100);
 
-        character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, v, e, d) =>
+        character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, d) =>
         {
             character.AddBuff("victoryMomentDEF2", BuffType.Buff, CommonAttribute.DEF, ValueType.Percentage, def2, 1);
-            return v;
+            return d;
         }));
     }
 

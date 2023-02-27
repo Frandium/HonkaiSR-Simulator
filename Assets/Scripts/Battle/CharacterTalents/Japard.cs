@@ -13,16 +13,16 @@ public class Japard : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, atkDmg, DamageType.Attack);
-        self.DealDamage(e, Element.Cryo, DamageType.Attack, dmg);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, atkDmg, DamageType.Attack);
+        self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
 
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
-        self.DealDamage(e, Element.Cryo, DamageType.Skill, dmg);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
+        self.DealDamage(e, dmg);
         float hit = .65f * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
         float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
         if (Utils.TwoRandom(hit) && !Utils.TwoRandom(resist))
@@ -35,8 +35,8 @@ public class Japard : ACharacterTalents
                 {
                     if (e.IsUnderState(StateType.Frozen))
                     {
-                        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillFreeze, DamageType.Continue);
-                        self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
+                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillFreeze, DamageType.Continue);
+                        self.DealDamage(e, dmg);
                     }
                 }));
         }
@@ -63,17 +63,17 @@ public class Japard : ACharacterTalents
         talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.burstLevel];
         
         TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
-        t.trigger = (s, v, e, dt) =>
+        t.trigger = (s, d) =>
         {
-            if (self.hp - v <= 0)
+            if (self.hp - d.value <= 0)
             {
                 self.hp = .25f * self.GetFinalAttr(CommonAttribute.MaxHP);
                 self.mono.hpLine.fillAmount = self.mono.hpPercentage;
                 self.mono?.ShowMessage("²»ÇüÖ®Éí", Color.blue);
                 t.Zero();
-                return 0;
+                d.value = 0;
             }
-            return v;
+            return d;
         };
         self.onTakingDamage.Add(t);
     }

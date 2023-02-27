@@ -3,7 +3,7 @@ using UnityEngine;
 using LitJson;
 using System.Collections.Generic;
 
-public class Character: Creature
+public class Character : Creature
 {
     public string atkName = "ÆÕÍ¨¹¥»÷";
     public string atkDescription = "ÆÕÍ¨¹¥»÷ÉËº¦";
@@ -16,6 +16,7 @@ public class Character: Creature
     public string mysteryName = "ÃØ¼¼";
     public string mysteryDescription = "ÃØ¼¼Ð§¹û";
 
+    public new int level { get { return config.level; } }
     public int breakLevel { get { return config.breakLevel; } }
     public int constellaLevel { get { return config.constellaLevel; }} // ÃüÖ®×ù
     public int atkLevel { get { return config.atkLevel; } }
@@ -27,7 +28,7 @@ public class Character: Creature
     public Career career { get; protected set; } = Career.Count;
     public float energy { get; protected set; } = 0;
     public float maxEnergy { get; protected set; } = 60;
-    public ACharacterTalents talents { get; protected set; }
+    public new ACharacterTalents talents { get; protected set; }
     public JsonData metaData { get; protected set; }
     public new CharacterMono mono { get; protected set; }
     public CharacterConfig config { get; protected set; }
@@ -48,9 +49,9 @@ public class Character: Creature
     public float takeDmgGainEnergy { get; protected set; } = 2.5f;
 
     public delegate void TalentUponTarget(Creature target);
-    public Dictionary<string, TalentUponTarget> onNormalAttack { get; protected set; } = new Dictionary<string, TalentUponTarget>();
-    public Dictionary<string, TalentUponTarget> onSkill { get; protected set; } = new Dictionary<string, TalentUponTarget>();
-    public Dictionary<string, TalentUponTarget> onBurst { get; protected set; } = new Dictionary<string, TalentUponTarget>();
+    public List<TriggerEvent<TalentUponTarget>> onNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> onSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> onBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
     public Character() { }
 
     public Character(string _dbname)
@@ -172,6 +173,7 @@ public class Character: Creature
                 break;
         }
         talents.OnEquipping();
+        base.talents = talents;
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
 
@@ -198,9 +200,9 @@ public class Character: Creature
         return res;
     }
 
-    public override void TakeDamage(Creature source, float value, Element element, DamageType type)
+    public override void TakeDamage(Creature source, Damage damage)
     {
-        base.TakeDamage(source, value, element, type);
+        base.TakeDamage(source, damage);
         ChangeEnergy(takeDmgGainEnergy);
     }
 
@@ -217,6 +219,14 @@ public class Character: Creature
         mono = m;
         base.mono = m;
         m.Initialize(this);
+    }
+
+    public override void EndNormalTurn()
+    {
+        base.EndNormalTurn();
+        onNormalAttack.RemoveAll(p => p.CountDown());
+        onSkill.RemoveAll(p => p.CountDown());
+        onBurst.RemoveAll(p => p.CountDown());        
     }
 
     public virtual void StartBurstTurn()

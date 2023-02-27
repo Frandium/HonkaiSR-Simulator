@@ -6,6 +6,7 @@ using LitJson;
 public class Utils
 {
     public static ObjectPool<Buff> valueBuffPool = new ObjectPool<Buff>(100);
+
     public static double Lerp(double min, double max, float scale, float length){
         return min + (max - min) * scale / length;
     }
@@ -23,7 +24,7 @@ public class Utils
         return min + (max - min) * (float)scale / (float)length;
     }
 
-    public static string[] attributeNames = new string[(int)CommonAttribute.Count]
+    public static string[] attributeNames = new string[(int)CommonAttribute.Count + 1]
     {
         "攻击力",
         "防御力",
@@ -52,10 +53,18 @@ public class Utils
         "雷属性伤害抗性",
         "风属性伤害抗性",
         "量子伤害抗性",
-        "虚数伤害抗性"
+        "虚数伤害抗性",
+        "物理穿透",
+        "火属性穿透",
+        "冰属性穿透",
+        "雷属性穿透",
+        "风属性穿透",
+        "量子属性穿透",
+        "虚数属性穿透",
+        "占位符"
     };
 
-    public static string[] ElementName = new string[] {
+    public static string[] ElementName = new string[(int)Element.Count + 1] {
     "物理",
     "火",
     "冰",
@@ -66,7 +75,7 @@ public class Utils
     "？？？"
     };
 
-    public static string[] CareerName = new string[]
+    public static string[] CareerName = new string[(int)Element.Count + 1]
     {
     "毁灭",
     "巡猎",

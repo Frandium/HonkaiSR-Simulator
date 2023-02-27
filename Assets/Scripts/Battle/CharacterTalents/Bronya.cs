@@ -21,11 +21,11 @@ public class Bronya : ACharacterTalents
         burstCrtDmgIns = (float)(double)self.metaData["burst"]["crtDmgIns"]["value"][self.burstLevel];
         burstCrtDmgPct = (float)(double)self.metaData["burst"]["crtDmgPct"]["value"][self.burstLevel];
         locationUp = (float)(double)self.metaData["talent"]["location"]["value"][self.talentLevel];
-        self.onNormalAttack.Add("talent", e =>
+        self.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
         {
             talent_activated = true;
             self.mono?.ShowMessage("行动提前", Color.green);
-        });
+        }));
         self.onTurnEnd.Add(new TriggerEvent<Creature.TurnStartEndEvent>("talent_inner", () =>
         {
             if (talent_activated)
@@ -34,12 +34,31 @@ public class Bronya : ACharacterTalents
                 talent_activated = false;
             }
         }));
+        if (self.constellaLevel >= 1)
+            self.onSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
+            {
+                if (Utils.TwoRandom(.5f)){
+                    BattleManager.Instance.skillPoint.GainPoint(1);
+                }
+                if(self.constellaLevel >= 2)
+                {
+                    c.onTurnEnd.Add(new TriggerEvent<Creature.TurnStartEndEvent>("bronyaConstallation2Trigger", () =>
+                    {
+                        c.AddBuff("bronyaConstallation2Speed", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .3f, 2);
+                    }, 1));
+                }
+            }));
     }
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        float dmg = DamageCal.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
-        self.DealDamage(enemies[0], Element.Anemo, DamageType.Attack, dmg);
+        if (self.config.abilityActivated[0])
+        {
+            self.AddBuff("tempCritDmg", BuffType.Buff, CommonAttribute.CriticalRate, ValueType.InstantNumber, 10, 1);
+        }
+        Damage dmg = Damage.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
+        self.RemoveBuff("tempCritDmg");
+        self.DealDamage(enemies[0], dmg);
         base.AttackEnemyAction(enemies);
     }
 
@@ -47,7 +66,7 @@ public class Bronya : ACharacterTalents
     {
         Character c = characters[0];
         c.ChangePercentageLocation(1);
-        c.AddBuff("bronyaSkill", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, skilldmgUp, 1);
+        c.AddBuff("bronyaSkill", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, skilldmgUp, self.constellaLevel >= 6 ? 2 : 1);
         c.mono?.ShowMessage("行动提前", Color.black);
         Buff toRemove = c.buffs.Find(b => b.buffType == BuffType.Debuff);
         c.buffs.Remove(toRemove);
@@ -73,7 +92,46 @@ public class Bronya : ACharacterTalents
     {
         foreach(Character c in characters)
         {
-            c.AddBuff("bronyaMystery", BuffType.Permanent, CommonAttribute.ATK, ValueType.Percentage, .15f, 2);
+            c.AddBuff("bronyaMystery", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, .15f, 2);
         }
     }
+
+    public override void OnBattleStart(List<Character> characters, List<Enemy> enemies)
+    {
+        foreach(Character c in characters)
+        {
+            if(self.config.abilityActivated[1])
+                c.AddBuff("bronyaAbility2Def", BuffType.Buff, CommonAttribute.DEF, ValueType.Percentage, .2f, 2);
+            if(self.config.abilityActivated[2])
+            {
+                c.AddBuff("bronyaAbility3Dmgup", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .1f);
+            }
+            if(self.constellaLevel >= 4 && c != self)
+            {
+                c.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstalltion4", t =>
+                {
+                    if(t is Enemy)
+                    {
+                        Enemy e = t as Enemy;
+                        if (e.weakPoint.Contains(Element.Anemo))
+                        {
+                            Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
+                            dmg.value *= .8f;
+                            e.TakeDamage(self, dmg);
+                        }
+                    }
+                }));
+            }
+        }
+        if (self.config.abilityActivated[2])
+            self.onDying.Add(new TriggerEvent<Creature.DyingEvent>("bronyaAbility3", () =>
+            {
+                foreach (Character c in characters)
+                {
+                    c.RemoveBuff("bronyaAbility3Dmgup");
+                }
+            }));
+    }
+
+
 }

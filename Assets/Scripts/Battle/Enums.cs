@@ -77,6 +77,13 @@ public enum CommonAttribute
     AnemoResist, // 风抗 = 25
     QuantusResist, // 量子抗性 = 26
     ImaginaryResist, // 虚数抗性 = 27
+    PhysicalPenetrate, // 物理穿透 = 28
+    PyroPenetrate,// 火元素穿透 = 28
+    CryoPenetrate,// 冰元素穿透 = 28
+    ElectroPenetrate,// 雷元素穿透 = 28
+    AmenoPenetrate,// 风元素穿透 = 28
+    QuantusPenetrate,// 量子穿透 = 28
+    ImaginaryPenetrate,// 虚数穿透 = 28
     Count // = 28
 }
 

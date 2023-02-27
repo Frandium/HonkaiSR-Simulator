@@ -5,16 +5,6 @@ using UnityEngine.UI;
 
 public class CharacterDetailUI : MonoBehaviour
 {
-    enum DetailPage
-    {
-        Attribute,
-        Talent,
-        Weapon,
-        Constellation,
-        Artifacts,
-        Count
-    }
-
     // Start is called before the first frame update
     void Start()
     {
@@ -27,6 +17,7 @@ public class CharacterDetailUI : MonoBehaviour
     public GameObject[] detailPages;
     public GameObject[] talentItems;
     public GameObject[] constellaItems;
+    public GameObject buffContent;
 
     Color[] attrLineColor = new Color[] { new Color(0, .75f, 1, .25f), new Color(0, .75f, 1, .5f), new Color(0, .25f, 1, .25f) };
     public void ShowDetail(Character c)
@@ -133,11 +124,36 @@ public class CharacterDetailUI : MonoBehaviour
             texts[1].text = (string)c.metaData["constellation"][i]["content"];
             texts[1].color = activated ? Color.black : Color.grey;
         }
+
+        // Artifacts 界面
+
+        // Buff 界面
+        buffContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30 * (int)CommonAttribute.Count);
+
+        for (int i = 0; i < buffContent.transform.childCount; i++)
+        {
+            Destroy(buffContent.transform.GetChild(i).gameObject);
+        }
+        for(int i = 0; i < c.buffs.Count; ++i)
+        {
+            Buff b = c.buffs[i];
+            string attrName = b.tag;
+            GameObject go = Instantiate(attrLine, buffContent.transform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 15);
+            go.GetComponent<Image>().color = attrLineColor[i % 2];
+            go.name = attrName;
+            texts = go.GetComponentsInChildren<Text>();
+            texts[0].text = attrName + " " + b.buffType + " " + Utils.attributeNames[(int)b.targetAttribute];
+            if (b.buffType == BuffType.Permanent)
+                texts[1].text = "永久";
+            else
+                texts[1].text = "剩余 <color=#80f>" +  b.times + "</color> 回合";
+        }
     }
 
     public void ChangePage(int i)
     {
-        for(int j = 0; j < (int)DetailPage.Count; j++)
+        for(int j = 0; j < detailPages.Length; j++)
         {
             if(j == i)
             {

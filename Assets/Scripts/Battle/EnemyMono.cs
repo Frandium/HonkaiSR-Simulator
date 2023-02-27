@@ -58,10 +58,10 @@ public class EnemyMono : CreatureMono
         Destroy(gameObject);
     }
 
-    public override void TakeDamage(float value, Element e)
+    public override void TakeDamage(Damage d)
     {
         weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
-        base.TakeDamage(value, e);
+        base.TakeDamage(d);
     }
 
     //protected override IEnumerator TakeDamangeAnim(int dmg)
