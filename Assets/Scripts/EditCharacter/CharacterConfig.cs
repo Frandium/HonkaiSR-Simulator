@@ -134,4 +134,23 @@ public class CharacterConfig
             abilityActivated.Add((bool)d);
         }
     }
+
+    public void ATKLevelUp(int offset)
+    {
+        atkLevel += offset;
+        if (atkLevel > 15)
+            atkLevel = 15;
+    }
+    public void SkillLevelUp(int offset)
+    {
+        skillLevel += offset;
+        if (skillLevel > 15)
+            skillLevel = 15;
+    }
+    public void BurstLevelUp(int offset)
+    {
+        burstLevel += offset;
+        if (burstLevel > 15)
+            burstLevel = 15;
+    }
 }

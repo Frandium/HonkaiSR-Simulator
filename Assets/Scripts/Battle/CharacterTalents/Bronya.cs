@@ -13,8 +13,20 @@ public class Bronya : ACharacterTalents
     float skilldmgUp;
     float burstAtkUp, burstCrtDmgPct, burstCrtDmgIns;
     float locationUp;
+    bool isC1CD = false;
+    int c1CD = 0;
     public override void OnEquipping()
     {
+        if (self.constellaLevel >= 3)
+        {
+            self.config.BurstLevelUp(2);
+            self.config.ATKLevelUp(1);
+        }
+        if (self.constellaLevel >= 5)
+        {
+            self.config.SkillLevelUp(2);
+            self.config.ATKLevelUp(1);
+        }
         atkdmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
         skilldmgUp = (float)(double)self.metaData["skill"]["dmgUp"]["value"][self.skillLevel];
         burstAtkUp = (float)(double)self.metaData["burst"]["atkUp"]["value"][self.skillLevel];
@@ -33,14 +45,23 @@ public class Bronya : ACharacterTalents
                 self.ChangePercentageLocation(locationUp);
                 talent_activated = false;
             }
+            if (isC1CD)
+            {
+                c1CD++;
+                if (c1CD >= 2)
+                    isC1CD = false;
+            }
         }));
         if (self.constellaLevel >= 1)
+        {
             self.onSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
             {
-                if (Utils.TwoRandom(.5f)){
+                if (!isC1CD && Utils.TwoRandom(.5f))
+                {
                     BattleManager.Instance.skillPoint.GainPoint(1);
+                    isC1CD = true;
                 }
-                if(self.constellaLevel >= 2)
+                if (self.constellaLevel >= 2)
                 {
                     c.onTurnEnd.Add(new TriggerEvent<Creature.TurnStartEndEvent>("bronyaConstallation2Trigger", () =>
                     {
@@ -48,6 +69,7 @@ public class Bronya : ACharacterTalents
                     }, 1));
                 }
             }));
+        }
     }
 
     public override void AttackEnemyAction(List<Enemy> enemies)

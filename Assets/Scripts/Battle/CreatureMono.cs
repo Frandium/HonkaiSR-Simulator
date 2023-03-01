@@ -25,7 +25,6 @@ public class CreatureMono : MonoBehaviour
     public Image hpLine;
     public GameObject dmgGO;
     public SpriteRenderer cardSR;
-    public SpriteRenderer selectedSR;
     public Image buffImage;
     public Transform canvas;
     protected List<AudioClip> attackAudios = new List<AudioClip>();
@@ -143,6 +142,7 @@ public class CreatureMono : MonoBehaviour
     public virtual void StartMyTurn()
     {
         isMyTurn = true;
+        cardSR.material.SetColor("_lineColor", Color.blue);
         alpha = 1;
     }
 
@@ -150,14 +150,13 @@ public class CreatureMono : MonoBehaviour
     {
         isMyTurn = false;
         alpha = 0;
-        selectedSR.color = new Color(0, 0, 0, 0);
+        cardSR.material.SetFloat("_alpha", 0);
         UpdateState();
     }
 
     public virtual void Initialize(Creature c)
     {
         self = c;
-        selectedSR.sprite = Resources.Load<Sprite>(c.dbname + "/card_selected");
         cardSR.sprite = Resources.Load<Sprite>(c.dbname + "/card");
         runwayAvatar = Resources.Load<Sprite>(c.dbname + "/runway_avatar");
         int i = 1;
@@ -172,18 +171,18 @@ public class CreatureMono : MonoBehaviour
 
 
     // UI functions
-    public void SetUnselected()
+    public virtual void SetUnselected()
     {
         isSelected = false;
         alpha = 0;
-        selectedSR.color = new Color(0, 0, 0, 0);
+        cardSR.material.SetFloat("_alpha", 0);
     }
 
     public virtual void SetSelected()
     {
         alpha = 1;
         isSelected = true;
-        selectedSR.color = Color.red;
+        cardSR.material.SetColor("_lineColor", Color.red);
     }
 
     void UpdateBuffIcon(List<Buff> valueBuffs)
@@ -235,10 +234,13 @@ public class CreatureMono : MonoBehaviour
 
     public virtual void UpdateState()
     {
-        cardSR.color = Color.white;
         if(self.IsUnderState(StateType.Frozen))
         {
-            cardSR.color = Color.blue;
+            cardSR.material.SetColor("_bodyColor", Color.blue);
+        }
+        else
+        {
+            cardSR.material.SetColor("_bodyColor", Color.white);
         }
     }
 }

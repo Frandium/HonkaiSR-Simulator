@@ -55,12 +55,22 @@ public class Japard : ACharacterTalents
 
     public override void OnEquipping()
     {
+        if (self.constellaLevel >= 5)
+        {
+            self.config.BurstLevelUp(2);
+            self.config.ATKLevelUp(1);
+        }
+        if (self.constellaLevel >= 3)
+        {
+            self.config.SkillLevelUp(2);
+            self.config.ATKLevelUp(1);
+        }
         atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
         skillAtk = (float)(double)self.metaData["skill"]["atk"]["value"][self.skillLevel];
         skillFreeze = (float)(double)self.metaData["skill"]["freeze"]["value"][self.skillLevel];
         burstDefPer = (float)(double)self.metaData["burst"]["defPer"]["value"][self.burstLevel];
         burstDefIns = (int)self.metaData["burst"]["defIns"]["value"][self.burstLevel];
-        talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.burstLevel];
+        talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.talentLevel];
         
         TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
         t.trigger = (s, d) =>

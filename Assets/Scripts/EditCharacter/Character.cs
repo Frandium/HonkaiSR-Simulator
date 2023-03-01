@@ -69,7 +69,7 @@ public class Character : Creature
         }
         artifactsSuit.Clear();
 
-         config = new CharacterConfig(name);
+        config = new CharacterConfig(name);
 
         // Load 角色基本属性
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
@@ -77,6 +77,28 @@ public class Character : Creature
 
         // set character template
         dbname = name;
+        // 之后改成反射 dict?
+        switch (dbname)
+        {
+            case "bronya":
+                talents = new Bronya(this);
+                break;
+            case "seele":
+                talents = new Seele(this);
+                break;
+            case "japard":
+                talents = new Japard(this);
+                break;
+            case "tingyun":
+                talents = new Tingyun(this);
+                break;
+            default:
+                talents = new Bronya(this);
+                break;
+        }
+        talents.OnEquipping();
+        base.talents = talents;
+
         disname = (string)metaData["disname"];
         element = (Element)(int)metaData["element"];
         career = (Career)(int)metaData["career"];
@@ -153,27 +175,6 @@ public class Character : Creature
             artifacts.Add(new Artifact(b, new List<SimpleValueBuff>()));
         }
 
-        // 之后改成反射 dict?
-        switch (dbname)
-        {
-            case "bronya":
-                talents = new Bronya(this);
-                break;
-            case "seele":
-                talents = new Seele(this);
-                break;
-            case "japard":
-                talents = new Japard(this);
-                break;
-            case "tingyun":
-                talents = new Tingyun(this);
-                break;
-            default:
-                talents = new Bronya(this);
-                break;
-        }
-        talents.OnEquipping();
-        base.talents = talents;
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
 
