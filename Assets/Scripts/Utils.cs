@@ -87,6 +87,13 @@ public class Utils
     "？？？"
     };
 
+    public static string[] valueTypeName = new string[(int)ValueType.Count + 1]
+    {
+        "百分比",
+        "直接数",
+        "占位"
+    };
+
     public static bool TwoRandom(float rate)
     {
         int p = (int)(rate * 10000);

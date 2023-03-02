@@ -8,7 +8,12 @@ public class CharacterDetailUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        
     }
+    List<string> artifactDisnames;
+    List<string> artifactDbnames;
+    List<string> attributes;
+    List<string> valueTypes;
 
     public Text chaName;
     public Image background;
@@ -18,10 +23,14 @@ public class CharacterDetailUI : MonoBehaviour
     public GameObject[] talentItems;
     public GameObject[] constellaItems;
     public GameObject buffContent;
+    public GameObject[] artifactInfos;
+
+    Character curCharacter;
 
     Color[] attrLineColor = new Color[] { new Color(0, .75f, 1, .25f), new Color(0, .75f, 1, .5f), new Color(0, .25f, 1, .25f) };
-    public void ShowDetail(Character c)
+    public void ShowDetail(Character c, bool enableChange = false)
     {
+        curCharacter = c;
         background.sprite = Resources.Load<Sprite>(c.dbname + "/splash");
         Text[] texts;
         // Attribute 页面
@@ -126,6 +135,149 @@ public class CharacterDetailUI : MonoBehaviour
         }
 
         // Artifacts 界面
+        if(artifactDisnames == null)
+        {
+            artifactDisnames = new List<string>();
+            foreach (var v in ArtifactDescription.GetAllArtifactSuits().Values)
+            {
+                artifactDisnames.Add(v.disname);
+            }
+            artifactDbnames = new List<string>();
+            foreach (var v in ArtifactDescription.GetAllArtifactSuits().Values)
+            {
+                artifactDbnames.Add(v.dbname);
+            }
+            attributes = new List<string>(Utils.attributeNames);
+            attributes.RemoveAt(Utils.attributeNames.Length - 1);
+            valueTypes = new List<string>(Utils.valueTypeName);
+            valueTypes.RemoveAt(Utils.valueTypeName.Length - 1);
+
+
+            for (int i = 0; i < artifactInfos.Length; ++i)
+            {
+                GameObject art = artifactInfos[i];
+                Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
+                InputField[] inputFields = art.GetComponentsInChildren<InputField>();
+                dropdowns[0].ClearOptions();
+                dropdowns[0].AddOptions(artifactDisnames);
+                int num = i;
+                dropdowns[0].onValueChanged.AddListener(v => {
+                    Debug.Log("i = " + num);
+                    Debug.Log("v = " + v);
+                    curCharacter.config.artifacts[num].suitName = artifactDbnames[v];
+                });
+
+                for (int j = 1; j <= 10; j += 2)
+                {
+                    dropdowns[j].ClearOptions();
+                    dropdowns[j].AddOptions(attributes);
+                    if (j == 1)
+                    {
+                        dropdowns[j].onValueChanged.AddListener(v =>
+                        {
+                            curCharacter.config.artifacts[num].mainPhrase.attr = (CommonAttribute)v;
+                        });
+                    }
+                    else
+                    {
+                        int num2 = j;
+                        dropdowns[j].onValueChanged.AddListener(v =>
+                        {
+                            curCharacter.config.artifacts[num].vicePhrases[(num2 - 3) / 2].attr = (CommonAttribute)v;
+                        });
+                    }
+                }
+
+                for (int j = 2; j <= 10; j += 2)
+                {
+                    dropdowns[j].ClearOptions();
+                    dropdowns[j].AddOptions(valueTypes);
+                    if (j == 2)
+                    {
+                        dropdowns[j].onValueChanged.AddListener(v =>
+                        {
+                            curCharacter.config.artifacts[num].mainPhrase.type = (ValueType)v;
+                        });
+                    }
+                    else
+                    {
+                        int num2 = j;
+                        dropdowns[j].onValueChanged.AddListener(v =>
+                        {
+                            curCharacter.config.artifacts[num].vicePhrases[(num2 - 3) / 2].attr = (CommonAttribute)v;
+                        });
+                    }
+                }
+
+                for (int j = 0; j < 5; ++j)
+                {
+                    if (j == 0)
+                    {
+                        inputFields[j].onValueChanged.AddListener(s =>
+                        {
+                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
+                        });
+                    }
+                    else
+                    {
+                        int num2 = j;
+                        inputFields[j].onValueChanged.AddListener(s =>
+                        {
+                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
+                        });
+                    }
+                }
+            }
+        }
+
+        for (int i = 0; i < artifactInfos.Length; ++i)
+        {
+            GameObject art = artifactInfos[i];
+            Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
+            InputField[] inputFields = art.GetComponentsInChildren<InputField>();
+            dropdowns[0].SetValueWithoutNotify(artifactDbnames.IndexOf(c.config.artifacts[i].suitName));
+            dropdowns[0].interactable = enableChange;
+
+            for (int j = 1; j <= 10; j += 2)
+            {
+                dropdowns[j].interactable = enableChange;
+                if (j == 1)
+                
+                    dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.attr);
+                
+                else
+                
+                    dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].vicePhrases[(j - 3) / 2].attr);
+                
+            }
+
+            for (int j = 2; j <= 10; j += 2)
+            {
+                dropdowns[j].interactable = enableChange;
+                if (j == 2)
+                
+                    dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.type);
+                
+                else
+                
+                    dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].vicePhrases[(j - 4) / 2].type);
+                
+            }
+
+            for (int j = 0; j < 5; ++j)
+            {
+                inputFields[j].interactable = enableChange;
+                if (j == 0)
+                {
+                    inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].mainPhrase.value.ToString());
+                }
+                else
+                {
+                    inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].vicePhrases[j - 1].value.ToString());
+                }
+            }
+        }
+
 
         // Buff 界面
         buffContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30 * (int)CommonAttribute.Count);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 using System.IO;
+using System.Text;
 
 public class WeaponConfig
 {
@@ -27,10 +28,10 @@ public class WeaponConfig
 
 public class ArtifactConfig
 {
-    public string suitName { get; protected set; } = "default";
-    public ArtifactPosition position { get; protected set; }
-    public PhraseConfig mainPhrase { get; protected set; }
-    public List<PhraseConfig> vicePhrases { get; protected set; }
+    public string suitName { get; set; } = "default";
+    public ArtifactPosition position { get; set; }
+    public PhraseConfig mainPhrase { get; set; }
+    public List<PhraseConfig> vicePhrases { get; set; }
 
     public ArtifactConfig(JsonData d)
     {
@@ -58,9 +59,9 @@ public class ArtifactConfig
 
 public class PhraseConfig
 {
-    public CommonAttribute attr { get; protected set; }
-    public ValueType type { get; protected set; }
-    public double value { get; protected set; }
+    public CommonAttribute attr { get; set; }
+    public ValueType type { get; set; }
+    public double value { get; set; }
 
     public PhraseConfig(JsonData d)
     {
@@ -135,22 +136,13 @@ public class CharacterConfig
         }
     }
 
-    public void ATKLevelUp(int offset)
+
+    public void Save()
     {
-        atkLevel += offset;
-        if (atkLevel > 15)
-            atkLevel = 15;
-    }
-    public void SkillLevelUp(int offset)
-    {
-        skillLevel += offset;
-        if (skillLevel > 15)
-            skillLevel = 15;
-    }
-    public void BurstLevelUp(int offset)
-    {
-        burstLevel += offset;
-        if (burstLevel > 15)
-            burstLevel = 15;
+        FileStream fs;
+        fs = File.Open(GlobalInfoHolder.Instance.characterConfigDir + "/" + dbname + ".json", FileMode.Create);
+        string content = JsonMapper.ToJson(this);
+        fs.Write(Encoding.UTF8.GetBytes(content));
+        fs.Close();
     }
 }

@@ -19,13 +19,13 @@ public class Bronya : ACharacterTalents
     {
         if (self.constellaLevel >= 3)
         {
-            self.config.BurstLevelUp(2);
-            self.config.ATKLevelUp(1);
+            self.BurstLevelUp(2);
+            self.ATKLevelUp(1);
         }
         if (self.constellaLevel >= 5)
         {
-            self.config.SkillLevelUp(2);
-            self.config.ATKLevelUp(1);
+            self.SkillLevelUp(2);
+            self.ATKLevelUp(1);
         }
         atkdmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
         skilldmgUp = (float)(double)self.metaData["skill"]["dmgUp"]["value"][self.skillLevel];

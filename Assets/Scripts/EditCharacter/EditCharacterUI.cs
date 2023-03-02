@@ -8,7 +8,7 @@ using UnityEngine.UI;
 
 public class EditCharacterUI : MonoBehaviour
 {
-    Character character = new Character();
+    Character character;
 
     public GameObject headButtonGO;
     public GameObject scrollContent;
@@ -50,8 +50,9 @@ public class EditCharacterUI : MonoBehaviour
 
     public void OnHeadClick(string name)
     {
+        character?.SaveConfig();
         character = new Character(name);
-        detail.ShowDetail(character);
+        detail.ShowDetail(character, true);
     }
 
 

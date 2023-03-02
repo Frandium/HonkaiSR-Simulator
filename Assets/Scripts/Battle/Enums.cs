@@ -38,10 +38,10 @@ public enum StateType
 public enum ArtifactPosition
 {
     Head,  // 头
-    Hand,  // 手
-    Body,  // 身体
-    Foot,  // 脚
     Neck,  // 颈
+    Body,  // 身体
+    Hand,  // 手
+    Foot,  // 脚
     Stuff, // 饰品
     Count
 }

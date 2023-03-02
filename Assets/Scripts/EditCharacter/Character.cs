@@ -19,9 +19,12 @@ public class Character : Creature
     public new int level { get { return config.level; } }
     public int breakLevel { get { return config.breakLevel; } }
     public int constellaLevel { get { return config.constellaLevel; }} // ÃüÖ®×ù
-    public int atkLevel { get { return config.atkLevel; } }
-    public int skillLevel { get { return config.skillLevel; } }
-    public int burstLevel { get { return config.burstLevel; } }
+    public int atkLevel { get { return Mathf.Min(15, config.atkLevel + additionalAtkLevel); } }
+    int additionalAtkLevel = 0;
+    public int skillLevel { get { return Mathf.Min(15, config.skillLevel + additionalSkillLevel); } }
+    int additionalSkillLevel = 0;
+    public int burstLevel { get { return Mathf.Min(15, config.burstLevel + additionalBurstLevel); } }
+    int additionalBurstLevel = 0;
     public int talentLevel { get { return config.talentLevel; } }
 
     public Element element { get; protected set; } = Element.Count;
@@ -268,4 +271,21 @@ public class Character : Creature
         mono?.EndBurstTurn();
     }
 
+    public void SaveConfig()
+    {
+        config.Save();
+    }
+
+    public void ATKLevelUp(int offset)
+    {
+        additionalAtkLevel += offset;
+    }
+    public void SkillLevelUp(int offset)
+    {
+        additionalSkillLevel += offset;
+    }
+    public void BurstLevelUp(int offset)
+    {
+        additionalBurstLevel += offset;
+    }
 }
