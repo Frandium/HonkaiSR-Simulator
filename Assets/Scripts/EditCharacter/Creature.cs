@@ -289,4 +289,16 @@ public class Creature
         return states.Find(s => s.state == t) != null;
     }
 
+    public virtual void Initialize()
+    {
+        onTakingDamage.Clear();
+        onDealingDamage.Clear();
+        onTakingHeal.Clear();
+        onDealingHeal.Clear();
+        buffs.Clear();
+        states.Clear();
+        onTurnEnd.Clear();
+        onTurnStart.Clear();
+        onDying.Clear();
+    }
 }

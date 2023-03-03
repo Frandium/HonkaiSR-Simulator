@@ -26,11 +26,14 @@ public class CharacterDetailUI : MonoBehaviour
     public GameObject[] artifactInfos;
 
     Character curCharacter;
+    bool enableChange = false;
 
     Color[] attrLineColor = new Color[] { new Color(0, .75f, 1, .25f), new Color(0, .75f, 1, .5f), new Color(0, .25f, 1, .25f) };
-    public void ShowDetail(Character c, bool enableChange = false)
+    public void ShowDetail(Character c, bool _enableChange = false)
     {
         curCharacter = c;
+        enableChange = _enableChange;
+
         background.sprite = Resources.Load<Sprite>(c.dbname + "/splash");
         Text[] texts;
         // Attribute 页面
@@ -62,25 +65,35 @@ public class CharacterDetailUI : MonoBehaviour
         imgs = talentItems[0].GetComponentsInChildren<Image>();
         imgs[1].sprite = Resources.Load<Sprite>(c.dbname + "/attack");
         texts = talentItems[0].GetComponentsInChildren<Text>();
-        texts[0].text = c.atkName + " Lv.<color=#0f8>" + c.atkLevel + "</color>";
+        Slider slider = talentItems[0].GetComponentInChildren<Slider>();
+        slider.SetValueWithoutNotify(c.config.atkLevel);
+        string ncolor = " Lv.<color=#000>";
+        string tcolor = " Lv.<color=#0f8>";
+        texts[0].text = c.atkName + (c.atkLevel > c.config.atkLevel ? tcolor : ncolor) + c.atkLevel + "</color>";
         texts[1].text = c.atkDescription;
 
         imgs = talentItems[1].GetComponentsInChildren<Image>();
         imgs[1].sprite = Resources.Load<Sprite>(c.dbname + "/skill");
         texts = talentItems[1].GetComponentsInChildren<Text>();
-        texts[0].text = c.skillName + " Lv.<color=#0f8>" + c.skillLevel + "</color>";
+        slider = talentItems[1].GetComponentInChildren<Slider>();
+        slider.SetValueWithoutNotify(c.config.skillLevel);
+        texts[0].text = c.skillName + (c.skillLevel > c.config.skillLevel ? tcolor : ncolor) + c.skillLevel + "</color>";
         texts[1].text = c.skillDescription;
 
         imgs = talentItems[2].GetComponentsInChildren<Image>();
         imgs[1].sprite = Resources.Load<Sprite>(c.dbname + "/burst");
         texts = talentItems[2].GetComponentsInChildren<Text>();
-        texts[0].text = c.burstName + " Lv.<color=#0f8>" + c.burstLevel + "</color>";
+        slider = talentItems[2].GetComponentInChildren<Slider>();
+        slider.SetValueWithoutNotify(c.config.burstLevel);
+        texts[0].text = c.burstName + (c.burstLevel > c.config.burstLevel ? tcolor : ncolor) + c.burstLevel + "</color>";
         texts[1].text = c.burstDescription;
 
         imgs = talentItems[3].GetComponentsInChildren<Image>();
         imgs[1].sprite = Resources.Load<Sprite>(c.dbname + "/talent");
         texts = talentItems[3].GetComponentsInChildren<Text>();
-        texts[0].text = c.talentName + " Lv.<color=#0f8>" + c.talentLevel + "</color>";
+        slider = talentItems[3].GetComponentInChildren<Slider>();
+        slider.SetValueWithoutNotify(c.config.talentLevel);
+        texts[0].text = c.talentName + (c.talentLevel > c.config.talentLevel ? tcolor : ncolor) + c.talentLevel + "</color>";
         texts[1].text = c.talentDescription;
 
         imgs = talentItems[4].GetComponentsInChildren<Image>();
@@ -127,11 +140,16 @@ public class CharacterDetailUI : MonoBehaviour
         {
             constellaItems[i].GetComponentInChildren<Image>().sprite = Resources.Load<Sprite>(c.dbname + "/c" + i);
             texts = constellaItems[i].GetComponentsInChildren<Text>();
+            constellaItems[i].GetComponentInChildren<Button>().interactable = _enableChange;
             bool activated = c.constellaLevel >= i + 1;
             texts[0].text = (string)c.metaData["constellation"][i]["name"] + (activated? "" : "  未激活");
             texts[0].color = activated ? Color.black : Color.grey;
             texts[1].text = (string)c.metaData["constellation"][i]["content"];
             texts[1].color = activated ? Color.black : Color.grey;
+            if(i < curCharacter.constellaLevel)
+                texts[2].text = "关闭";
+            else
+                texts[2].text = "开启";
         }
 
         // Artifacts 界面
@@ -236,11 +254,11 @@ public class CharacterDetailUI : MonoBehaviour
             Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
             InputField[] inputFields = art.GetComponentsInChildren<InputField>();
             dropdowns[0].SetValueWithoutNotify(artifactDbnames.IndexOf(c.config.artifacts[i].suitName));
-            dropdowns[0].interactable = enableChange;
+            dropdowns[0].interactable = _enableChange;
 
             for (int j = 1; j <= 10; j += 2)
             {
-                dropdowns[j].interactable = enableChange;
+                dropdowns[j].interactable = _enableChange;
                 if (j == 1)
                 
                     dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.attr);
@@ -253,7 +271,7 @@ public class CharacterDetailUI : MonoBehaviour
 
             for (int j = 2; j <= 10; j += 2)
             {
-                dropdowns[j].interactable = enableChange;
+                dropdowns[j].interactable = _enableChange;
                 if (j == 2)
                 
                     dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.type);
@@ -266,7 +284,7 @@ public class CharacterDetailUI : MonoBehaviour
 
             for (int j = 0; j < 5; ++j)
             {
-                inputFields[j].interactable = enableChange;
+                inputFields[j].interactable = _enableChange;
                 if (j == 0)
                 {
                     inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].mainPhrase.value.ToString());
@@ -316,5 +334,53 @@ public class CharacterDetailUI : MonoBehaviour
                 detailPages[j].SetActive(false);
             }
         }
+    }
+
+    public void ChangeConstellation(int n)
+    {
+        if(curCharacter.config.constellaLevel >= n)
+        {
+            curCharacter.config.constellaLevel = n - 1;
+        }
+        else
+        {
+            curCharacter.config.constellaLevel = n;
+        }
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        curCharacter.SaveConfig();
+        ShowDetail(curCharacter, enableChange);
+    }
+
+    public void ChangeTalentLevel(Slider slider)
+    {
+        if (curCharacter == null)
+            return;
+        curCharacter.config.talentLevel = (int)slider.value;
+        Refresh();
+    }
+    public void ChangeNormalAttackLevel(Slider slider)
+    {
+        if (curCharacter == null)
+            return;
+        curCharacter.config.atkLevel = (int)slider.value;
+        Refresh();
+    }
+    public void ChangeSkillLevel(Slider slider)
+    {
+        if (curCharacter == null)
+            return;
+        curCharacter.config.skillLevel = (int)slider.value;
+        Refresh();
+    }
+    public void ChangeBurstLevel(Slider slider)
+    {
+        if (curCharacter == null)
+            return;
+        curCharacter.config.burstLevel = (int)slider.value;
+        Refresh();
     }
 }

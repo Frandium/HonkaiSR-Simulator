@@ -80,6 +80,21 @@ public class Character : Creature
 
         // set character template
         dbname = name;
+        Initialize();
+    }
+
+    public override void Initialize()
+    {
+        base.Initialize();
+        onBurst.Clear();
+        onSkill.Clear();
+        onNormalAttack.Clear();
+        artifacts.Clear();
+        artifactsSuit.Clear();
+        additionalAtkLevel = 0;
+        additionalBurstLevel = 0;
+        additionalSkillLevel = 0;
+        
         // 之后改成反射 dict?
         switch (dbname)
         {
@@ -106,10 +121,10 @@ public class Character : Creature
         element = (Element)(int)metaData["element"];
         career = (Career)(int)metaData["career"];
         maxEnergy = (float)(double)metaData["maxEnergy"];
-        for(int i = 0; i < (int)CommonAttribute.Speed; ++i)
+        for (int i = 0; i < (int)CommonAttribute.Speed; ++i)
         {
             // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
-            if(level < 20)
+            if (level < 20)
             {
                 attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][0], (float)(double)metaData["attrs"][i][0], 19, level - 1);
                 continue;
@@ -118,7 +133,7 @@ public class Character : Creature
             if (levelRate == 0)
             {
                 // 突破等级最低为0， 最高为 6
-                if(breakLevel == level / 10 - 1)
+                if (breakLevel == level / 10 - 1)
                     attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel];
                 else
                     attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel - 1];
@@ -128,7 +143,7 @@ public class Character : Creature
                 attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][2 * breakLevel - 2], (float)(double)metaData["attrs"][i][2 * breakLevel - 1], levelRate, 10);
             }
         }
-        for(int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
+        for (int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
         {
             attrs[i] = (float)(double)metaData["attrs"][i];
         }
@@ -157,12 +172,12 @@ public class Character : Creature
 
         // Load 角色光锥
         weapon = new Weapon(config.weaponConfig);
-        if(weapon.career == career)
+        if (weapon.career == career)
             weapon.OnEquipping(this);
 
         // Load 角色圣遗物
         Dictionary<string, int> suitCount = new Dictionary<string, int>();
-        foreach(ArtifactConfig arti in config.artifacts)
+        foreach (ArtifactConfig arti in config.artifacts)
         {
             // 套装名
             string suitName = arti.suitName;
@@ -180,7 +195,6 @@ public class Character : Creature
 
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
-
 
     public override float GetBaseAttr(CommonAttribute attr)
     {
@@ -274,6 +288,7 @@ public class Character : Creature
     public void SaveConfig()
     {
         config.Save();
+        Initialize();
     }
 
     public void ATKLevelUp(int offset)

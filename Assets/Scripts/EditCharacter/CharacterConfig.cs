@@ -81,13 +81,13 @@ public class PhraseConfig
 public class CharacterConfig
 {
     public string dbname { get; protected set; } = "bronya";
-    public int level { get; protected set; } = 10;
-    public int breakLevel { get; protected set; } = 10;
-    public int constellaLevel { get; protected set; } = 10;
-    public int atkLevel { get; protected set; } = 10;
-    public int skillLevel { get; protected set; } = 10;
-    public int burstLevel { get; protected set; } = 10;
-    public int talentLevel { get; protected set; } = 10;
+    public int level  = 10;
+    public int breakLevel  = 10;
+    public int constellaLevel  = 10;
+    public int atkLevel  = 10;
+    public int skillLevel  = 10;
+    public int burstLevel  = 10;
+    public int talentLevel  = 10;
     public WeaponConfig weaponConfig { get; protected set; }
     public List<ArtifactConfig> artifacts { get; protected set; }
     public List<bool> abilityActivated { get; protected set; }
