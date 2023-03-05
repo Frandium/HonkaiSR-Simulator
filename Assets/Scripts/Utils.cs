@@ -21,7 +21,7 @@ public class Utils
     }
     public static float Lerp(float min, float max, int scale, int length)
     {
-        return min + (max - min) * (float)scale / (float)length;
+        return min + (max - min) * scale / length;
     }
 
     public static string[] attributeNames = new string[(int)CommonAttribute.Count + 1]

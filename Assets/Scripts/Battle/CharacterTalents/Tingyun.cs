@@ -13,6 +13,16 @@ public class Tingyun : ACharacterTalents
 
     public override void OnEquipping()
     {
+        if (self.constellaLevel >= 5)
+        {
+            self.SkillLevelUp(2);
+            self.ATKLevelUp(1);
+        }
+        if (self.constellaLevel >= 3)
+        {
+            self.BurstLevelUp(2);
+            self.TalentLevelUp(2);
+        }
         atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
         skillAtkUp = (float)(double)self.metaData["skill"]["atkUp"]["value"][self.atkLevel];
         skillAtkMax = (float)(double)self.metaData["skill"]["atkMax"]["value"][self.atkLevel];

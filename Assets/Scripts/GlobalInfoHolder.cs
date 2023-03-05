@@ -23,6 +23,7 @@ public class GlobalInfoHolder
     static GlobalInfoHolder _instance;
 
     public string characterDir { get; protected set; } = Application.streamingAssetsPath + "/characters";
+    public string weaponDir { get; protected set; } = Application.streamingAssetsPath + "/weapons";
     public string artifactsDir { get; protected set; } = Application.streamingAssetsPath + "/artifacts";
     public string enemyDir { get; protected set; } = Application.streamingAssetsPath + "/enemies";
     public string battleDir { get; protected set; } = Application.streamingAssetsPath + "/battles";
@@ -31,5 +32,7 @@ public class GlobalInfoHolder
     public string battleFilePath = Application.streamingAssetsPath + "/battles/boss.json";
 
     public string mystery = "japard";
+
+    public string[] teamMembers = new string[] { "none", "none", "none", "none" };
 
 }

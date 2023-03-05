@@ -40,4 +40,9 @@ public class ArtifactDescription
         }
         return artifacts;
     }
+
+    public static ArtifactDescription GetArtifactDescriptionByDbname(string name)
+    {
+        return GetAllArtifactSuits()[name];
+    }
 }

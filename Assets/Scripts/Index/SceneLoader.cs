@@ -5,17 +5,12 @@ using UnityEngine.UI;
 using System.IO;
 using UnityEngine.SceneManagement;
 
-public class IndexUI : MonoBehaviour
+public class SceneLoader : MonoBehaviour
 {
-    
-    // Start is called before the first frame update
-    void Start()
+    public void LoadScene(string sceneName)
     {
-    }
-
-    public void LoadBattleScene()
-    {
-        AsyncOperation ao = SceneManager.LoadSceneAsync("ChooseBattle");
+        cover.gameObject.SetActive(true);
+        AsyncOperation ao = SceneManager.LoadSceneAsync(sceneName);
         StartCoroutine(LoadSceneAnim(ao));
     }
 

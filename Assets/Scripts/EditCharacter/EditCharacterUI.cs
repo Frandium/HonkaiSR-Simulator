@@ -5,6 +5,7 @@ using LitJson;
 using System.IO;
 using System.Text;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class EditCharacterUI : MonoBehaviour
 {

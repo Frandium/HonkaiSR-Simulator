@@ -80,7 +80,12 @@ public class Selection : MonoBehaviour
         characterAction = action;
         enemyAction = null;
         isDuringSelection = true;
-        List<CharacterMono> characters = BattleManager.Instance.cMonos;
+        List<CharacterMono> characters = new();
+        foreach(CharacterMono cm in BattleManager.Instance.cMonos)
+        {
+            if (cm.gameObject.activeInHierarchy)
+                characters.Add(cm);
+        }
         curCharacterIndex = characters.FindIndex(c => c == curCharacter);
         switch (type)
         {

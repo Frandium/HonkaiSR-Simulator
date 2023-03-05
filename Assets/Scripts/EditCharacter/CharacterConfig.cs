@@ -7,10 +7,10 @@ using System.Text;
 
 public class WeaponConfig
 {
-    public string dbname { get; protected set; } = "default";
-    public int level { get; protected set; } = 10;
-    public int breakLevel { get; protected set; } = 10;
-    public int refine { get; protected set; } = 10;
+    public string dbname = "default";
+    public int level = 10;
+    public int breakLevel = 10;
+    public int refine = 10;
 
     public WeaponConfig(JsonData config)
     {

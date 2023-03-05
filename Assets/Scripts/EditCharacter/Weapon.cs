@@ -24,6 +24,9 @@ public class Weapon: Equipment
     WeaponConfig config;
     AEquipmentTalents talents;
 
+    static Dictionary<string, string> dbname2Disname;
+    static Dictionary<string, int> dbname2Career;
+
     public Weapon(WeaponConfig c)
     {
         config = c;
@@ -52,21 +55,37 @@ public class Weapon: Equipment
         disName = (string)data["disname"];
         if (level < 20)
         {
-            atk = (float)Utils.Lerp((double)data["atk"][0], (double)data["atk"][1], 19, level % 20);
-            def = (float)Utils.Lerp((double)data["def"][0], (double)data["def"][1], 19, level % 20);
-            maxHp = (float)Utils.Lerp((double)data["maxHp"][0], (double)data["maxHp"][1], 19, level % 20);
+            atk = (float)Utils.Lerp((double)data["atk"][0], (double)data["atk"][1], level - 1, 19);
+            def = (float)Utils.Lerp((double)data["def"][0], (double)data["def"][1], level - 1, 19);
+            maxHp = (float)Utils.Lerp((double)data["maxHp"][0], (double)data["maxHp"][1], level - 1, 19);
         }
         else if (level >= 20)
         {
-            int l = 2 * (level / 10 - 2);
-            if (level % 10 == 0 && breakLevel == (level / 10 - 1))
+            int levelRate = level % 10;
+            if (levelRate == 0)
             {
-                l++;
+                // 突破等级最低为0， 最高为 6
+                if (breakLevel == level / 10 - 1)
+                {
+                    atk = (float)(double)data["atk"][2 * breakLevel];
+                    def = (float)(double)data["def"][2 * breakLevel];
+                    maxHp = (float)(double)data["maxHp"][2 * breakLevel];
+                }
+                else
+                { // 应该是 breaklevel == level / 10 - 2，没突破
+                    atk = (float)(double)data["atk"][2 * breakLevel + 1];
+                    def = (float)(double)data["def"][2 * breakLevel + 1];
+                    maxHp = (float)(double)data["maxHp"][2 * breakLevel + 1];
+                }
+            }
+            else
+            {
+                // breaklevel = level / 10 - 1
+                atk = (float)Utils.Lerp((double)data["atk"][2 * breakLevel], (double)data["atk"][2 * breakLevel + 1], level % 10, 10);
+                def = (float)Utils.Lerp((double)data["def"][2 * breakLevel], (double)data["def"][2 * breakLevel + 1], level % 10 * 10, 10);
+                maxHp = (float)Utils.Lerp((double)data["maxHp"][2 * breakLevel], (double)data["maxHp"][2 * breakLevel + 1], level % 10, 10);
             }
 
-            atk = (float)Utils.Lerp((double)data["atk"][l], (double)data["atk"][l + 1], level - (level / 10 - 1) * 10, 10);
-            def = (float)Utils.Lerp((double)data["def"][l], (double)data["def"][l + 1], level - (level / 10 - 1) * 10, 10);
-            maxHp = (float)Utils.Lerp((double)data["maxHp"][l], (double)data["maxHp"][l + 1], level - (level / 10 - 1) * 10, 10);
         }
 
         effectName = (string)data["effect"]["name"];
@@ -97,5 +116,49 @@ public class Weapon: Equipment
     public void OnTakingOff(Character character)
     {
         talents.OnTakingOff(character);
+    }
+
+    public static Dictionary<string, string> GetAllWeapons()
+    {
+        if(dbname2Disname == null)
+        {
+            dbname2Disname = new Dictionary<string, string>();
+            dbname2Career = new Dictionary<string, int>();
+
+            List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.weaponDir));
+            files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
+            
+            foreach (string s in files)
+            {
+                string dbname = Path.GetFileNameWithoutExtension(s);
+                string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbname + ".json");
+                JsonData data = JsonMapper.ToObject(jsonString);
+                dbname2Disname.Add(dbname, (string)data["disname"]);
+                dbname2Career.Add(dbname, (int)data["career"]);
+            }
+        }
+        return dbname2Disname;
+    }
+
+    public static Dictionary<string, int> GetAllWeaponCareers()
+    {
+        if(dbname2Career == null)
+        {
+            dbname2Disname = new Dictionary<string, string>();
+            dbname2Career = new Dictionary<string, int>();
+
+            List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.weaponDir));
+            files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
+
+            foreach (string s in files)
+            {
+                string dbname = Path.GetFileNameWithoutExtension(s);
+                string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbname + ".json");
+                JsonData data = JsonMapper.ToObject(jsonString);
+                dbname2Disname.Add(dbname, (string)data["disname"]);
+                dbname2Career.Add(dbname, (int)data["career"]);
+            }
+        }
+        return dbname2Career;
     }
 }

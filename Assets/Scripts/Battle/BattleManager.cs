@@ -187,7 +187,7 @@ public class BattleManager : MonoBehaviour
 
         foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
         {
-            if (Input.GetKeyDown(p.Key)) {
+            if (Input.GetKeyDown(p.Key) && p.Value < characters.Count) {
                 chaDetailActivated = false;
                 ShowCharacterDetail(p.Value);
                 curShowingDetail = p.Value;
@@ -208,11 +208,6 @@ public class BattleManager : MonoBehaviour
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // load json
-        chaNames = new List<string>();
-        for(int i = 0; i < data["characters"].Count; ++i)
-        {
-            chaNames.Add((string)data["characters"][i]);
-        }
         enmNames = new List<List<string>>();
         for(int i = 0; i < data["enemies"].Count; ++i)
         {
@@ -224,12 +219,21 @@ public class BattleManager : MonoBehaviour
             enmNames.Add(enm);
         }
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < chaNames.Count; ++i)
+        for (int i = 0; i < GlobalInfoHolder.Instance.teamMembers.Length; ++i)
         {
-            Character c = new Character(chaNames[i]);
-            characters.Add(c);
-            c.SetMono(cMonos[i]);
-            runway.AddCreature(c);
+            string chaname = GlobalInfoHolder.Instance.teamMembers[i];
+            if (chaname == "none")
+            {
+                cMonos[i].gameObject.SetActive(false);
+                cMonos[i].avatar.SetActive(false);
+            }
+            else
+            {
+                Character c = new Character(chaname);
+                characters.Add(c);
+                c.SetMono(cMonos[i]);
+                runway.AddCreature(c);
+            }
         }
         mystery = GlobalInfoHolder.Instance.mystery;
     }

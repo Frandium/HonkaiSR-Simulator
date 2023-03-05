@@ -26,7 +26,7 @@ public class Character : Creature
     public int burstLevel { get { return Mathf.Min(15, config.burstLevel + additionalBurstLevel); } }
     int additionalBurstLevel = 0;
     public int talentLevel { get { return config.talentLevel; } }
-
+    int additionalTalentLevel = 0;
     public Element element { get; protected set; } = Element.Count;
     public Career career { get; protected set; } = Career.Count;
     public float energy { get; protected set; } = 0;
@@ -94,6 +94,7 @@ public class Character : Creature
         additionalAtkLevel = 0;
         additionalBurstLevel = 0;
         additionalSkillLevel = 0;
+        additionalTalentLevel = 0;
         
         // 之后改成反射 dict?
         switch (dbname)
@@ -126,21 +127,22 @@ public class Character : Creature
             // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
             if (level < 20)
             {
-                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][0], (float)(double)metaData["attrs"][i][0], 19, level - 1);
+                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][0], (float)(double)metaData["attrs"][i][1], level - 1, 19);
                 continue;
             }
             int levelRate = level % 10;
             if (levelRate == 0)
             {
                 // 突破等级最低为0， 最高为 6
-                if (breakLevel == level / 10 - 1)
+                if (breakLevel == level / 10 - 1) // 突破了
                     attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel];
-                else
-                    attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel - 1];
+                else // 应该是 breaklevel == level / 10 - 2，没突破
+                    attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel + 1];
             }
             else
             {
-                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][2 * breakLevel - 2], (float)(double)metaData["attrs"][i][2 * breakLevel - 1], levelRate, 10);
+                // breaklevel = level / 10 - 1
+                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][2 * breakLevel], (float)(double)metaData["attrs"][i][2 * breakLevel + 1], levelRate, 10);
             }
         }
         for (int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
@@ -186,11 +188,8 @@ public class Character : Creature
             suitCount[suitName]++;
             // 位置 TODO: 检验位置重复
             ArtifactPosition pos = arti.position;
-            // 主属性
-            SimpleValueBuff b = new SimpleValueBuff(arti.mainPhrase.attr, (float)arti.mainPhrase.value, arti.mainPhrase.type);
-
-            // 副属性
-            artifacts.Add(new Artifact(b, new List<SimpleValueBuff>()));
+            
+            artifacts.Add(new Artifact(arti.mainPhrase, arti.vicePhrases));
         }
 
         hp = GetFinalAttr(CommonAttribute.MaxHP);
@@ -302,5 +301,9 @@ public class Character : Creature
     public void BurstLevelUp(int offset)
     {
         additionalBurstLevel += offset;
+    }
+    public void TalentLevelUp(int offset)
+    {
+        additionalTalentLevel += offset;
     }
 }

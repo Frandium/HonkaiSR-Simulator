@@ -29,13 +29,14 @@ public class CharacterMono : CreatureMono
 
     public Image burstImage;
     public Image burstFillingImage;
+    public GameObject avatar;
 
     List<AudioClip> skillAudios = new List<AudioClip>();
     List<AudioClip> burstAudios = new List<AudioClip>();
     List<AudioClip> changeAudios = new List<AudioClip>();
     List<AudioClip> burstPrepareAudios = new List<AudioClip>();
 
-    public VideoClip burstVideo;
+    public VideoClip burstVideo { get; protected set; }
 
     public List<Dictionary<string, float>> attackActionSeries = new List<Dictionary<string, float>>();
     public List<Dictionary<string, float>> skillActionSeries = new List<Dictionary<string, float>>();
