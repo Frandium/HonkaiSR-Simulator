@@ -25,7 +25,6 @@ public class CreatureMono : MonoBehaviour
     public Image hpLine;
     public GameObject dmgGO;
     public SpriteRenderer cardSR;
-    public SpriteRenderer selectedSR;
     public Image buffImage;
     public Transform canvas;
     protected List<AudioClip> attackAudios = new List<AudioClip>();
@@ -60,12 +59,12 @@ public class CreatureMono : MonoBehaviour
     }
 
     //Battle functions
-    public virtual void TakeDamage(float value, Element e)
+    public virtual void TakeDamage(Damage d)
     {
         hpLine.fillAmount = hpPercentage;
-        int dmg = -Mathf.RoundToInt(value);
+        int dmg = -Mathf.RoundToInt(d.value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        ShowMessage(content, ElementColors[(int)e], () => { if (self.hp <= 0) OnDying(); });
+        ShowMessage(content, ElementColors[(int)d.element], d.isCritical?2:1, () => { if (self.hp <= 0) OnDying(); });
     }
 
     public virtual void TakeHeal(float value)
@@ -85,11 +84,13 @@ public class CreatureMono : MonoBehaviour
     Queue<string> messages = new Queue<string>();
     Queue<Color> colors = new Queue<Color>();
     Queue<Then> thens = new Queue<Then>();
+    Queue<int> fontSize = new Queue<int>();
     bool isMessageShowing = false; 
-    public virtual void ShowMessage(string content, Color c, Then t = null)
+    public virtual void ShowMessage(string content, Color c, int fontsize = 1, Then t = null)
     {
         messages.Enqueue(content);
         colors.Enqueue(c);
+        fontSize.Enqueue(fontsize);
         thens.Enqueue(t);
         if (!isMessageShowing)
         {
@@ -101,13 +102,13 @@ public class CreatureMono : MonoBehaviour
     public virtual IEnumerator ConsumeMessage()
     {
         while (messages.Count > 0) { 
-            StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), thens.Dequeue()));
+            StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), fontSize.Dequeue(), thens.Dequeue()));
             yield return new WaitForSeconds(.3f);
         }
         isMessageShowing = false;
     }
 
-    protected virtual IEnumerator TakeDamangeAnim(string content, Color c, Then then = null)
+    protected virtual IEnumerator TakeDamangeAnim(string content, Color c, int fontsize, Then then = null)
     {
         isAnimFinished = false;
         GameObject go = Instantiate(dmgGO);
@@ -120,6 +121,7 @@ public class CreatureMono : MonoBehaviour
         dmgBgImg.color = new Color(1, 1, 1, dmgBgBaseAlpha);
         rect.localPosition = new Vector3(0, 0, 0);
         t.color = c;
+        t.fontSize = fontsize;
         float dmgAlpha = 1;
         float alphaFadeSpeed = 1 / dmgAnimTime;
         float dmgBgSpeed = (6 - 2.5f) / dmgAnimTime;
@@ -140,6 +142,7 @@ public class CreatureMono : MonoBehaviour
     public virtual void StartMyTurn()
     {
         isMyTurn = true;
+        cardSR.material.SetColor("_lineColor", Color.blue);
         alpha = 1;
     }
 
@@ -147,14 +150,13 @@ public class CreatureMono : MonoBehaviour
     {
         isMyTurn = false;
         alpha = 0;
-        selectedSR.color = new Color(0, 0, 0, 0);
+        cardSR.material.SetFloat("_alpha", 0);
         UpdateState();
     }
 
     public virtual void Initialize(Creature c)
     {
         self = c;
-        selectedSR.sprite = Resources.Load<Sprite>(c.dbname + "/card_selected");
         cardSR.sprite = Resources.Load<Sprite>(c.dbname + "/card");
         runwayAvatar = Resources.Load<Sprite>(c.dbname + "/runway_avatar");
         int i = 1;
@@ -169,18 +171,18 @@ public class CreatureMono : MonoBehaviour
 
 
     // UI functions
-    public void SetUnselected()
+    public virtual void SetUnselected()
     {
         isSelected = false;
         alpha = 0;
-        selectedSR.color = new Color(0, 0, 0, 0);
+        cardSR.material.SetFloat("_alpha", 0);
     }
 
     public virtual void SetSelected()
     {
         alpha = 1;
         isSelected = true;
-        selectedSR.color = Color.red;
+        cardSR.material.SetColor("_lineColor", Color.red);
     }
 
     void UpdateBuffIcon(List<Buff> valueBuffs)
@@ -232,10 +234,13 @@ public class CreatureMono : MonoBehaviour
 
     public virtual void UpdateState()
     {
-        cardSR.color = Color.white;
         if(self.IsUnderState(StateType.Frozen))
         {
-            cardSR.color = Color.blue;
+            cardSR.material.SetColor("_bodyColor", Color.blue);
+        }
+        else
+        {
+            cardSR.material.SetColor("_bodyColor", Color.white);
         }
     }
 }

@@ -49,7 +49,7 @@ public class BattleManager : MonoBehaviour
 
     // Other Monos
     public Creature curCreature { get; private set; }
-    private Character curCharacter;
+    public Character curCharacter { get; private set; }
     public Selection selection;
     public Runway runway;
     public SkillPoint skillPoint;
@@ -187,7 +187,7 @@ public class BattleManager : MonoBehaviour
 
         foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
         {
-            if (Input.GetKeyDown(p.Key)) {
+            if (Input.GetKeyDown(p.Key) && p.Value < characters.Count) {
                 chaDetailActivated = false;
                 ShowCharacterDetail(p.Value);
                 curShowingDetail = p.Value;
@@ -208,11 +208,6 @@ public class BattleManager : MonoBehaviour
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // load json
-        chaNames = new List<string>();
-        for(int i = 0; i < data["characters"].Count; ++i)
-        {
-            chaNames.Add((string)data["characters"][i]);
-        }
         enmNames = new List<List<string>>();
         for(int i = 0; i < data["enemies"].Count; ++i)
         {
@@ -224,12 +219,21 @@ public class BattleManager : MonoBehaviour
             enmNames.Add(enm);
         }
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < chaNames.Count; ++i)
+        for (int i = 0; i < GlobalInfoHolder.Instance.teamMembers.Length; ++i)
         {
-            Character c = new Character(chaNames[i]);
-            characters.Add(c);
-            c.SetMono(cMonos[i]);
-            runway.AddCreature(c);
+            string chaname = GlobalInfoHolder.Instance.teamMembers[i];
+            if (chaname == "none")
+            {
+                cMonos[i].gameObject.SetActive(false);
+                cMonos[i].avatar.SetActive(false);
+            }
+            else
+            {
+                Character c = new Character(chaname);
+                characters.Add(c);
+                c.SetMono(cMonos[i]);
+                runway.AddCreature(c);
+            }
         }
         mystery = GlobalInfoHolder.Instance.mystery;
     }
@@ -279,23 +283,24 @@ public class BattleManager : MonoBehaviour
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.ChangePercentageLocation(-100);
+                curCreature.ChangePercentageLocation(-1);
                 curCreature.EndNormalTurn();
             }
         }
         else
         {
             // 第一回合发动秘技
-            if (mystery != "none")
+            foreach(Character c in characters)
             {
-                Character c = characters.Find(x => x.dbname == mystery);
-                c.talents.Mystery(characters, enemies);
+                c.talents.OnBattleStart(characters, enemies);
+                if (c.dbname == mystery)
+                    c.talents.Mystery(characters, enemies);
             }
         }
 
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
-        bool isAdditional = false;
+        bool isAdditional;
         curCreature = runway.UpdateRunway(out isBurst, out isAdditional);
         if (curCreature is Character) // 玩家的回合
         {
@@ -313,7 +318,6 @@ public class BattleManager : MonoBehaviour
                 if (interrupted && !isAdditional)
                 {
                     curCharacter.mono.StartMyTurn();
-                    selection.StartNewTurn(curCharacter.mono);
                     SelectTarget();
                     interrupted = false;
                 }
@@ -326,7 +330,6 @@ public class BattleManager : MonoBehaviour
                     }
                     else
                     {
-                        selection.StartNewTurn(curCharacter.mono);
                         SelectTarget();
                     }
                 }
@@ -402,29 +405,9 @@ public class BattleManager : MonoBehaviour
     {
         if (chaDetailActivated)
             return;
-        Character c = characters[x];
         chaDetailActivated = true;
         characterDetail.SetActive(true);
-        Text t = characterDetail.GetComponentInChildren<Text>();
-        string show = "角色名：" + c.disname + "  Lv." + c.level + "  突破" + c.breakLevel + "  " + Utils.ElementName[(int)c.element]
-            + "  " + Utils.CareerName[(int)c.career];
-        show += "\n" + c.atkName + "：" + c.atkDescription;
-        show += "\n" + c.skillName + "：" + c.skillDescription;
-        show += "\n" + c.burstName + "：" + c.burstDescription;
-        show += "\n" + c.talentName + "：" + c.talentDescription;
-
-        show += "\n光锥：" + c.weapon.disName + "  Lv." + c.weapon.level + "  突破" + c.weapon.breakLevel;
-        show += "\n" + c.weapon.effectName + "：" + c.weapon.effectDescription;
-        show += "\n生命值：" + c.hp + "  位置：" + (c.location / Runway.Length * 100) + "%";
-
-        for(int i = 0; i < (int)CommonAttribute.Count; ++i)
-        {
-            float b = c.GetBaseAttr((CommonAttribute)i);
-            float f = c.GetFinalAttr((CommonAttribute)i);
-            show += "\n" + Utils.attributeNames[i] + "：" +
-                 b + " + <color=green>" + (f-b) + "</color> = " + f;
-        }
-        t.text = show;
+        characterDetail.GetComponent<CharacterDetailUI>().ShowDetail(characters[x]);
     }
 
     public void RemoveEnemy(Enemy e)

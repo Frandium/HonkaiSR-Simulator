@@ -10,10 +10,13 @@ public class InTheNight : AEquipmentTalents
     {
         refine = r;
     }
-
+    float crit, atkSkill, burst;
     public override void OnEquiping(Character character)
     {
-        character.AddBuff("inTheNightCritRate", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, (float)(double)config["crit"][refine]);
+        crit = (float)(double)config["effect"]["crit"]["value"][refine];
+        atkSkill = (float)(double)config["effect"]["atkSkill"]["value"][refine];
+        burst = (float)(double)config["effect"]["burst"]["value"][refine];
+        character.AddBuff("inTheNightCritRate", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, crit);
         character.AddBuff(Utils.valueBuffPool.GetOne().Set("inTheNightAtkSkill", BuffType.Permanent, CommonAttribute.GeneralBonus, int.MaxValue, (c, e, t) =>
         {
             if (t == DamageType.Attack || t == DamageType.Skill)
@@ -22,7 +25,7 @@ public class InTheNight : AEquipmentTalents
                 if (additionalSpeed <= 0) return 0;
                 int times = (int)additionalSpeed / 10;
                 if (times > 8) times = 8;
-                return (float)(double)config["atkskill"][refine] * times;
+                return atkSkill * times;
             }
             return 0;
         })
@@ -35,7 +38,7 @@ public class InTheNight : AEquipmentTalents
                 if (additionalSpeed <= 0) return 0;
                 int times = (int)additionalSpeed / 10;
                 if (times > 8) times = 8;
-                return (float)(double)config["burst"][refine] * times;
+                return burst * times;
             }
             return 0;
         })

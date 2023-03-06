@@ -5,33 +5,23 @@ using LitJson;
 using System.IO;
 using System.Text;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class EditCharacterUI : MonoBehaviour
 {
-    public Dropdown chaList;
-
-    Character character = new Character();
+    Character character;
 
     public GameObject headButtonGO;
     public GameObject scrollContent;
+    public CharacterDetailUI detail;
 
     public Sprite defaultAvatar;
-
-    public Text chaName;
-    public Text hpText;
-    public Text atkText;
-    public Text DefText;
-    public Text crtRateText;
-    public Text crtDmgText;
-
     List<string> files;
 
     // Start is called before the first frame update
     void Start()
     {
-       // temp = new CharacterTemplate();
         ScanCharacters();
-//        chaList.onValueChanged.AddListener(OptionChange);
     }
 
     public void ScanCharacters()
@@ -59,28 +49,13 @@ public class EditCharacterUI : MonoBehaviour
         OnHeadClick(Path.GetFileNameWithoutExtension(files[0]));
      }
 
-    public void OnHeadClick(string dbname)
+    public void OnHeadClick(string name)
     {
-        // Load json 获得角色基本数据
-        // Load json 获得角色配装，包括光锥、命座等级、天赋等级、圣遗物
-        // Load json 获得光锥属性、圣遗物属性、天赋属性
-        // 刷新当前页面
-        character.LoadJson(dbname);
-        chaName.text = character.disname;
-        hpText.text = character.GetFinalAttr(CommonAttribute.MaxHP).ToString();
-        atkText.text = character.GetFinalAttr(CommonAttribute.ATK).ToString();
-        DefText.text = character.GetFinalAttr(CommonAttribute.DEF).ToString();
-        crtRateText.text = character.GetFinalAttr(CommonAttribute.CriticalRate).ToString();
-        crtDmgText.text = character.GetFinalAttr(CommonAttribute.CriticalDamage).ToString();
-
-
-        Debug.Log(dbname);
+        character?.SaveConfig();
+        character = new Character(name);
+        detail.ShowDetail(character, true);
     }
 
-    public void FastTest()
-    {
-        Debug.Log("123");
-    }
 
     public void OptionChange(int v)
     {
@@ -112,5 +87,15 @@ public class EditCharacterUI : MonoBehaviour
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();
         ScanCharacters();
+    }
+
+    public void DumpCharacter()
+    {
+        CharacterConfig c = new CharacterConfig();
+        FileStream fs;
+        fs = File.Open(GlobalInfoHolder.Instance.characterConfigDir + "/" + "babara.json", FileMode.OpenOrCreate);
+        string content = JsonMapper.ToJson(c);
+        fs.Write(Encoding.UTF8.GetBytes(content));
+        fs.Close();
     }
 }

@@ -3,7 +3,7 @@ using UnityEngine;
 using LitJson;
 using System.Collections.Generic;
 
-public class Character: Creature
+public class Character : Creature
 {
     public string atkName = "普通攻击";
     public string atkDescription = "普通攻击伤害";
@@ -16,22 +16,28 @@ public class Character: Creature
     public string mysteryName = "秘技";
     public string mysteryDescription = "秘技效果";
 
-    public int breakLevel { get; protected set; } = 4;
-    public int constellation { get; protected set; } = 0; // 命之座
-    public int atkLevel { get; protected set; } = 1; 
-    public int skillLevel { get; protected set; } = 1; 
-    public int burstLevel { get; protected set; } = 1; 
-
+    public new int level { get { return config.level; } }
+    public int breakLevel { get { return config.breakLevel; } }
+    public int constellaLevel { get { return config.constellaLevel; }} // 命之座
+    public int atkLevel { get { return Mathf.Min(15, config.atkLevel + additionalAtkLevel); } }
+    int additionalAtkLevel = 0;
+    public int skillLevel { get { return Mathf.Min(15, config.skillLevel + additionalSkillLevel); } }
+    int additionalSkillLevel = 0;
+    public int burstLevel { get { return Mathf.Min(15, config.burstLevel + additionalBurstLevel); } }
+    int additionalBurstLevel = 0;
+    public int talentLevel { get { return config.talentLevel + additionalTalentLevel; } }
+    int additionalTalentLevel = 0;
     public Element element { get; protected set; } = Element.Count;
     public Career career { get; protected set; } = Career.Count;
     public float energy { get; protected set; } = 0;
     public float maxEnergy { get; protected set; } = 60;
-    public ACharacterTalents talents { get; protected set; }
-    public JsonData config { get; protected set; }
+    public new ACharacterTalents talents { get; protected set; }
+    public JsonData metaData { get; protected set; }
     public new CharacterMono mono { get; protected set; }
+    public CharacterConfig config { get; protected set; }
     public Weapon weapon;
     public List<AEquipmentTalents> artifactsSuit = new List<AEquipmentTalents>();
-    public Artifact[] artifacts = new Artifact[(int)ArtifactPosition.Count];
+    public List<Artifact> artifacts = new List<Artifact>((int)ArtifactPosition.Count);
 
     public bool isAttackTargetEnemy { get; protected set; } = true;
     public SelectionType attackSelectionType { get; protected set; } = SelectionType.One;
@@ -46,9 +52,9 @@ public class Character: Creature
     public float takeDmgGainEnergy { get; protected set; } = 2.5f;
 
     public delegate void TalentUponTarget(Creature target);
-    public Dictionary<string, TalentUponTarget> onNormalAttack { get; protected set; } = new Dictionary<string, TalentUponTarget>();
-    public Dictionary<string, TalentUponTarget> onSkill { get; protected set; } = new Dictionary<string, TalentUponTarget>();
-    public Dictionary<string, TalentUponTarget> onBurst { get; protected set; } = new Dictionary<string, TalentUponTarget>();
+    public List<TriggerEvent<TalentUponTarget>> onNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> onSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> onBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
     public Character() { }
 
     public Character(string _dbname)
@@ -66,99 +72,30 @@ public class Character: Creature
         }
         artifactsSuit.Clear();
 
+        config = new CharacterConfig(name);
+
         // Load 角色基本属性
         string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
-        config = JsonMapper.ToObject(jsonString);
+        metaData = JsonMapper.ToObject(jsonString);
 
         // set character template
         dbname = name;
-        disname = (string)config["disname"];
-        level = (int)config["level"];
-        element = (Element)(int)config["element"];
-        career = (Career)(int)config["career"];
-        breakLevel = (int)config["breakLevel"];
-        maxEnergy = (float)(double)config["maxEnergy"];
-        constellation = (int)config["constellation"];
-        atkLevel = (int)config["atkLevel"];
-        skillLevel = (int)config["skillLevel"];
-        burstLevel = (int)config["burstLevel"];
-        for(int i = 0; i < (int)CommonAttribute.Speed; ++i)
-        {
-            // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
-            if(level < 20)
-            {
-                attrs[i] = Utils.Lerp((float)(double)config["attrs"][i][0], (float)(double)config["attrs"][i][0], 19, level - 1);
-                continue;
-            }
-            int levelRate = level % 10;
-            if (levelRate == 0)
-            {
-                // 突破等级最低为0， 最高为 6
-                if(breakLevel == level / 10 - 1)
-                    attrs[i] = (float)(double)config["attrs"][i][2 * breakLevel];
-                else
-                    attrs[i] = (float)(double)config["attrs"][i][2 * breakLevel - 1];
-            }
-            else
-            {
-                attrs[i] = Utils.Lerp((float)(double)config["attrs"][i][2 * breakLevel - 2], (float)(double)config["attrs"][i][2 * breakLevel - 1], levelRate, 10);
-            }
-        }
-        for(int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
-        {
-            attrs[i] = (float)(double)config["attrs"][i];
-        }
-        atkName = (string)config["atk"]["name"];
-        atkDescription = (string)config["atk"]["description"];
-        skillName = (string)config["skill"]["name"];
-        skillDescription = (string)config["skill"]["description"];
-        burstName = (string)config["burst"]["name"];
-        burstDescription = (string)config["burst"]["description"];
-        talentName = (string)config["talent"]["name"];
-        talentDescription = (string)config["talent"]["description"];
-        mysteryName = (string)config["mystery"]["name"];
-        mysteryDescription = (string)config["mystery"]["description"];
+        Initialize();
+    }
 
-        isAttackTargetEnemy = (bool)config["isAttackTargetEnemy"];
-        attackSelectionType = (SelectionType)(int)config["attackSelectionType"];
-        isSkillTargetEnemy = (bool)config["isSkillTargetEnemy"];
-        skillSelectionType = (SelectionType)(int)config["skillSelectionType"];
-        isBurstTargetEnemy = (bool)config["isBurstTargetEnemy"];
-        burstSelectionType = (SelectionType)(int)config["burstSelectionType"];
-        attackGainPointCount = (int)config["attackGainPointCount"];
-        skillConsumePointCount = (int)config["skillConsumePointCount"];
-        attackGainEnergy = (float)(double)config["attackGainEnergy"];
-        skillGainEnergy = (float)(double)config["skillGainEnergy"];
-        takeDmgGainEnergy = (float)(double)config["takeDmgGainEnergy"];
-
-        // Load 角色光锥
-        JsonData weaponData = config["weapon"];
-        string weaponName = (string)weaponData["name"];
-        int wLevel = (int)weaponData["level"];
-        int rLevle = (int)weaponData["refine"];
-        int bLevle = (int)weaponData["breakLevel"];
-        weapon = new Weapon(weaponName, wLevel, bLevle, rLevle);
-        weapon.OnEquipping(this);
-
-        // Load 角色圣遗物
-        JsonData artsJson = config["artifacts"];
-        Dictionary<string, int> suitCount = new Dictionary<string, int>();
-        foreach(JsonData artJson in artsJson)
-        {
-            // 套装名
-            string suitName = (string)artJson["suitName"];
-            if (!suitCount.ContainsKey(suitName))
-                suitCount[suitName] = 0;
-            suitCount[suitName]++;
-            // 位置
-            ArtifactPosition pos = (ArtifactPosition)(int)artJson["position"];
-            // 主属性
-            SimpleValueBuff b = new SimpleValueBuff((CommonAttribute)(int)artJson["main"]["attr"], (float)(double)artJson["main"]["value"], (ValueType)(int)artJson["main"]["type"]);
-
-            // 副属性
-            artifacts[(int)pos] = new Artifact(b, new List<SimpleValueBuff>());
-        }
-
+    public override void Initialize()
+    {
+        base.Initialize();
+        onBurst.Clear();
+        onSkill.Clear();
+        onNormalAttack.Clear();
+        artifacts.Clear();
+        artifactsSuit.Clear();
+        additionalAtkLevel = 0;
+        additionalBurstLevel = 0;
+        additionalSkillLevel = 0;
+        additionalTalentLevel = 0;
+        
         // 之后改成反射 dict?
         switch (dbname)
         {
@@ -179,6 +116,82 @@ public class Character: Creature
                 break;
         }
         talents.OnEquipping();
+        base.talents = talents;
+
+        disname = (string)metaData["disname"];
+        element = (Element)(int)metaData["element"];
+        career = (Career)(int)metaData["career"];
+        maxEnergy = (float)(double)metaData["maxEnergy"];
+        for (int i = 0; i < (int)CommonAttribute.Speed; ++i)
+        {
+            // 这些数据每个有 14 条，分别是1级，10级未突破/突破……70级未突破/突破，80级 的数据
+            if (level < 20)
+            {
+                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][0], (float)(double)metaData["attrs"][i][1], level - 1, 19);
+                continue;
+            }
+            int levelRate = level % 10;
+            if (levelRate == 0)
+            {
+                // 突破等级最低为0， 最高为 6
+                if (breakLevel == level / 10 - 1) // 突破了
+                    attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel];
+                else // 应该是 breaklevel == level / 10 - 2，没突破
+                    attrs[i] = (float)(double)metaData["attrs"][i][2 * breakLevel + 1];
+            }
+            else
+            {
+                // breaklevel = level / 10 - 1
+                attrs[i] = Utils.Lerp((float)(double)metaData["attrs"][i][2 * breakLevel], (float)(double)metaData["attrs"][i][2 * breakLevel + 1], levelRate, 10);
+            }
+        }
+        for (int i = (int)CommonAttribute.Speed; i < (int)CommonAttribute.Count; ++i)
+        {
+            attrs[i] = (float)(double)metaData["attrs"][i];
+        }
+        atkName = (string)metaData["atk"]["name"];
+        atkDescription = Utils.FormatDescription((string)metaData["atk"]["description"], metaData["atk"], atkLevel);
+        skillName = (string)metaData["skill"]["name"];
+        skillDescription = Utils.FormatDescription((string)metaData["skill"]["description"], metaData["skill"], skillLevel);
+        burstName = (string)metaData["burst"]["name"];
+        burstDescription = Utils.FormatDescription((string)metaData["burst"]["description"], metaData["burst"], burstLevel);
+        talentName = (string)metaData["talent"]["name"];
+        talentDescription = Utils.FormatDescription((string)metaData["talent"]["description"], metaData["talent"], talentLevel);
+        mysteryName = (string)metaData["mystery"]["name"];
+        mysteryDescription = (string)metaData["mystery"]["description"];
+
+        isAttackTargetEnemy = (bool)metaData["isAttackTargetEnemy"];
+        attackSelectionType = (SelectionType)(int)metaData["attackSelectionType"];
+        isSkillTargetEnemy = (bool)metaData["isSkillTargetEnemy"];
+        skillSelectionType = (SelectionType)(int)metaData["skillSelectionType"];
+        isBurstTargetEnemy = (bool)metaData["isBurstTargetEnemy"];
+        burstSelectionType = (SelectionType)(int)metaData["burstSelectionType"];
+        attackGainPointCount = (int)metaData["attackGainPointCount"];
+        skillConsumePointCount = (int)metaData["skillConsumePointCount"];
+        attackGainEnergy = (float)(double)metaData["attackGainEnergy"];
+        skillGainEnergy = (float)(double)metaData["skillGainEnergy"];
+        takeDmgGainEnergy = (float)(double)metaData["takeDmgGainEnergy"];
+
+        // Load 角色光锥
+        weapon = new Weapon(config.weaponConfig);
+        if (weapon.career == career)
+            weapon.OnEquipping(this);
+
+        // Load 角色圣遗物
+        Dictionary<string, int> suitCount = new Dictionary<string, int>();
+        foreach (ArtifactConfig arti in config.artifacts)
+        {
+            // 套装名
+            string suitName = arti.suitName;
+            if (!suitCount.ContainsKey(suitName))
+                suitCount[suitName] = 0;
+            suitCount[suitName]++;
+            // 位置 TODO: 检验位置重复
+            ArtifactPosition pos = arti.position;
+            
+            artifacts.Add(new Artifact(arti.mainPhrase, arti.vicePhrases));
+        }
+
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
 
@@ -204,9 +217,9 @@ public class Character: Creature
         return res;
     }
 
-    public override void TakeDamage(Creature source, float value, Element element, DamageType type)
+    public override void TakeDamage(Creature source, Damage damage)
     {
-        base.TakeDamage(source, value, element, type);
+        base.TakeDamage(source, damage);
         ChangeEnergy(takeDmgGainEnergy);
     }
 
@@ -223,6 +236,14 @@ public class Character: Creature
         mono = m;
         base.mono = m;
         m.Initialize(this);
+    }
+
+    public override void EndNormalTurn()
+    {
+        base.EndNormalTurn();
+        onNormalAttack.RemoveAll(p => p.CountDown());
+        onSkill.RemoveAll(p => p.CountDown());
+        onBurst.RemoveAll(p => p.CountDown());        
     }
 
     public virtual void StartBurstTurn()
@@ -263,4 +284,26 @@ public class Character: Creature
         mono?.EndBurstTurn();
     }
 
+    public void SaveConfig()
+    {
+        config.Save();
+        Initialize();
+    }
+
+    public void ATKLevelUp(int offset)
+    {
+        additionalAtkLevel += offset;
+    }
+    public void SkillLevelUp(int offset)
+    {
+        additionalSkillLevel += offset;
+    }
+    public void BurstLevelUp(int offset)
+    {
+        additionalBurstLevel += offset;
+    }
+    public void TalentLevelUp(int offset)
+    {
+        additionalTalentLevel += offset;
+    }
 }

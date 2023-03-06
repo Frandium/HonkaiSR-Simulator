@@ -8,21 +8,22 @@ public class Japard : ACharacterTalents
     {
 
     }
+    float atkDmg, skillAtk, skillFreeze, burstDefPer, burstDefIns, talentHp;
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 50, DamageType.Attack);
-        self.DealDamage(e, Element.Cryo, DamageType.Attack, dmg);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, atkDmg, DamageType.Attack);
+        self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
 
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 100, DamageType.Skill);
-        self.DealDamage(e, Element.Cryo, DamageType.Skill, dmg);
-        float hit = .6f * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
+        self.DealDamage(e, dmg);
+        float hit = (self.constellaLevel >= 1 ? 1 : .65f) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
         float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
         if (Utils.TwoRandom(hit) && !Utils.TwoRandom(resist))
         {
@@ -34,17 +35,21 @@ public class Japard : ACharacterTalents
                 {
                     if (e.IsUnderState(StateType.Frozen))
                     {
-                        float dmg = DamageCal.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, 25, DamageType.Continue);
-                        self.DealDamage(e, Element.Cryo, DamageType.Continue, dmg);
+                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillFreeze, DamageType.Continue);
+                        self.DealDamage(e, dmg);
                     }
                 }));
+            if (self.constellaLevel >= 2)
+            {
+                e.AddBuff("japardContellation2SpeedDown", BuffType.Debuff, CommonAttribute.Speed, ValueType.Percentage, -.2f, 1);
+            }
         }
         base.SkillEnemyAction(enemies);
     }
 
     public override void BurstCharacterAction(List<Character> characters)
     {
-        float shield = .36f * self.GetFinalAttr(CommonAttribute.DEF) + 120;
+        float shield = burstDefPer * self.GetFinalAttr(CommonAttribute.DEF) + burstDefIns;
         foreach(Character c in characters)
         {
             c.GetShield(new Shield("japardBurst", shield, 3));
@@ -54,18 +59,40 @@ public class Japard : ACharacterTalents
 
     public override void OnEquipping()
     {
-        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
-        t.trigger = (s, v, e, dt) =>
+        if (self.constellaLevel >= 5)
         {
-            if (self.hp - v <= 0)
+            self.SkillLevelUp(2);
+            self.ATKLevelUp(1);
+        }
+        if (self.constellaLevel >= 3)
+        {
+            self.BurstLevelUp(2);
+            self.TalentLevelUp(2);
+        }
+        atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
+        skillAtk = (float)(double)self.metaData["skill"]["atk"]["value"][self.skillLevel];
+        skillFreeze = (float)(double)self.metaData["skill"]["freeze"]["value"][self.skillLevel];
+        burstDefPer = (float)(double)self.metaData["burst"]["defPer"]["value"][self.burstLevel];
+        burstDefIns = (int)self.metaData["burst"]["defIns"]["value"][self.burstLevel];
+        talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.talentLevel];
+        
+        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
+        t.trigger = (s, d) =>
+        {
+            if (self.hp - d.value <= 0)
             {
-                self.hp = .25f * self.GetFinalAttr(CommonAttribute.MaxHP);
+                self.hp = (self.constellaLevel >= 6 ? .75f : .25f) * self.GetFinalAttr(CommonAttribute.MaxHP);
                 self.mono.hpLine.fillAmount = self.mono.hpPercentage;
                 self.mono?.ShowMessage("不屈之身", Color.blue);
                 t.Zero();
-                return 0;
+                d.value = 0;
+                if (self.constellaLevel >= 6)
+                {
+                    self.mono?.ShowMessage("行动提前", Color.blue);
+                    self.ChangePercentageLocation(1);
+                }
             }
-            return v;
+            return d;
         };
         self.onTakingDamage.Add(t);
     }
@@ -75,6 +102,24 @@ public class Japard : ACharacterTalents
         foreach(Character c in characters)
         {
             c.AddBuff("japardMystery", BuffType.Buff, CommonAttribute.DEF, ValueType.InstantNumber, self.GetBaseAttr(CommonAttribute.DEF) * .25f, 2);
+        }
+    }
+
+    public override void OnBattleStart(List<Character> characters, List<Enemy> enemies)
+    {
+        if (self.constellaLevel >= 4)
+        {
+            foreach (Character c in characters)
+            {
+                c.AddBuff("japardConstellation4ResistUp", BuffType.Permanent, CommonAttribute.EffectResist, ValueType.InstantNumber, .2f);
+            }
+            self.onDying.Add(new TriggerEvent<Creature.DyingEvent>("japardConstellation4Die", () =>
+            {
+                foreach (Character c in characters)
+                {
+                    c.RemoveBuff("japardConstellation4ResistUp");
+                }
+            }));
         }
     }
 

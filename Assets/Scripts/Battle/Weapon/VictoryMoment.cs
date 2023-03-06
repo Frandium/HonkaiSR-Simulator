@@ -10,17 +10,20 @@ public class VictoryMoment : AEquipmentTalents
     {
         refine = r;
     }
-
+    float def1, effHit, def2;
     public override void OnEquiping(Character character)
     {
-        character.AddBuff("victoryMomentDEF", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, (float)(double)config["def1"][refine]);
-        character.AddBuff("victoryMomentEffectHit", BuffType.Permanent, CommonAttribute.EffectHit, ValueType.InstantNumber, (float)(double)config["effHit"][refine]);
+        def1 = (float)(double)config["effect"]["def1"]["value"][refine];
+        effHit = (float)(double)config["effect"]["effHit"]["value"][refine];
+        def2 = (float)(double)config["effect"]["def2"]["value"][refine];
+        character.AddBuff("victoryMomentDEF", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, def1);
+        character.AddBuff("victoryMomentEffectHit", BuffType.Permanent, CommonAttribute.EffectHit, ValueType.InstantNumber, effHit);
         character.AddBuff("victoryMomentTaunt", BuffType.Permanent, CommonAttribute.Taunt, ValueType.InstantNumber, 100);
 
-        character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, v, e, d) =>
+        character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, d) =>
         {
-            character.AddBuff("victoryMomentDEF2", BuffType.Buff, CommonAttribute.DEF, ValueType.Percentage, (float)(double)config["def2"][refine], 1);
-            return v;
+            character.AddBuff("victoryMomentDEF2", BuffType.Buff, CommonAttribute.DEF, ValueType.Percentage, def2, 1);
+            return d;
         }));
     }
 
@@ -30,6 +33,5 @@ public class VictoryMoment : AEquipmentTalents
         character.RemoveBuff("victoryMomentEffectHit");
         character.RemoveBuff("victoryMomentTaunt");
         character.onTakingDamage.RemoveAll(r => r.tag == "victoryMomentDEF2");
-        throw new System.NotImplementedException();
     }
 }

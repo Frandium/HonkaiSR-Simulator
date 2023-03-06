@@ -45,7 +45,7 @@ public class Runway : MonoBehaviour
     public void AddCreature(Creature c)
     {
         creatures.Add(c);
-        c.ChangePercentageLocation(-100);
+        c.ChangePercentageLocation(-1);
         RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
         newOne.SetCreature(c, false);
         newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(10, -500, 0);

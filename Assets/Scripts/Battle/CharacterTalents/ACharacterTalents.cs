@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class ACharacterTalents
+public abstract class ACharacterTalents: ACommomBattleTalents
 {
     protected Character self;
 
@@ -54,4 +54,5 @@ public abstract class ACharacterTalents
     {
 
     }
+
 }

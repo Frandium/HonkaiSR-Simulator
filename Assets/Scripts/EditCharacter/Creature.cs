@@ -18,10 +18,10 @@ public class Creature
     public float hp = 100;
     public CreatureMono mono { get; protected set; }
     public List<Buff> buffs { get; protected set; } = new List<Buff>();
-
     public List<State> states { get; protected set; } = new List<State>();
+    public ACommomBattleTalents talents { get; protected set; }
 
-    public delegate float DamageEvent(Creature sourceOrTarget, float value, Element element, DamageType type);
+    public delegate Damage DamageEvent(Creature sourceOrTarget, Damage damage);
     public List<TriggerEvent<DamageEvent>> onTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
     public List<TriggerEvent<DamageEvent>> onDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
 
@@ -33,6 +33,9 @@ public class Creature
     public delegate void TurnStartEndEvent();
     public List<TriggerEvent<TurnStartEndEvent>> onTurnStart { get; protected set; } = new List<TriggerEvent<TurnStartEndEvent>>();
     public List<TriggerEvent<TurnStartEndEvent>> onTurnEnd { get; protected set; } = new List<TriggerEvent<TurnStartEndEvent>>();
+
+    public delegate void DyingEvent();
+    public List<TriggerEvent<DyingEvent>> onDying { get; protected set; } = new List<TriggerEvent<DyingEvent>>();
 
     public List<Shield> shields = new List<Shield>();
     
@@ -66,7 +69,7 @@ public class Creature
 
     public void ChangePercentageLocation(float offset)
     {
-        location += offset * Runway.Length / 100.0f;
+        location += offset * Runway.Length;
         if (location < 0)
             location = 0;
         if (location > Runway.Length)
@@ -82,7 +85,7 @@ public class Creature
     {
         if (removeIfExists)
             shields.RemoveAll(s => s.tag == shield.tag);
-        mono?.ShowMessage("护盾+" + shield.maxHp, Color.black);
+        mono?.ShowMessage("护盾+" + Mathf.RoundToInt(shield.maxHp), Color.black);
         shields.Add(shield);
     }
 
@@ -92,37 +95,44 @@ public class Creature
     }
 
 
-    public void DealDamage(Creature target, Element element, DamageType type, float value)
+    public void DealDamage(Creature target, Damage damage)
     {
         // 先 take damage，再触发事件，不然 damage 可能就错了
-        target.TakeDamage(this, value, element, type);
+        target.TakeDamage(this, damage);
         List<string> toremove = new List<string>();
         foreach (var p in onDealingDamage)
         {
-            p.trigger(target, value, element, type);
+            p.trigger(target, damage);
         }
-        onDealingDamage.RemoveAll(p => p.CountDown());
     }
 
-    public virtual void TakeDamage(Creature source, float value, Element element, DamageType type)
+    public virtual void TakeDamage(Creature source, Damage damage)
     {
         // value 是正数
-        foreach (var p in onTakingDamage)
-        {
-            value = p.trigger(source, value, element, type);
-        }
-        onTakingDamage.RemoveAll(p => p.CountDown());
-
-        float remain = value;
+        float remain = damage.value;
         foreach(var p in shields)
         {
-            float r = - p.TakeDamage(value);
+            float r = - p.TakeDamage(damage);
             remain = Mathf.Min(r, remain);
         }
         shields.RemoveAll(s => s.CountDown() || s.hp <= 0);
         remain = Mathf.Max(0, remain);
-        hp -= remain;
-        mono?.TakeDamage(remain, element);
+        damage.value = remain;
+
+        foreach (var p in onTakingDamage)
+        {
+            damage = p.trigger(source, damage);
+        }
+
+        hp -= damage.value;
+        if (hp < 0)
+        {
+            foreach(var p in onDying)
+            {
+                p.trigger();
+            }
+        }
+        mono?.TakeDamage(damage);
     }
 
     public virtual void TakeHeal(Creature source, float value)
@@ -140,7 +150,6 @@ public class Creature
         {
             p.trigger(source, value);
         }
-        onTakingHeal.RemoveAll(p => p.CountDown());
         mono?.TakeHeal(value);
     }
 
@@ -150,7 +159,6 @@ public class Creature
         {
             p.trigger(target, value);
         }
-        onDealingHeal.RemoveAll(p => p.CountDown());
         target.TakeHeal(this, value);
     }
 
@@ -160,7 +168,6 @@ public class Creature
         {
             p.trigger();
         }
-        onTurnStart.RemoveAll(p => p.CountDown());
         mono?.StartMyTurn();
 
         if (states.Find(s => s.state == StateType.Frozen) != null)
@@ -176,6 +183,11 @@ public class Creature
             p.trigger();
         }
         onTurnEnd.RemoveAll(p => p.CountDown());
+        onTurnStart.RemoveAll(p => p.CountDown());
+        onDealingDamage.RemoveAll(p => p.CountDown());
+        onTakingDamage.RemoveAll(p => p.CountDown());
+        onDealingHeal.RemoveAll(p => p.CountDown());
+        onTakingHeal.RemoveAll(p => p.CountDown());
         
         // Remove Buff
         for(int i = buffs.Count - 1; i >=0; --i)
@@ -205,30 +217,65 @@ public class Creature
         buffs.Add(buff);
     }
 
-    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, ValueType valueType, float value, int duration = int.MaxValue, DamageType damageType = DamageType.All)
+    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, ValueType valueType, float value,
+        int duration = int.MaxValue, DamageType damageType = DamageType.All, int maxStack = 1)
     {
         DamageType dt = damageType;
         ValueType vt = valueType;
         float v = value;
         CommonAttribute a = attr;
-        Buff b = Utils.valueBuffPool.GetOne().Set("default", buffType, attr, duration, (s, t, d) =>
+        Buff b = Utils.valueBuffPool.GetOne().Set(tag, buffType, attr, duration, (s, t, d) =>
         {
-            if(dt != DamageType.All && d != dt)
+            if (dt != DamageType.All && d != dt)
                 return 0;
-            if(vt == ValueType.InstantNumber)
+            if (vt == ValueType.InstantNumber)
                 return v;
             return s.GetBaseAttr(a) * v;
         });
-        AddBuff(b, false);
+        if (maxStack > 1)
+        {
+            List<Buff> stacks = buffs.FindAll(t => t.tag == tag);
+            if (stacks.Count >= maxStack)
+            {
+                int minDuration = int.MaxValue;
+                foreach (Buff buff in stacks)
+                {
+                    minDuration = Mathf.Min(buff.times, minDuration);
+                }
+                Buff toremove = stacks.Find(b => b.times == minDuration);
+                RemoveBuff(toremove);
+            }
+        }
+        AddBuff(b, maxStack <= 1);
     }
 
-    public virtual void RemoveBuff(string tag)
+    public virtual void RemoveBuff(string tag, bool removeAll = false)
     {
-        Buff b = buffs.Find(p => p.tag == tag);
+        if (removeAll)
+        {
+            List<Buff> toremoves = buffs.FindAll(b => b.tag == tag);
+            RemoveBuff(toremoves);
+        }
+        else
+        {
+            Buff b = buffs.Find(p => p.tag == tag);
+            RemoveBuff(b);
+        }
+    }
+    public void RemoveBuff(Buff b)
+    {
         if (b != null)
         {
             buffs.Remove(b);
             Utils.valueBuffPool.ReturnOne(b);
+        }       
+    }
+
+    public void RemoveBuff(ICollection<Buff> toremoves)
+    {
+        foreach(Buff b in toremoves)
+        {
+            RemoveBuff(b);
         }
     }
 
@@ -243,4 +290,16 @@ public class Creature
         return states.Find(s => s.state == t) != null;
     }
 
+    public virtual void Initialize()
+    {
+        onTakingDamage.Clear();
+        onDealingDamage.Clear();
+        onTakingHeal.Clear();
+        onDealingHeal.Clear();
+        buffs.Clear();
+        states.Clear();
+        onTurnEnd.Clear();
+        onTurnStart.Clear();
+        onDying.Clear();
+    }
 }

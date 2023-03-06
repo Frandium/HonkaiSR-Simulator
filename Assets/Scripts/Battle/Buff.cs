@@ -40,6 +40,20 @@ public class Buff : AProgressWithTurn
         return this;
     }
 
+    public Buff Set(PhraseConfig p)
+    {
+        buffType = BuffType.Permanent;
+        targetAttribute = p.attr;
+        content = (c, e, t) =>
+        {
+            if (p.type == ValueType.InstantNumber)
+                return (float)p.value;
+            float b = c.GetBaseAttr(p.attr);
+            return b * (float)p.value;
+        };
+        return this;
+    }
+
     public Buff Set(string _tag, BuffType type, CommonAttribute target_att, int _duration, BuffContent c)
     {
         tag = _tag;

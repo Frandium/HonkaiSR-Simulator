@@ -6,7 +6,7 @@ using LitJson;
 
 public class Enemy : Creature
 {
-    public AEnemyTalents talents;
+    public new AEnemyTalents talents { get; protected set; }
     public new EnemyMono mono { get; protected set; }
     public List<Element> weakPoint { get; protected set; } = new List<Element>();
     public float weakMaxHp { get; protected set; } = 100;
@@ -59,26 +59,26 @@ public class Enemy : Creature
             default:
                 break;
         }
+        base.talents = talents;
 
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
 
-    public override void TakeDamage(Creature source, float value, Element element, DamageType type)
+    public override void TakeDamage(Creature source, Damage damage)
     {
-        if (weakHp > 0 && weakPoint.Contains(element))
+        if (weakHp > 0 && weakPoint.Contains(damage.element))
         {
             weakHp -= 50.0f;
             if (weakHp <= 0)
             {
                 weakHp = 0;
-                ChangePercentageLocation(25f);
+                ChangePercentageLocation(-.25f);
                 mono?.ShowMessage("Èõµã»÷ÆÆ", Color.green);
                 mono?.ShowMessage("»÷ÍË25%", Color.green);
                 mono?.ShowMessage("¼õ·À30%", Color.green);
-                AddBuff("defBreak", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, .3f);
-                // ÆÆ·ÀÊÂ¼þ
+                AddBuff("breakDefDown", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, -.3f);
             }
         }
-        base.TakeDamage(source, value, element, type);
+        base.TakeDamage(source, damage);
     }
 }

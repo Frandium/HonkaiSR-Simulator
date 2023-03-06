@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using LitJson;
 
 public class Utils
 {
     public static ObjectPool<Buff> valueBuffPool = new ObjectPool<Buff>(100);
+
     public static double Lerp(double min, double max, float scale, float length){
         return min + (max - min) * scale / length;
     }
@@ -19,10 +21,10 @@ public class Utils
     }
     public static float Lerp(float min, float max, int scale, int length)
     {
-        return min + (max - min) * (float)scale / (float)length;
+        return min + (max - min) * scale / length;
     }
 
-    public static string[] attributeNames = new string[(int)CommonAttribute.Count]
+    public static string[] attributeNames = new string[(int)CommonAttribute.Count + 1]
     {
         "攻击力",
         "防御力",
@@ -51,10 +53,18 @@ public class Utils
         "雷属性伤害抗性",
         "风属性伤害抗性",
         "量子伤害抗性",
-        "虚数伤害抗性"
+        "虚数伤害抗性",
+        "物理穿透",
+        "火属性穿透",
+        "冰属性穿透",
+        "雷属性穿透",
+        "风属性穿透",
+        "量子属性穿透",
+        "虚数属性穿透",
+        "占位符"
     };
 
-    public static string[] ElementName = new string[] {
+    public static string[] ElementName = new string[(int)Element.Count + 1] {
     "物理",
     "火",
     "冰",
@@ -65,7 +75,7 @@ public class Utils
     "？？？"
     };
 
-    public static string[] CareerName = new string[]
+    public static string[] CareerName = new string[(int)Element.Count + 1]
     {
     "毁灭",
     "巡猎",
@@ -77,10 +87,42 @@ public class Utils
     "？？？"
     };
 
+    public static string[] valueTypeName = new string[(int)ValueType.Count + 1]
+    {
+        "百分比",
+        "直接数",
+        "占位"
+    };
+
     public static bool TwoRandom(float rate)
     {
         int p = (int)(rate * 10000);
         int r = Random.Range(0, 10000);
         return r < p;
+    }
+
+    public static string FormatDescription(string format, JsonData d, int l)
+    {
+        string[] strs = format.Split("#"); // 第1， 3， 5 …… 是要替换的字符串
+        string res = "";
+        for (int i = 0; i < strs.Length; i++)
+        {
+            if (i % 2 == 0)
+                res += strs[i];
+            else
+            {
+                if((string)d[strs[i]]["type"] == "instant")
+                {
+                    if (d[strs[i]]["value"][0].IsDouble)
+                        res += "<color=#f08>" + ((float)(double)d[strs[i]]["value"][l] * 100).ToString() + "</color>";
+                    else if (d[strs[i]]["value"][0].IsInt)
+                        res += "<color=#f08>" + ((int)d[strs[i]]["value"][l]).ToString() + "</color>";
+                }
+                else if ((string)d[strs[i]]["type"] == "percentage")
+                    if (d[strs[i]]["value"][0].IsDouble)
+                        res += "<color=#f08>" + ((float)(double)d[strs[i]]["value"][l] * 100).ToString() + "%</color>";
+            }
+        }
+        return res;
     }
 }

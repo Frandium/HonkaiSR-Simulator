@@ -18,8 +18,7 @@ public class EnemyMono : CreatureMono
             alpha += Time.deltaTime * alphaSpeed * alphaDirection;
             if (alpha > 1) alphaDirection = -1;
             else if (alpha < 0) alphaDirection = 1;
-            if (isSelected) selectedSR.color = new Color(1, 0, 0, alpha);
-            else if (isMyTurn) selectedSR.color = new Color(0, 0, 1, alpha);
+            cardSR.material.SetFloat("_alpha", alpha);
         }
     }
 
@@ -58,35 +57,10 @@ public class EnemyMono : CreatureMono
         Destroy(gameObject);
     }
 
-    public override void TakeDamage(float value, Element e)
+    public override void TakeDamage(Damage d)
     {
         weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
-        base.TakeDamage(value, e);
+        base.TakeDamage(d);
     }
 
-    //protected override IEnumerator TakeDamangeAnim(int dmg)
-    //{
-    //    isAnimFinished = false;
-    //    PlayAudio(AudioType.TakeDamage);
-    //    dmgGO.SetActive(true);
-    //    dmgText.text =  dmg.ToString();
-    //    RectTransform rect = dmgGO.GetComponent<RectTransform>();
-    //    Image dmgBgImg = dmgGO.GetComponent<Image>();
-    //    dmgBgImg.color = new Color(0, 0, 0, dmgBgBaseAlpha);
-    //    rect.localPosition = new Vector3(0, 0f, 0);
-    //    dmgText.color = Color.white;
-    //    float dmgAlpha = 1;
-    //    float alphaFadeSpeed = 1 / dmgAnimTime;
-    //    float dmgBgSpeed = (6 - 0f) / dmgAnimTime;
-    //    while (rect.localPosition.y < 6)
-    //    {
-    //        rect.localPosition += Vector3.up * dmgBgSpeed * Time.deltaTime;
-    //        dmgBgImg.color = new Color(0, 0, 0, dmgBgBaseAlpha * dmgAlpha);
-    //        dmgText.color = new Color(1, 1, 1, dmgAlpha);
-    //        dmgAlpha -= alphaFadeSpeed * Time.deltaTime;
-    //        yield return new WaitForEndOfFrame();
-    //    }
-    //    dmgGO.SetActive(false);
-    //    isAnimFinished = true;
-    //}
 }

@@ -29,13 +29,14 @@ public class CharacterMono : CreatureMono
 
     public Image burstImage;
     public Image burstFillingImage;
+    public GameObject avatar;
 
     List<AudioClip> skillAudios = new List<AudioClip>();
     List<AudioClip> burstAudios = new List<AudioClip>();
     List<AudioClip> changeAudios = new List<AudioClip>();
     List<AudioClip> burstPrepareAudios = new List<AudioClip>();
 
-    public VideoClip burstVideo;
+    public VideoClip burstVideo { get; protected set; }
 
     public List<Dictionary<string, float>> attackActionSeries = new List<Dictionary<string, float>>();
     public List<Dictionary<string, float>> skillActionSeries = new List<Dictionary<string, float>>();
@@ -56,8 +57,7 @@ public class CharacterMono : CreatureMono
         {
             alpha += Time.deltaTime * alphaSpeed * alphaDirection;
             if (alpha > 1 || alpha < 0) alphaDirection *= -1;
-            if (isSelected) selectedSR.color = new Color(0, 1, 0, alpha);
-            else if (isMyTurn) selectedSR.color = new Color(0, 0, 1, alpha);
+            cardSR.material.SetFloat("_alpha", alpha);
         }
     }
 
@@ -65,7 +65,16 @@ public class CharacterMono : CreatureMono
     {
         alpha = 1;
         isSelected = true;
-        selectedSR.color = Color.green;
+        cardSR.material.SetColor("_lineColor", Color.green);
+    }
+
+    public override void SetUnselected()
+    {
+        isSelected = false;
+        if (isMyTurn)
+            cardSR.material.SetColor("_lineColor", Color.blue);
+        else
+            cardSR.material.SetFloat("_alpha", 0);
     }
 
     public void Initialize(Character c)
@@ -159,11 +168,6 @@ public class CharacterMono : CreatureMono
         }
     }
 
-    //public override void StartMyTurn()
-    //{
-    //    isMyTurn = true;
-    //    alpha = 1;
-    //}
 
     public void EndBurstTurn()
     {
@@ -174,20 +178,22 @@ public class CharacterMono : CreatureMono
         c.a = 1;
         burstFillingImage.color = c;
         alpha = 0;
-        selectedSR.color = new Color(0, 0, 0, 0);
+        cardSR.material.SetFloat("Alpha", 0);
     }
 
     public void InterruptedByBurst()
     {
         isMyTurn = false;
         alpha = 0;
-        selectedSR.color = new Color(0, 0, 0, 0);
+        cardSR.material.SetFloat("Alpha", 0);
     }
 
     public override void OnDying()
     {
         cardSR.color = new Color(.25f, .25f, .25f, .25f);
         BattleManager.Instance.RemoveCharacter(self);
+        avatar.SetActive(false);
+        gameObject.SetActive(false);
     }
 
 
