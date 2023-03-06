@@ -15,20 +15,20 @@ public class Tingyun : ACharacterTalents
     {
         if (self.constellaLevel >= 5)
         {
-            self.SkillLevelUp(2);
+            self.BurstLevelUp(2);
             self.ATKLevelUp(1);
         }
         if (self.constellaLevel >= 3)
         {
-            self.BurstLevelUp(2);
+            self.SkillLevelUp(2);
             self.TalentLevelUp(2);
         }
         atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
-        skillAtkUp = (float)(double)self.metaData["skill"]["atkUp"]["value"][self.atkLevel];
-        skillAtkMax = (float)(double)self.metaData["skill"]["atkMax"]["value"][self.atkLevel];
-        skillDmg = (float)(double)self.metaData["skill"]["dmg"]["value"][self.atkLevel];
-        burstDmgUp = (float)(double)self.metaData["burst"]["dmgUp"]["value"][self.atkLevel];
-        talentAtk = (float)(double)self.metaData["talent"]["atk"]["value"][self.atkLevel];
+        skillAtkUp = (float)(double)self.metaData["skill"]["atkUp"]["value"][self.skillLevel];
+        skillAtkMax = (float)(double)self.metaData["skill"]["atkMax"]["value"][self.skillLevel];
+        skillDmg = (float)(double)self.metaData["skill"]["dmg"]["value"][self.skillLevel];
+        burstDmgUp = (float)(double)self.metaData["burst"]["dmgUp"]["value"][self.burstLevel];
+        talentAtk = (float)(double)self.metaData["talent"]["atk"]["value"][self.talentLevel];
         base.OnEquipping();
         self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, d) =>
         {
@@ -68,15 +68,25 @@ public class Tingyun : ACharacterTalents
     }
 
     Character curSkill;
-
+    bool constellation2Triggerd = false;
     public override void SkillCharacterAction(List<Character> characters)
     {
-        if(curSkill != null)
+        if (curSkill != null)
         {
             curSkill.RemoveBuff("tingyunSkillATK");
             curSkill.onDealingDamage.RemoveAll(t => t.tag == "tingyunHelp");
+            if(self.constellaLevel >= 1)
+            {
+                curSkill.onBurst.RemoveAll(t => t.tag == "tingyunConstellation1Trigger");
+                if(self.constellaLevel >= 2)
+                {
+                    curSkill.onDealingDamage.RemoveAll(t => t.tag == "tingyunConstellation2");
+                    curSkill.onTurnStart.RemoveAll(t => t.tag == "tingyunConstellation2Refresh");
+                }
+            }
         }
         Character c = characters[0];
+        curSkill = c;
         c.AddBuff(Utils.valueBuffPool.GetOne().Set("tingyunSkillATK", BuffType.Buff, CommonAttribute.ATK, 3, (s, t, d) =>
         {
             float res = t.GetBaseAttr(CommonAttribute.ATK) * skillAtkUp;
@@ -85,21 +95,43 @@ public class Tingyun : ACharacterTalents
         }));
         c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
         {
-            Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg, d.type);
+            Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg + (self.constellaLevel >= 4? .2f : 0), d.type);
             t.TakeDamage(c, dmg);
             return d;
         }, 3));
-        curSkill = c;
         c.mono?.ShowMessage("赐福", Color.red);
         c.mono?.ShowMessage("攻击提升", Color.red);
         c.mono?.ShowMessage("协同伤害", Color.red);
+        if (self.constellaLevel >= 1)
+        {
+            c.onBurst.Add(new TriggerEvent<Character.TalentUponTarget>("tingyunConstellation1Trigger", c =>
+            {
+                curSkill.AddBuff("tingyunConstellation1SpeedUp", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .2f, 2);
+            }));
+            if (self.constellaLevel >= 2)
+            {
+                c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunConstellation2", (t, d) =>
+                {
+                    if (t.hp <= 0 && !constellation2Triggerd)
+                    {
+                        constellation2Triggerd = true;
+                        curSkill.ChangeEnergy(10);
+                    }
+                    return d;
+                }));
+                c.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("tingyunConstellation2Refresh", () =>
+                {
+                    constellation2Triggerd = false;
+                }));
+            }
+        }
         base.SkillCharacterAction(characters);
     }
 
     public override void BurstCharacterAction(List<Character> characters)
     {
         Character c = characters[0];
-        c.ChangeEnergy(50);
+        c.ChangeEnergy(self.constellaLevel >= 6? 60: 50);
         c.AddBuff("tingyunBurstBonus", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, burstDmgUp, 3);
         c.mono?.ShowMessage("造成伤害提高", Color.red);
         base.BurstCharacterAction(characters);

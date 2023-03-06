@@ -25,7 +25,7 @@ public class Character : Creature
     int additionalSkillLevel = 0;
     public int burstLevel { get { return Mathf.Min(15, config.burstLevel + additionalBurstLevel); } }
     int additionalBurstLevel = 0;
-    public int talentLevel { get { return config.talentLevel; } }
+    public int talentLevel { get { return config.talentLevel + additionalTalentLevel; } }
     int additionalTalentLevel = 0;
     public Element element { get; protected set; } = Element.Count;
     public Career career { get; protected set; } = Career.Count;

@@ -109,11 +109,6 @@ public class Creature
     public virtual void TakeDamage(Creature source, Damage damage)
     {
         // value ÊÇÕýÊý
-        foreach (var p in onTakingDamage)
-        {
-            damage = p.trigger(source, damage);
-        }
-
         float remain = damage.value;
         foreach(var p in shields)
         {
@@ -123,7 +118,13 @@ public class Creature
         shields.RemoveAll(s => s.CountDown() || s.hp <= 0);
         remain = Mathf.Max(0, remain);
         damage.value = remain;
-        hp -= remain;
+
+        foreach (var p in onTakingDamage)
+        {
+            damage = p.trigger(source, damage);
+        }
+
+        hp -= damage.value;
         if (hp < 0)
         {
             foreach(var p in onDying)

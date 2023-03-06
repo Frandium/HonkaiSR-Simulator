@@ -1207,7 +1207,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: "\u8FD4\u56DE"
+  m_Text: "\u8FD4\u56DE\n\u9996\u9875"
 --- !u!222 &1616745943
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1696,6 +1696,10 @@ PrefabInstance:
     - target: {fileID: 2668607791222708814, guid: 6e268f2e8f1960e419e7d933a44f78b2, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2682385791580407675, guid: 6e268f2e8f1960e419e7d933a44f78b2, type: 3}
+      propertyPath: m_Text
+      value: "\u70B9\u6B64\u4FDD\u5B58\n\u9057\u5668\u914D\u7F6E"
       objectReference: {fileID: 0}
     - target: {fileID: 2732816789686061757, guid: 6e268f2e8f1960e419e7d933a44f78b2, type: 3}
       propertyPath: m_AnchorMax.y

@@ -28,7 +28,7 @@ public class Damage
         bool critical = Utils.TwoRandom(source.GetFinalAttr(source, target, CommonAttribute.CriticalRate, damageType));
         if (critical)
         {
-            dmg *= source.GetFinalAttr(source, target, CommonAttribute.CriticalDamage, damageType);
+            dmg *= (1 + source.GetFinalAttr(source, target, CommonAttribute.CriticalDamage, damageType));
         }
 
         float def = target.GetFinalAttr(source, target, CommonAttribute.DEF, damageType);

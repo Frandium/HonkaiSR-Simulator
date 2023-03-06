@@ -17,13 +17,13 @@ public class Seele : ACharacterTalents
     {
         if (self.constellaLevel >= 5)
         {
-            self.BurstLevelUp(2);
+            self.SkillLevelUp(2);
             self.ATKLevelUp(1);
         }
         if (self.constellaLevel >= 3)
         {
-            self.SkillLevelUp(2);
-            self.ATKLevelUp(1);
+            self.BurstLevelUp(2);
+            self.TalentLevelUp(2);
         }
         atkDmg = (float)(double)self.metaData["atk"]["dmg"]["value"][self.atkLevel];
         skillDmg = (float)(double)self.metaData["skill"]["atk"]["value"][self.atkLevel];

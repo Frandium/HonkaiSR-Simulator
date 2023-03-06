@@ -339,7 +339,7 @@ public class CharacterDetailUI : MonoBehaviour
             weaponBreak.interactable = false;
         }
         weaponSliders[1].SetValueWithoutNotify(c.weapon.refine);
-        weaponSliders[1].interactable = false;
+        weaponSliders[1].interactable = enableChange;
 
 
         // Constellation 页面
@@ -420,6 +420,8 @@ public class CharacterDetailUI : MonoBehaviour
             suittext += "4件套：" + ad.four + "</color>\n";
             suittext += "\n";
         }
+        suittext += "\n<color=red>*遗器套装效果暂未实装*</color>";
+        suittext += "\n<color=red>*遗器配置须点击左下角按钮保存*</color>";
         artiSuitInfo.text = suittext;
 
         // Buff 界面
