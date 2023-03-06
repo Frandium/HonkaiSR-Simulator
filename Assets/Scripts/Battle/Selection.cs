@@ -65,12 +65,8 @@ public class Selection : MonoBehaviour
     bool isTargetEnemy = false;
     SelectionType selectionType;
     int curCharacterIndex = 0;
-    CharacterMono curCharacter;
-
-    public void StartNewTurn(CharacterMono curC)
-    {
-        curCharacter = curC;
-    }
+    List<Character> characters { get { return BattleManager.Instance.characters; } }
+    Character curCharacter { get { return BattleManager.Instance.curCharacter; } }
 
     public void StartCharacterSelection(SelectionType type, ActionUponCharacter action)
     {
@@ -80,30 +76,24 @@ public class Selection : MonoBehaviour
         characterAction = action;
         enemyAction = null;
         isDuringSelection = true;
-        List<CharacterMono> characters = new();
-        foreach(CharacterMono cm in BattleManager.Instance.cMonos)
-        {
-            if (cm.gameObject.activeInHierarchy)
-                characters.Add(cm);
-        }
         curCharacterIndex = characters.FindIndex(c => c == curCharacter);
         switch (type)
         {
             case SelectionType.Self:
-                curCharacter.SetSelected();
+                curCharacter.mono.SetSelected();
                 selectedCreatures.Add(curCharacterIndex);
                 break;
             case SelectionType.One:
-                characters[0].SetSelected();
+                characters[0].mono.SetSelected();
                 selectedCreatures.Add(0);
                 break;
             case SelectionType.OneExceptSelf:
                 for(int i = 0;i<characters.Count; ++i)
                 {
-                    CharacterMono c = characters[i];
+                    Character c = characters[i];
                     if(c != curCharacter)
                     {
-                        c.SetSelected();
+                        c.mono.SetSelected();
                         selectedCreatures.Add(i);
                         break;
                     }
@@ -112,18 +102,18 @@ public class Selection : MonoBehaviour
             case SelectionType.All:
                 for (int i = 0; i < characters.Count; ++i)
                 {
-                    CharacterMono c = characters[i];
-                    c.SetSelected();
+                    Character c = characters[i];
+                    c.mono.SetSelected();
                     selectedCreatures.Add(i);
                 }
                 break;
             case SelectionType.AllExceptSelf:
                 for (int i = 0; i < characters.Count; ++i)
                 {
-                    CharacterMono c = characters[i];
+                    Character c = characters[i];
                     if (c != curCharacter)
                     {
-                        c.SetSelected();
+                        c.mono.SetSelected();
                         selectedCreatures.Add(i);
                     }
                 }
@@ -167,9 +157,9 @@ public class Selection : MonoBehaviour
 
     void ClearSelection()
     {
-        foreach (CharacterMono c in BattleManager.Instance.cMonos)
+        foreach (Character c in characters)
         {
-            c.SetUnselected();
+            c.mono.SetUnselected();
         }
         foreach (Enemy e in BattleManager.Instance.enemies)
         {
@@ -219,7 +209,6 @@ public class Selection : MonoBehaviour
             }
             else
             {
-                List<CharacterMono> characters = BattleManager.Instance.cMonos;
                 int curSelected = selectedCreatures[0];
                 if (Input.GetKeyDown(KeyCode.D))
                 {
@@ -227,9 +216,9 @@ public class Selection : MonoBehaviour
                     PlayAudio(change);
                     if (change)
                     {
-                        characters[curSelected].SetUnselected();
+                        characters[curSelected].mono.SetUnselected();
                         ++curSelected;
-                        characters[curSelected].SetSelected();
+                        characters[curSelected].mono.SetSelected();
                         selectedCreatures[0] = curSelected;
                     }
                 }
@@ -239,9 +228,9 @@ public class Selection : MonoBehaviour
                     PlayAudio(change);
                     if (change)
                     {
-                        characters[curSelected].SetUnselected();
+                        characters[curSelected].mono.SetUnselected();
                         --curSelected;
-                        characters[curSelected].SetSelected();
+                        characters[curSelected].mono.SetSelected();
                         selectedCreatures[0] = curSelected;
                     }
                 }
@@ -249,7 +238,6 @@ public class Selection : MonoBehaviour
         }
         else if (selectionType == SelectionType.OneExceptSelf)
         {
-            List<CharacterMono> characters = BattleManager.Instance.cMonos;
             int curSelected = selectedCreatures[0];
             if (Input.GetKeyDown(KeyCode.A))
             {
@@ -259,17 +247,17 @@ public class Selection : MonoBehaviour
                     {
                         if (curSelected + 2 < characters.Count)
                         {
-                            characters[curSelected].SetUnselected();
+                            characters[curSelected].mono.SetUnselected();
                             curSelected += 2;
-                            characters[curSelected].SetSelected();
+                            characters[curSelected].mono.SetSelected();
                             selectedCreatures[0] = curSelected;
                         }
                     }
                     else
                     {
-                        characters[curSelected].SetUnselected();
+                        characters[curSelected].mono.SetUnselected();
                         ++curSelected;
-                        characters[curSelected].SetSelected();
+                        characters[curSelected].mono.SetSelected();
                         selectedCreatures[0] = curSelected;
                     }
                 }
@@ -282,17 +270,17 @@ public class Selection : MonoBehaviour
                     {
                         if (curSelected - 2 >= 0)
                         {
-                            characters[curSelected].SetUnselected();
+                            characters[curSelected].mono.SetUnselected();
                             curSelected -= 2;
-                            characters[curSelected].SetSelected();
+                            characters[curSelected].mono.SetSelected();
                             selectedCreatures[0] = curSelected;
                         }
                     }
                     else
                     {
-                        characters[curSelected].SetUnselected();
+                        characters[curSelected].mono.SetUnselected();
                         --curSelected;
-                        characters[curSelected].SetSelected();
+                        characters[curSelected].mono.SetSelected();
                         selectedCreatures[0] = curSelected;
                     }
                 }

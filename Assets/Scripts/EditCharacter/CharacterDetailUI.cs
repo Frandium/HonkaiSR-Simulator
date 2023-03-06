@@ -23,6 +23,7 @@ public class CharacterDetailUI : MonoBehaviour
     public GameObject[] artifactInfos;
     public Text[] WeaponPageTexts;
     public Text artiSuitInfo;
+    public Button saveArtifacts;
 
     Button[] talentButtons;
     Slider[] talentLevels;
@@ -205,6 +206,7 @@ public class CharacterDetailUI : MonoBehaviour
     {
         curCharacter = c;
         enableChange = _enableChange;
+        saveArtifacts.interactable = enableChange;
 
         background.sprite = Resources.Load<Sprite>(c.dbname + "/splash");
         Text[] texts;

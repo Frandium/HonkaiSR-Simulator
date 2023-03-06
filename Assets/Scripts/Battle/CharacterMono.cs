@@ -186,13 +186,14 @@ public class CharacterMono : CreatureMono
         isMyTurn = false;
         alpha = 0;
         cardSR.material.SetFloat("Alpha", 0);
-//        selectedSR.color = new Color(0, 0, 0, 0);
     }
 
     public override void OnDying()
     {
         cardSR.color = new Color(.25f, .25f, .25f, .25f);
         BattleManager.Instance.RemoveCharacter(self);
+        avatar.SetActive(false);
+        gameObject.SetActive(false);
     }
 
 

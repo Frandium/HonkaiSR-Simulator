@@ -23,7 +23,7 @@ public class Japard : ACharacterTalents
         Enemy e = enemies[0];
         Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
         self.DealDamage(e, dmg);
-        float hit = (.65f + self.constellaLevel >= 1 ? .35f : 0) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
+        float hit = (self.constellaLevel >= 1 ? 1 : .65f) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
         float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
         if (Utils.TwoRandom(hit) && !Utils.TwoRandom(resist))
         {
@@ -81,7 +81,7 @@ public class Japard : ACharacterTalents
         {
             if (self.hp - d.value <= 0)
             {
-                self.hp = (.25f + self.constellaLevel >= 6 ? .5f : 0) * self.GetFinalAttr(CommonAttribute.MaxHP);
+                self.hp = (self.constellaLevel >= 6 ? .75f : .25f) * self.GetFinalAttr(CommonAttribute.MaxHP);
                 self.mono.hpLine.fillAmount = self.mono.hpPercentage;
                 self.mono?.ShowMessage("²»ÇüÖ®Éí", Color.blue);
                 t.Zero();

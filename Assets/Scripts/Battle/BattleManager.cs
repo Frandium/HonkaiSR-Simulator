@@ -49,7 +49,7 @@ public class BattleManager : MonoBehaviour
 
     // Other Monos
     public Creature curCreature { get; private set; }
-    private Character curCharacter;
+    public Character curCharacter { get; private set; }
     public Selection selection;
     public Runway runway;
     public SkillPoint skillPoint;
@@ -318,7 +318,6 @@ public class BattleManager : MonoBehaviour
                 if (interrupted && !isAdditional)
                 {
                     curCharacter.mono.StartMyTurn();
-                    selection.StartNewTurn(curCharacter.mono);
                     SelectTarget();
                     interrupted = false;
                 }
@@ -331,7 +330,6 @@ public class BattleManager : MonoBehaviour
                     }
                     else
                     {
-                        selection.StartNewTurn(curCharacter.mono);
                         SelectTarget();
                     }
                 }

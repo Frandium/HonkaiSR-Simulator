@@ -33,6 +33,6 @@ public class GlobalInfoHolder
 
     public string mystery = "japard";
 
-    public string[] teamMembers = new string[] { "none", "none", "none", "none" };
+    public string[] teamMembers = new string[] { "bronya", "japard", "seele", "tingyun" };
 
 }
