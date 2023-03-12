@@ -3,24 +3,23 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Equipment
-{
-    public virtual void OnBattleStart(CharacterMono c)
-    {
-        // 加一些 buff，给装备者加。
-        // 如果给我方全体加，就找 BattleManager
-    }
+{ 
+    // 自身能提供的 buff。
+    protected List<Buff> buffs = new List<Buff>();
 
-    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a, DamageType damageType)
+    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a, DamageType damageType, bool forView)
     {
         float res = 0;
-        foreach(Buff b in buffs)
+        for(int i = buffs.Count - 1; i>=0; --i)
         {
-            res += b.CalBuffValue(source, target, a, damageType);
+            float b = buffs[i].CalBuffValue(source, target, a, damageType);
+            if (!forView && b > 0)
+            {
+                if (buffs[i].CountDown(CountDownType.Trigger))
+                    buffs.RemoveAt(i);
+            }
+            res += b;
         }
         return res;
     }
-
-
-    // 自身能提供的 buff。
-    protected List<Buff> buffs = new List<Buff>();
 }

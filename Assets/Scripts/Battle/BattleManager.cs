@@ -293,6 +293,10 @@ public class BattleManager : MonoBehaviour
             foreach(Character c in characters)
             {
                 c.talents.OnBattleStart(characters, enemies);
+                foreach(AArtifactTalent at in c.artifactsSuit)
+                {
+                    at.OnBattleStart(c, characters, enemies);
+                }
                 if (c.dbname == mystery)
                     c.talents.Mystery(characters, enemies);
             }

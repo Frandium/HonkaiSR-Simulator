@@ -31,7 +31,7 @@ public class GlobalInfoHolder
 
     public string battleFilePath = Application.streamingAssetsPath + "/battles/boss.json";
 
-    public string mystery = "japard";
+    public string mystery = "tingyun";
 
     public string[] teamMembers = new string[] { "bronya", "japard", "seele", "tingyun" };
 

@@ -188,14 +188,22 @@ public class CharacterDetailUI : MonoBehaviour
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
+                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage ||
+                        curCharacter.config.artifacts[num].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
+                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s) / 100;
+                        else
+                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
                     });
                 }
                 else
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
+                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage || 
+                        curCharacter.config.artifacts[num].vicePhrases[num2 - 1].attr > CommonAttribute.InstantNumberPercentageDividing)
+                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s) / 100;
+                        else
+                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
                     });
                 }
             }
@@ -232,7 +240,7 @@ public class CharacterDetailUI : MonoBehaviour
         {
             Destroy(attrScroll.transform.GetChild(i).gameObject);
         }
-        for (int i = 0; i < (int)CommonAttribute.Count; ++i)
+        for (int i = 0; i < (int)CommonAttribute.InstantNumberPercentageDividing; ++i)
         {
             string attrName = Utils.attributeNames[i];
             GameObject go = Instantiate(attrLine, attrScroll.transform);
@@ -242,8 +250,21 @@ public class CharacterDetailUI : MonoBehaviour
             texts = go.GetComponentsInChildren<Text>();
             texts[0].text = attrName;
             float b = c.GetBaseAttr((CommonAttribute)i);
-            float f = c.GetFinalAttr((CommonAttribute)i);
-            texts[1].text = b + " + <color=green>" + (f - b) + "</color> = " + (f);
+            float f = c.GetFinalAttr((CommonAttribute)i, true);
+            texts[1].text = b + " + <color=green>" + (f - b) + "</color> = " + f;
+        }
+        for (int i = (int)CommonAttribute.InstantNumberPercentageDividing + 1; i < (int)CommonAttribute.Count; ++i)
+        {
+            string attrName = Utils.attributeNames[i];
+            GameObject go = Instantiate(attrLine, attrScroll.transform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i + 15);
+            go.GetComponent<Image>().color = attrLineColor[i % 3];
+            go.name = attrName;
+            texts = go.GetComponentsInChildren<Text>();
+            texts[0].text = attrName;
+            float b = c.GetBaseAttr((CommonAttribute)i);
+            float f = c.GetFinalAttr((CommonAttribute)i, true);
+            texts[1].text = b * 100 + " + <color=green>" + (f - b) * 100 + "</color> = " + f * 100 + "%";
         }
 
         // Talent 页面
@@ -398,10 +419,22 @@ public class CharacterDetailUI : MonoBehaviour
             for (int j = 0; j < 5; ++j)
             {
                 inputFields[j].interactable = _enableChange;
+                double toshow;
                 if (j == 0)
-                    inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].mainPhrase.value.ToString());
+                {
+                    toshow = c.config.artifacts[i].mainPhrase.value;
+                    if (c.config.artifacts[i].mainPhrase.type == ValueType.Percentage || 
+                        c.config.artifacts[i].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
+                        toshow *= 100;
+                }
                 else
-                    inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].vicePhrases[j - 1].value.ToString());
+                {
+                    toshow = c.config.artifacts[i].vicePhrases[j - 1].value;
+                    if (c.config.artifacts[i].vicePhrases[j - 1].type == ValueType.Percentage || 
+                        c.config.artifacts[i].vicePhrases[j - 1].attr > CommonAttribute.InstantNumberPercentageDividing)
+                        toshow *= 100;
+                }
+                inputFields[j].SetTextWithoutNotify(toshow.ToString());
             }
         }
         string suittext = "套装效果\n\n";
@@ -422,7 +455,6 @@ public class CharacterDetailUI : MonoBehaviour
             suittext += "4件套：" + ad.four + "</color>\n";
             suittext += "\n";
         }
-        suittext += "\n<color=red>*遗器套装效果暂未实装*</color>";
         suittext += "\n<color=red>*遗器配置须点击左下角按钮保存*</color>";
         artiSuitInfo.text = suittext;
 
@@ -433,7 +465,7 @@ public class CharacterDetailUI : MonoBehaviour
         {
             Destroy(buffContent.transform.GetChild(i).gameObject);
         }
-        for(int i = 0; i < c.buffs.Count; ++i)
+        for (int i = 0; i < c.buffs.Count; ++i)
         {
             Buff b = c.buffs[i];
             string attrName = b.tag;
@@ -442,11 +474,20 @@ public class CharacterDetailUI : MonoBehaviour
             go.GetComponent<Image>().color = attrLineColor[i % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
-            texts[0].text = attrName + " " + b.buffType + " " + Utils.attributeNames[(int)b.targetAttribute];
+            texts[0].text = attrName;
+            if (b.buffType != BuffType.Permanent)
+                texts[0].text += " " + b.buffType;
+            texts[0].text += " " + Utils.attributeNames[(int)b.targetAttribute];
             if (b.buffType == BuffType.Permanent)
                 texts[1].text = "永久";
             else
-                texts[1].text = "剩余 <color=#80f>" +  b.times + "</color> 回合";
+            {
+                texts[1].text = "剩余";
+                if (b.ctype == CountDownType.Trigger || b.ctype == CountDownType.All)
+                    texts[1].text += " <color=#80f>" + b._triggerTimes + "</color> 次";
+                if (b.ctype == CountDownType.Turn || b.ctype == CountDownType.All)
+                    texts[1].text += " <color=#80f>" + b._turnTimes + "</color> 回合";
+            }
         }
     }
 

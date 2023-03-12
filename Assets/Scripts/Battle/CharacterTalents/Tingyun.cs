@@ -62,7 +62,7 @@ public class Tingyun : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Electro, atkDmg, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Pyro, atkDmg, DamageType.Attack);
         self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -87,12 +87,12 @@ public class Tingyun : ACharacterTalents
         }
         Character c = characters[0];
         curSkill = c;
-        c.AddBuff(Utils.valueBuffPool.GetOne().Set("tingyunSkillATK", BuffType.Buff, CommonAttribute.ATK, 3, (s, t, d) =>
+        c.AddBuff(Utils.valueBuffPool.GetOne().Set("tingyunSkillATK", BuffType.Buff, CommonAttribute.ATK, (s, t, d) =>
         {
             float res = t.GetBaseAttr(CommonAttribute.ATK) * skillAtkUp;
             res = Mathf.Min(res, self.GetFinalAttr(CommonAttribute.ATK) * skillAtkMax);
             return res;
-        }));
+        }, 3));
         c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
         {
             Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg + (self.constellaLevel >= 4? .2f : 0), d.type);

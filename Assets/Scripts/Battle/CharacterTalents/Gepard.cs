@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Japard : ACharacterTalents
+public class Gepard : ACharacterTalents
 {
-    public Japard(Character c): base(c)
+    public Gepard(Character c): base(c)
     {
 
     }
@@ -49,10 +49,9 @@ public class Japard : ACharacterTalents
 
     public override void BurstCharacterAction(List<Character> characters)
     {
-        float shield = burstDefPer * self.GetFinalAttr(CommonAttribute.DEF) + burstDefIns;
         foreach(Character c in characters)
         {
-            c.GetShield(new Shield("japardBurst", shield, 3));
+            c.GetShield(Shield.MakeShield("japardBurst", self, CommonAttribute.DEF, burstDefPer, burstDefIns, 3));
         }
         base.BurstCharacterAction(characters);
     }
@@ -81,7 +80,7 @@ public class Japard : ACharacterTalents
         {
             if (self.hp - d.value <= 0)
             {
-                self.hp = (self.constellaLevel >= 6 ? .75f : .25f) * self.GetFinalAttr(CommonAttribute.MaxHP);
+                self.hp = ((self.constellaLevel >= 6 ? .5f : 0) + talentHp) * self.GetFinalAttr(CommonAttribute.MaxHP);
                 self.mono.hpLine.fillAmount = self.mono.hpPercentage;
                 self.mono?.ShowMessage("²»ÇüÖ®Éí", Color.blue);
                 t.Zero();

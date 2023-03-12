@@ -60,7 +60,7 @@ public class Seele : ACharacterTalents
         }));
         if (self.config.abilityActivated[0])
         {
-            self.AddBuff(Utils.valueBuffPool.GetOne().Set("seeleAbility1TauntDown", BuffType.Permanent, CommonAttribute.Taunt, int.MaxValue, (s, t, dt) =>
+            self.AddBuff(Utils.valueBuffPool.GetOne().Set("seeleAbility1TauntDown", BuffType.Permanent, CommonAttribute.Taunt, (s, t, dt) =>
             {
                 if (self.hp <= self.GetFinalAttr(CommonAttribute.MaxHP) / 2)
                     return -50;
@@ -85,7 +85,7 @@ public class Seele : ACharacterTalents
         }
         if(self.config.constellaLevel >= 2)
         {
-            self.AddBuff(Utils.valueBuffPool.GetOne().Set("seeleConstellation2CriticalRate", BuffType.Permanent, CommonAttribute.CriticalRate, int.MaxValue, (s, t, dt)=> {
+            self.AddBuff(Utils.valueBuffPool.GetOne().Set("seeleConstellation2CriticalRate", BuffType.Permanent, CommonAttribute.CriticalRate, (s, t, dt)=> {
                 if(t.hp <= t.GetFinalAttr(CommonAttribute.MaxHP) / 2)
                 {
                     return .15f;
@@ -109,7 +109,7 @@ public class Seele : ACharacterTalents
         Enemy e = enemies[0];
         Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, skillDmg, DamageType.Skill);
         self.DealDamage(e, dmg);
-        self.AddBuff("seeleSkillSpeed", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .25f, 3, DamageType.All, self.constellaLevel >= 1 ? 2 : 1);
+        self.AddBuff("seeleSkillSpeed", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .25f, 3, maxStack: self.constellaLevel >= 1 ? 2 : 1);
         self.mono?.ShowMessage("ËÙ¶ÈÌáÉı", Color.blue);
         base.SkillEnemyAction(enemies);
     }

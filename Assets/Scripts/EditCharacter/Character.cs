@@ -36,7 +36,7 @@ public class Character : Creature
     public new CharacterMono mono { get; protected set; }
     public CharacterConfig config { get; protected set; }
     public Weapon weapon;
-    public List<AEquipmentTalents> artifactsSuit = new List<AEquipmentTalents>();
+    public List<AArtifactTalent> artifactsSuit = new List<AArtifactTalent>();
     public List<Artifact> artifacts = new List<Artifact>((int)ArtifactPosition.Count);
 
     public bool isAttackTargetEnemy { get; protected set; } = true;
@@ -66,7 +66,7 @@ public class Character : Creature
     {
         // 先把之前的脱下来
         weapon?.OnTakingOff(this);
-        foreach(AEquipmentTalents t in artifactsSuit)
+        foreach(AEquipmentTalent t in artifactsSuit)
         {
             t.OnTakingOff(this);
         }
@@ -106,7 +106,7 @@ public class Character : Creature
                 talents = new Seele(this);
                 break;
             case "japard":
-                talents = new Japard(this);
+                talents = new Gepard(this);
                 break;
             case "tingyun":
                 talents = new Tingyun(this);
@@ -191,6 +191,18 @@ public class Character : Creature
             
             artifacts.Add(new Artifact(arti.mainPhrase, arti.vicePhrases));
         }
+        foreach(var p in suitCount)
+        {
+            AArtifactTalent artTalent = p.Key switch
+            {
+                "iceHunter" => new IceHunter(p.Value),
+                "firesmith" => new FireSmith(p.Value),
+                "holyKnight" => new HolyKnight(p.Value),
+                _ => new DefaultArtifact(p.Value),
+            };
+            artTalent.OnEquiping(this);
+            artifactsSuit.Add(artTalent);
+        }
 
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
@@ -206,13 +218,13 @@ public class Character : Creature
         return base.GetBaseAttr(attr);
     }
 
-    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType)
+    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType, bool forView = false)
     {
-        float res = base.GetFinalAttr(c1, c2, attr, damageType);
-        res += weapon.CalBuffValue(null, null, attr, damageType);
+        float res = base.GetFinalAttr(c1, c2, attr, damageType, forView);
+        res += weapon.CalBuffValue(null, null, attr, damageType, forView);
         foreach(Artifact art in artifacts)
         {
-            res += art.CalBuffValue(this, this, attr, damageType);
+            res += art.CalBuffValue(this, this, attr, damageType, false);
         }
         return res;
     }
@@ -241,9 +253,9 @@ public class Character : Creature
     public override void EndNormalTurn()
     {
         base.EndNormalTurn();
-        onNormalAttack.RemoveAll(p => p.CountDown());
-        onSkill.RemoveAll(p => p.CountDown());
-        onBurst.RemoveAll(p => p.CountDown());        
+        onNormalAttack.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        onSkill.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        onBurst.RemoveAll(p => p.CountDown(CountDownType.Turn));        
     }
 
     public virtual void StartBurstTurn()
@@ -252,7 +264,7 @@ public class Character : Creature
         {
             p.trigger();
         }
-        onTurnStart.RemoveAll(p => p.CountDown());
+        onTurnStart.RemoveAll(p => p.CountDown(CountDownType.Turn));
         mono?.StartMyTurn();
     }
 
@@ -263,12 +275,12 @@ public class Character : Creature
         {
             p.trigger();
         }
-        onTurnEnd.RemoveAll(p => p.CountDown());
+        onTurnEnd.RemoveAll(p => p.CountDown(CountDownType.Turn));
 
         // Remove Buff
         for (int i = buffs.Count - 1; i >= 0; --i)
         {
-            if (buffs[i].CountDown())
+            if (buffs[i].CountDown(CountDownType.Turn))
             {
                 Utils.valueBuffPool.ReturnOne(buffs[i]);
                 buffs.RemoveAt(i);
@@ -276,10 +288,10 @@ public class Character : Creature
         }
 
         // Remove shields
-        shields.RemoveAll(s => s.CountDown());
+        shields.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
         // Remove states
-        states.RemoveAll(s => s.CountDown());
+        states.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
         mono?.EndBurstTurn();
     }
