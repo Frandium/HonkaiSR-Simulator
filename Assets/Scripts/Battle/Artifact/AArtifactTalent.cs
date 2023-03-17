@@ -11,7 +11,12 @@ public abstract class AArtifactTalent : AEquipmentTalent
         count = c;
     }
 
-    public override void OnBattleStart(Character self, List<Character> characters, List<Enemy> enemies)
+    public override void OnBattleStart(Character self, List<Character> characters)
+    {
+
+    }
+
+    public override void OnEnemyRefresh(Character self, List<Enemy> enemies)
     {
 
     }

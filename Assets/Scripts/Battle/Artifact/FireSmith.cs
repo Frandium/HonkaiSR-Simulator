@@ -27,7 +27,8 @@ public class FireSmith : AArtifactTalent
 
     public override void OnTakingOff(Character character)
     {
-        character.RemoveBuff("holyKnight2");
-        character.onBurst.RemoveAll(t => t.tag == "holyKnight4");
+        character.RemoveBuff("fireSmith2");
+        character.RemoveBuff("fireSmith4");
+        character.onBurst.RemoveAll(t => t.tag == "fireSmith4");
     }
 }

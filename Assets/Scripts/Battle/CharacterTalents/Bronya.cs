@@ -118,7 +118,7 @@ public class Bronya : ACharacterTalents
         }
     }
 
-    public override void OnBattleStart(List<Character> characters, List<Enemy> enemies)
+    public override void OnBattleStart(List<Character> characters)
     {
         foreach(Character c in characters)
         {

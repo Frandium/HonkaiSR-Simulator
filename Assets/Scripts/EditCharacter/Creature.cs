@@ -121,7 +121,7 @@ public class Creature
             float r = - p.TakeDamage(damage);
             remain = Mathf.Min(r, remain);
         }
-        shields.RemoveAll(s => s.CountDown(CountDownType.Turn) || s.hp <= 0);
+        shields.RemoveAll(s => s.CountDown(CountDownType.Trigger) || s.hp <= 0);
         remain = Mathf.Max(0, remain);
         damage.value = remain;
 
@@ -176,7 +176,7 @@ public class Creature
         }
         mono?.StartMyTurn();
 
-        if (states.Find(s => s.state == StateType.Frozen) != null)
+        if (states.Find(s => s.state == StateType.Frozen || s.state == StateType.Restricted) != null)
             return true;
         return false;
     }

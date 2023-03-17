@@ -12,6 +12,9 @@ public class Enemy : Creature
     public float weakMaxHp { get; protected set; } = 100;
     public float weakHp { get; protected set; } = 100;
 
+    public delegate void OnBreak(Creature source, Damage dmg);
+    public List<TriggerEvent<OnBreak>> onBreak { get; protected set; } = new List<TriggerEvent<OnBreak>>();
+
     public void SetMono(EnemyMono m)
     {
         mono = m;
@@ -77,8 +80,18 @@ public class Enemy : Creature
                 mono?.ShowMessage("»÷ÍË25%", Color.green);
                 mono?.ShowMessage("¼õ·À30%", Color.green);
                 AddBuff("breakDefDown", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, -.3f);
+                foreach(var t in onBreak)
+                {
+                    t.trigger(source, damage);
+                }
             }
         }
         base.TakeDamage(source, damage);
+    }
+
+    public override void EndNormalTurn()
+    {
+        base.EndNormalTurn();
+        onBreak.RemoveAll(t => t.CountDown(CountDownType.Turn));
     }
 }

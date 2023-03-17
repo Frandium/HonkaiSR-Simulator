@@ -32,7 +32,9 @@ public class Damage
         }
 
         float def = target.GetFinalAttr(source, target, CommonAttribute.DEF, damageType);
-        float defRate = 1 - def / (def + 2000);
+        float defIgnore = source.GetFinalAttr(source, target, CommonAttribute.DEFIgnore, damageType);
+        def *= (1 - defIgnore);
+        float defRate = 1 - def / (def + 200 + source.level * 10);
         float overallResist = 1 
             - target.GetFinalAttr(source, target, CommonAttribute.PhysicalResist + (int)element, damageType) 
             - target.GetFinalAttr(source, target, CommonAttribute.GeneralResist, damageType);

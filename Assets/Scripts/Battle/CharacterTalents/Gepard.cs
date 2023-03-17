@@ -30,8 +30,8 @@ public class Gepard : ACharacterTalents
             // ¶³½áµÐÈË
             e.AddState(self, new State(StateType.Frozen, 1));
             e.mono?.ShowMessage("¶³½á", Color.blue);
-            if(e.onTurnStart.Find(t => t.tag == "japardFreeze") == null)
-                e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("japardFreeze", () =>
+            if(e.onTurnStart.Find(t => t.tag == "gepardFreeze") == null)
+                e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("gepardFreeze", () =>
                 {
                     if (e.IsUnderState(StateType.Frozen))
                     {
@@ -41,7 +41,7 @@ public class Gepard : ACharacterTalents
                 }));
             if (self.constellaLevel >= 2)
             {
-                e.AddBuff("japardContellation2SpeedDown", BuffType.Debuff, CommonAttribute.Speed, ValueType.Percentage, -.2f, 1);
+                e.AddBuff("gepardContellation2SpeedDown", BuffType.Debuff, CommonAttribute.Speed, ValueType.Percentage, -.2f, 1);
             }
         }
         base.SkillEnemyAction(enemies);
@@ -51,7 +51,7 @@ public class Gepard : ACharacterTalents
     {
         foreach(Character c in characters)
         {
-            c.GetShield(Shield.MakeShield("japardBurst", self, CommonAttribute.DEF, burstDefPer, burstDefIns, 3));
+            c.GetShield(Shield.MakeShield("gepardBurst", self, CommonAttribute.DEF, burstDefPer, burstDefIns, 3));
         }
         base.BurstCharacterAction(characters);
     }
@@ -75,7 +75,7 @@ public class Gepard : ACharacterTalents
         burstDefIns = (int)self.metaData["burst"]["defIns"]["value"][self.burstLevel];
         talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.talentLevel];
         
-        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("japardTalent");
+        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("gepardTalent");
         t.trigger = (s, d) =>
         {
             if (self.hp - d.value <= 0)
@@ -100,23 +100,23 @@ public class Gepard : ACharacterTalents
     {
         foreach(Character c in characters)
         {
-            c.AddBuff("japardMystery", BuffType.Buff, CommonAttribute.DEF, ValueType.InstantNumber, self.GetBaseAttr(CommonAttribute.DEF) * .25f, 2);
+            c.AddBuff("gepardMystery", BuffType.Buff, CommonAttribute.DEF, ValueType.InstantNumber, self.GetBaseAttr(CommonAttribute.DEF) * .25f, 2);
         }
     }
 
-    public override void OnBattleStart(List<Character> characters, List<Enemy> enemies)
+    public override void OnBattleStart(List<Character> characters)
     {
         if (self.constellaLevel >= 4)
         {
             foreach (Character c in characters)
             {
-                c.AddBuff("japardConstellation4ResistUp", BuffType.Permanent, CommonAttribute.EffectResist, ValueType.InstantNumber, .2f);
+                c.AddBuff("gepardConstellation4ResistUp", BuffType.Permanent, CommonAttribute.EffectResist, ValueType.InstantNumber, .2f);
             }
-            self.onDying.Add(new TriggerEvent<Creature.DyingEvent>("japardConstellation4Die", () =>
+            self.onDying.Add(new TriggerEvent<Creature.DyingEvent>("gepardConstellation4Die", () =>
             {
                 foreach (Character c in characters)
                 {
-                    c.RemoveBuff("japardConstellation4ResistUp");
+                    c.RemoveBuff("gepardConstellation4ResistUp");
                 }
             }));
         }

@@ -7,6 +7,7 @@ public enum CountDownType
     Turn = 0,
     Trigger = 1,
     All = 2,
+    Permanent = 3,
     Count
 }
 
@@ -27,6 +28,8 @@ public abstract class ACountDownBehaviour
 
     public virtual bool CountDown(CountDownType t)
     {
+        if (ctype != CountDownType.All && t != ctype)
+            return false;
         if(t == CountDownType.Trigger)
         {
             --_triggerTimes;

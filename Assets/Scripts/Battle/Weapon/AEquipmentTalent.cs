@@ -8,5 +8,7 @@ public abstract class AEquipmentTalent
 
     public abstract void OnTakingOff(Character character);
 
-    public abstract void OnBattleStart(Character self, List<Character> characters, List<Enemy> enemies);
+    public abstract void OnBattleStart(Character self, List<Character> characters);
+
+    public abstract void OnEnemyRefresh(Character self, List<Enemy> enemies);
 }

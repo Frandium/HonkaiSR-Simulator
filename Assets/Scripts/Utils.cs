@@ -34,6 +34,7 @@ public class Utils
         "正数与百分数分界线",
         "暴击率",
         "暴击伤害",
+        "击破特攻",
         "治疗加成",
         "受治疗加成",
         "造成护盾加成",
@@ -63,6 +64,7 @@ public class Utils
         "风属性穿透",
         "量子属性穿透",
         "虚数属性穿透",
+        "无视防御",
         "占位符"
     };
 
@@ -95,6 +97,27 @@ public class Utils
         "直接数",
         "占位"
     };
+
+    public static string[] ArtifactPositionName = new string[(int)ArtifactPosition.Count]
+    {
+        "头部",
+        "颈部",
+        "躯干",
+        "手部",
+        "脚部",
+        "饰品"
+    };
+    
+    public static string[] ArtifactPositionPath = new string[(int)ArtifactPosition.Count]
+    {
+        "head",
+        "neck",
+        "body",
+        "hand",
+        "feet",
+        "stuff"
+    };
+
 
     public static bool TwoRandom(float rate)
     {

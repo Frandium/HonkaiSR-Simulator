@@ -55,4 +55,14 @@ public abstract class ACharacterTalents: ACommomBattleTalents
 
     }
 
+    public virtual void OnEnemyRefresh(List<Enemy> enemies)
+    {
+
+    }
+
+    public virtual void OnBattleStart(List<Character> characters)
+    {
+
+    }
+
 }

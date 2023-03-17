@@ -7,7 +7,8 @@ public class Shield : ACountDownBehaviour
     public float maxHp { get; protected set; }
     public float hp { get; protected set; }
 
-    public Shield(string tag, float max, CountDownType cdt, int turnTimes, int triggerTimes): base(tag, CountDownType.Turn, turnTimes, triggerTimes)
+    public Shield(string tag, float max, CountDownType cdt, int turnTimes, int triggerTimes): 
+        base(tag, cdt, triggerTimes, turnTimes)
     {
         maxHp = max;
         hp = maxHp;

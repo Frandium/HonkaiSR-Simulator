@@ -262,6 +262,15 @@ public class BattleManager : MonoBehaviour
                     e.SetMono(em);
                     runway.AddCreature(e);
                 }
+                foreach (Character c in characters)
+                {
+                    c.talents.OnEnemyRefresh(enemies);
+                    foreach (AArtifactTalent at in c.artifactsSuit)
+                    {
+                        at.OnEnemyRefresh(c, enemies);
+                    }
+                }
+
             }
         }
         if (characters.Count == 0)
@@ -292,10 +301,10 @@ public class BattleManager : MonoBehaviour
             // 第一回合发动秘技
             foreach(Character c in characters)
             {
-                c.talents.OnBattleStart(characters, enemies);
+                c.talents.OnBattleStart(characters);
                 foreach(AArtifactTalent at in c.artifactsSuit)
                 {
-                    at.OnBattleStart(c, characters, enemies);
+                    at.OnBattleStart(c, characters);
                 }
                 if (c.dbname == mystery)
                     c.talents.Mystery(characters, enemies);
@@ -304,8 +313,7 @@ public class BattleManager : MonoBehaviour
 
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
-        bool isAdditional;
-        curCreature = runway.UpdateRunway(out isBurst, out isAdditional);
+        curCreature = runway.UpdateRunway(out isBurst, out bool isAdditional);
         if (curCreature is Character) // 玩家的回合
         {
             curStage = TurnStage.Instruction;

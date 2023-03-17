@@ -31,6 +31,7 @@ public enum Career
 public enum StateType
 {
     Frozen,   // 冻结 = 0
+    Restricted, // 禁锢 = 1
     Count
 }
 
@@ -57,11 +58,12 @@ public enum CommonAttribute
     InstantNumberPercentageDividing, // 分界线
     CriticalRate, // 暴击率 = 5
     CriticalDamage,  //暴击伤害 = 6
-    HealBonus,  // 治疗加成 = 7
-    HealedBonus, // 受治疗加成 = 8
-    ShieldBonus, // 造成护盾强效 = 9
-    EnergyRecharge, // 充能效率 = 10
-    EffectHit, // 效果命中 = 11
+    BreakBonus, // 击破特攻 = 7
+    HealBonus,  // 治疗加成 = 8
+    HealedBonus, // 受治疗加成 = 9
+    ShieldBonus, // 造成护盾强效 = 10
+    EnergyRecharge, // 充能效率 = 11
+    EffectHit, // 效果命中 = 12
     EffectResist, // 效果抵抗 = 12
     GeneralBonus, // 通用伤害加成 = 13
     PhysicalBonus, // 物理伤害加成 = 14
@@ -86,6 +88,7 @@ public enum CommonAttribute
     AmenoPenetrate,// 风元素穿透 = 33
     QuantusPenetrate,// 量子穿透 = 34
     ImaginaryPenetrate,// 虚数穿透 = 35
+    DEFIgnore, // 无视防御
     Count // = 28
 }
 

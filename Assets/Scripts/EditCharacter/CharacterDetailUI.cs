@@ -134,9 +134,8 @@ public class CharacterDetailUI : MonoBehaviour
             dropdowns[0].AddOptions(artifactDisnames);
             int num = i;
             dropdowns[0].onValueChanged.AddListener(v => {
-                Debug.Log("i = " + num);
-                Debug.Log("v = " + v);
                 curCharacter.config.artifacts[num].suitName = artifactDbnames[v];
+                Refresh();
             });
 
             for (int j = 1; j <= 10; j += 2)
@@ -240,11 +239,21 @@ public class CharacterDetailUI : MonoBehaviour
         {
             Destroy(attrScroll.transform.GetChild(i).gameObject);
         }
+        // 护盾，位置
+        GameObject posAttr = Instantiate(attrLine, attrScroll.transform);
+        posAttr.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -15);
+        posAttr.GetComponent<Image>().color = attrLineColor[1];
+        posAttr.name = "position";
+        texts = posAttr.GetComponentsInChildren<Text>();
+        texts[0].text = "位置：" + c.location;
+        texts[1].text = "距离终点还要 <color=green>" + 
+            Mathf.CeilToInt((Runway.Length - c.location) / c.GetFinalAttr(CommonAttribute.Speed)) + 
+            "</color> 次前进";
         for (int i = 0; i < (int)CommonAttribute.InstantNumberPercentageDividing; ++i)
         {
             string attrName = Utils.attributeNames[i];
             GameObject go = Instantiate(attrLine, attrScroll.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 15);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 45);
             go.GetComponent<Image>().color = attrLineColor[i % 3];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
@@ -257,7 +266,7 @@ public class CharacterDetailUI : MonoBehaviour
         {
             string attrName = Utils.attributeNames[i];
             GameObject go = Instantiate(attrLine, attrScroll.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i + 15);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i -15);
             go.GetComponent<Image>().color = attrLineColor[i % 3];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
@@ -386,17 +395,20 @@ public class CharacterDetailUI : MonoBehaviour
         Dictionary<string, int> suitCount = new Dictionary<string, int>();
         for (int i = 0; i < artifactInfos.Length; ++i)
         {
-            if (!suitCount.ContainsKey(c.config.artifacts[i].suitName))
+            string suitName = c.config.artifacts[i].suitName;
+            if (!suitCount.ContainsKey(suitName))
             {
-                suitCount[c.config.artifacts[i].suitName] = 0;
+                suitCount[suitName] = 0;
             }
-            suitCount[c.config.artifacts[i].suitName]++;
+            suitCount[suitName]++;
             GameObject art = artifactInfos[i];
+            imgs = art.GetComponentsInChildren<Image>();
+            art.GetComponentInChildren<Text>().text = Utils.ArtifactPositionName[(int)c.config.artifacts[i].position];
             Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
             InputField[] inputFields = art.GetComponentsInChildren<InputField>();
-            dropdowns[0].SetValueWithoutNotify(artifactDbnames.IndexOf(c.config.artifacts[i].suitName));
+            dropdowns[0].SetValueWithoutNotify(artifactDbnames.IndexOf(suitName));
             dropdowns[0].interactable = _enableChange;
-
+            imgs[2].sprite = Resources.Load<Sprite>("artifacts/" + suitName + "/" + Utils.ArtifactPositionPath[(int)c.config.artifacts[i].position]);
 
             for (int j = 1; j <= 10; j += 2)
             {
@@ -479,7 +491,7 @@ public class CharacterDetailUI : MonoBehaviour
                 texts[0].text += " " + b.buffType;
             texts[0].text += " " + Utils.attributeNames[(int)b.targetAttribute];
             if (b.buffType == BuffType.Permanent)
-                texts[1].text = "永久";
+                texts[1].text = "固有";
             else
             {
                 texts[1].text = "剩余";
@@ -488,6 +500,22 @@ public class CharacterDetailUI : MonoBehaviour
                 if (b.ctype == CountDownType.Turn || b.ctype == CountDownType.All)
                     texts[1].text += " <color=#80f>" + b._turnTimes + "</color> 回合";
             }
+        }
+        for (int i = 0; i < c.shields.Count; ++i)
+        {
+            Shield s = c.shields[i];
+            string attrName = s.tag;
+            GameObject go = Instantiate(attrLine, buffContent.transform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * (i + c.buffs.Count) - 15);
+            go.GetComponent<Image>().color = attrLineColor[(i + c.buffs.Count) % 2];
+            go.name = attrName;
+            texts = go.GetComponentsInChildren<Text>();
+            texts[0].text = attrName + " " + s.hp;
+            texts[1].text = "剩余";
+            if (s.ctype == CountDownType.Trigger || s.ctype == CountDownType.All)
+                texts[1].text += " <color=#80f>" + s._triggerTimes + "</color> 次";
+            if (s.ctype == CountDownType.Turn || s.ctype == CountDownType.All)
+                texts[1].text += " <color=#80f>" + s._turnTimes + "</color> 回合";
         }
     }
 

@@ -95,26 +95,16 @@ public class Character : Creature
         additionalBurstLevel = 0;
         additionalSkillLevel = 0;
         additionalTalentLevel = 0;
-        
+
         // 之后改成反射 dict?
-        switch (dbname)
+        talents = dbname switch
         {
-            case "bronya":
-                talents = new Bronya(this);
-                break;
-            case "seele":
-                talents = new Seele(this);
-                break;
-            case "japard":
-                talents = new Gepard(this);
-                break;
-            case "tingyun":
-                talents = new Tingyun(this);
-                break;
-            default:
-                talents = new Bronya(this);
-                break;
-        }
+            "bronya" => new Bronya(this),
+            "seele" => new Seele(this),
+            "gepard" => new Gepard(this),
+            "tingyun" => new Tingyun(this),
+            _ => new Bronya(this),
+        };
         talents.OnEquipping();
         base.talents = talents;
 
@@ -198,6 +188,9 @@ public class Character : Creature
                 "iceHunter" => new IceHunter(p.Value),
                 "firesmith" => new FireSmith(p.Value),
                 "holyKnight" => new HolyKnight(p.Value),
+                "dawnEagle" => new DawnEagle(p.Value),
+                "meteorThief" => new MeteorThief(p.Value),
+                "starGenius" => new StarGenius(p.Value),
                 _ => new DefaultArtifact(p.Value),
             };
             artTalent.OnEquiping(this);

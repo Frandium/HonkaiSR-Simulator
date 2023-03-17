@@ -62,7 +62,7 @@ public class Tingyun : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Pyro, atkDmg, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Electro, atkDmg, DamageType.Attack);
         self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -130,11 +130,11 @@ public class Tingyun : ACharacterTalents
 
     public override void BurstCharacterAction(List<Character> characters)
     {
+        base.BurstCharacterAction(characters);
         Character c = characters[0];
         c.ChangeEnergy(self.constellaLevel >= 6? 60: 50);
         c.AddBuff("tingyunBurstBonus", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, burstDmgUp, 3);
         c.mono?.ShowMessage("造成伤害提高", Color.red);
-        base.BurstCharacterAction(characters);
     }
 
     public override void Mystery(List<Character> characters, List<Enemy> enemies)
