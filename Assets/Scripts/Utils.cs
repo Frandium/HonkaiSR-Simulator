@@ -65,6 +65,7 @@ public class Utils
         "量子属性穿透",
         "虚数属性穿透",
         "无视防御",
+        "减伤",
         "占位符"
     };
 
@@ -101,21 +102,21 @@ public class Utils
     public static string[] ArtifactPositionName = new string[(int)ArtifactPosition.Count]
     {
         "头部",
-        "颈部",
-        "躯干",
         "手部",
+        "躯干",
         "脚部",
-        "饰品"
+        "连结绳",
+        "位面球"
     };
     
     public static string[] ArtifactPositionPath = new string[(int)ArtifactPosition.Count]
     {
         "head",
-        "neck",
-        "body",
         "hand",
+        "body",
         "feet",
-        "stuff"
+        "rope",
+        "ball"
     };
 
 

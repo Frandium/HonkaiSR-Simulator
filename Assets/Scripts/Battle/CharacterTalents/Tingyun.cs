@@ -77,7 +77,7 @@ public class Tingyun : ACharacterTalents
             curSkill.onDealingDamage.RemoveAll(t => t.tag == "tingyunHelp");
             if(self.constellaLevel >= 1)
             {
-                curSkill.onBurst.RemoveAll(t => t.tag == "tingyunConstellation1Trigger");
+                curSkill.afterBurst.RemoveAll(t => t.tag == "tingyunConstellation1Trigger");
                 if(self.constellaLevel >= 2)
                 {
                     curSkill.onDealingDamage.RemoveAll(t => t.tag == "tingyunConstellation2");
@@ -104,7 +104,7 @@ public class Tingyun : ACharacterTalents
         c.mono?.ShowMessage("Ð­Í¬ÉËº¦", Color.red);
         if (self.constellaLevel >= 1)
         {
-            c.onBurst.Add(new TriggerEvent<Character.TalentUponTarget>("tingyunConstellation1Trigger", c =>
+            c.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("tingyunConstellation1Trigger", c =>
             {
                 curSkill.AddBuff("tingyunConstellation1SpeedUp", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .2f, 2);
             }));

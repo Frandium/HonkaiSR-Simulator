@@ -2,5 +2,6 @@
     "dbname": "dawnEagle",
     "disname": "晨昏交界的翔鹰",
     "two": "风属性伤害提高10%",
-    "four": "当装备者施放终结技后，行动提前25%。"
+    "four": "当装备者施放终结技后，行动提前25%。",
+    "isOrnament": false
 }

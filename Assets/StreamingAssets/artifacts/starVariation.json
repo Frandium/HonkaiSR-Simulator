@@ -1,0 +1,7 @@
+{
+    "dbname": "starVariation",
+    "disname": "星体差分机",
+    "two": "装备者的暴击率提高8%。当装备者的暴击率大于等于80%时，普攻和战技造成的伤害提高20%。",
+    "four": "无",
+    "isOrnament": true
+}

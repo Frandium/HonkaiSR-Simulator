@@ -41,7 +41,7 @@ public class Damage
         if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
         if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
         overallResist -= source.GetFinalAttr(CommonAttribute.PhysicalPenetrate + (int)element);
-        dmg *= overallResist * defRate;
+        dmg *= overallResist * defRate * (1 - target.GetFinalAttr(CommonAttribute.DmgDown));
         return new Damage(dmg, element, damageType, critical);
     }
 

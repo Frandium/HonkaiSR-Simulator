@@ -19,7 +19,7 @@ public class DawnEagle : AArtifactTalent
 
         if (count < 4)
             return;
-        character.onBurst.Add(new TriggerEvent<Character.TalentUponTarget>("dawnEagle4", t =>
+        character.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("dawnEagle4", t =>
         {
             if(locationUpTurn != BattleManager.Instance.curTurnNumber)
             {
@@ -55,7 +55,7 @@ public class DawnEagle : AArtifactTalent
     public override void OnTakingOff(Character character)
     {
         character.RemoveBuff("dawnEagle2");
-        character.onBurst.RemoveAll(t => t.tag == "dawnEagle4");
+        character.afterBurst.RemoveAll(t => t.tag == "dawnEagle4");
         character.onTurnEnd.RemoveAll(t => t.tag == "dawnEagle4LocationUp");
     }
 }

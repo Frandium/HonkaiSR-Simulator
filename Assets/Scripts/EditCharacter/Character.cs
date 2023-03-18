@@ -52,9 +52,12 @@ public class Character : Creature
     public float takeDmgGainEnergy { get; protected set; } = 2.5f;
 
     public delegate void TalentUponTarget(Creature target);
-    public List<TriggerEvent<TalentUponTarget>> onNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
-    public List<TriggerEvent<TalentUponTarget>> onSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
-    public List<TriggerEvent<TalentUponTarget>> onBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> beforeNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> afterNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> beforeSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> afterSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> beforeBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> afterBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
     public Character() { }
 
     public Character(string _dbname)
@@ -86,9 +89,12 @@ public class Character : Creature
     public override void Initialize()
     {
         base.Initialize();
-        onBurst.Clear();
-        onSkill.Clear();
-        onNormalAttack.Clear();
+        afterBurst.Clear();
+        beforeBurst.Clear();
+        afterSkill.Clear();
+        beforeSkill.Clear();
+        afterNormalAttack.Clear();
+        beforeNormalAttack.Clear();
         artifacts.Clear();
         artifactsSuit.Clear();
         additionalAtkLevel = 0;
@@ -185,12 +191,26 @@ public class Character : Creature
         {
             AArtifactTalent artTalent = p.Key switch
             {
-                "iceHunter" => new IceHunter(p.Value),
-                "firesmith" => new FireSmith(p.Value),
-                "holyKnight" => new HolyKnight(p.Value),
+                "builderBLBG" => new BuilderBLBG(p.Value),
+                "cloudPassanger" => new CloudPassanger(p.Value),
                 "dawnEagle" => new DawnEagle(p.Value),
+                "electroBand" => new ElectroBand(p.Value),
+                "firesmith" => new FireSmith(p.Value),
+                "galaxyBussiness" => new GalaxyBussiness(p.Value),
+                "holyKnight" => new HolyKnight(p.Value),
+                "iceHunter" => new IceHunter(p.Value),
+                "immortalArk" => new ImmortalArk(p.Value),
+                "lifeVVK" => new LifeVVK(p.Value),
                 "meteorThief" => new MeteorThief(p.Value),
+                "snowGuard" => new SnowGuard(p.Value),
+                "spaceSeal" => new SpaceSeal(p.Value),
                 "starGenius" => new StarGenius(p.Value),
+                "starVariation" => new StarVariation(p.Value),
+                "stoppedSRST" => new StoppedSRST(p.Value),
+                "streetFighter" => new StreetFighter(p.Value),
+                "thiefCountry" => new ThiefCountry(p.Value),
+                "thiefDesert" => new ThiefDesert(p.Value),
+                "wheatGunner" => new WheatGunner(p.Value),
                 _ => new DefaultArtifact(p.Value),
             };
             artTalent.OnEquiping(this);
@@ -230,7 +250,7 @@ public class Character : Creature
 
     public void ChangeEnergy(float offset)
     {
-        energy += offset;
+        energy += offset * GetFinalAttr(CommonAttribute.EnergyRecharge);
         if (energy > maxEnergy) energy = maxEnergy;
         if (energy < 0) energy = 0;
         mono.UpdateEnergyIcon();
@@ -246,9 +266,12 @@ public class Character : Creature
     public override void EndNormalTurn()
     {
         base.EndNormalTurn();
-        onNormalAttack.RemoveAll(p => p.CountDown(CountDownType.Turn));
-        onSkill.RemoveAll(p => p.CountDown(CountDownType.Turn));
-        onBurst.RemoveAll(p => p.CountDown(CountDownType.Turn));        
+        beforeNormalAttack.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterNormalAttack.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeSkill.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterSkill.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeBurst.RemoveAll(p => p.CountDown(CountDownType.Turn));        
+        afterBurst.RemoveAll(p => p.CountDown(CountDownType.Turn));        
     }
 
     public virtual void StartBurstTurn()

@@ -16,7 +16,7 @@ public class IceHunter : AArtifactTalent
             character.AddBuff("iceHunter2", BuffType.Permanent, CommonAttribute.CryoBonus, ValueType.InstantNumber, .1f);
             if(count >= 4)
             {
-                character.onBurst.Add(new TriggerEvent<Character.TalentUponTarget>("iceHunter4", t =>
+                character.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("iceHunter4", t =>
                 {
                     character.AddBuff("iceHunter4CrtDmg", BuffType.Buff, CommonAttribute.CriticalDamage, ValueType.InstantNumber, .25f, 3);
                 }));
@@ -27,7 +27,7 @@ public class IceHunter : AArtifactTalent
     public override void OnTakingOff(Character character)
     {
         character.RemoveBuff("iceHunter2");
-        character.onBurst.RemoveAll(t => t.tag == "iceHunter4");
+        character.afterBurst.RemoveAll(t => t.tag == "iceHunter4");
     }
 }
 

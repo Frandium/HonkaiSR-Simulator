@@ -39,11 +39,11 @@ public enum StateType
 public enum ArtifactPosition
 {
     Head,  // 头
-    Neck,  // 颈
-    Body,  // 身体
     Hand,  // 手
+    Body,  // 驱赶
     Foot,  // 脚
-    Stuff, // 饰品
+    Rope,  // 连结绳
+    Ball, // 位面球
     Count
 }
 
@@ -89,6 +89,7 @@ public enum CommonAttribute
     QuantusPenetrate,// 量子穿透 = 34
     ImaginaryPenetrate,// 虚数穿透 = 35
     DEFIgnore, // 无视防御
+    DmgDown, // 减伤
     Count // = 28
 }
 
@@ -127,6 +128,7 @@ public enum DamageType
     Skill,
     Burst,
     Continue,
+    Additional,
     All,
     Count
 }

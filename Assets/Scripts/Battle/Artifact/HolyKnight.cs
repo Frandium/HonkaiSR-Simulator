@@ -24,6 +24,6 @@ public class HolyKnight : AArtifactTalent
     public override void OnTakingOff(Character character)
     {
         character.RemoveBuff("holyKnight2");
-        character.onBurst.RemoveAll(t => t.tag == "holyKnight4");
+        character.afterBurst.RemoveAll(t => t.tag == "holyKnight4");
     }
 }

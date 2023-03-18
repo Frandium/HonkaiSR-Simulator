@@ -4,12 +4,14 @@ using UnityEngine;
 using LitJson;
 using System.IO;
 
+
 public class ArtifactDescription
 {
     public string dbname { get; protected set; }
     public string disname { get; protected set; }
     public string two { get; protected set; }
     public string four { get; protected set; }
+    public bool isOrnament { get; protected set; }
 
     public ArtifactDescription(string _dbname)
     {
@@ -20,6 +22,7 @@ public class ArtifactDescription
         disname = (string)data["disname"];
         two = (string)data["two"];
         four = (string)data["four"];
+        isOrnament = (bool)data["isOrnament"];
     }
 
     public static Dictionary<string, ArtifactDescription> artifacts;

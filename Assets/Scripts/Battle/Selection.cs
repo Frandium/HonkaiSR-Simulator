@@ -17,17 +17,24 @@ public class Selection : MonoBehaviour
         }
     }
 
-    public void ApplyAction(List<TriggerEvent<Character.TalentUponTarget>> talent)
+    public void ApplyAction(List<TriggerEvent<Character.TalentUponTarget>> before, List<TriggerEvent<Character.TalentUponTarget>> after)
     {
         if (isTargetEnemy)
         {
-            List<Enemy> selectedEnemies = new List<Enemy>();
+            List<Enemy> selectedEnemies = new List<Enemy>(); 
             foreach (int i in selectedCreatures)
             {
                 selectedEnemies.Add(BattleManager.Instance.enemies[i]);
             }
+            foreach(var t in before)
+            {
+                foreach (Enemy e in selectedEnemies)
+                {
+                    t.trigger(e);
+                }
+            }
             enemyAction(selectedEnemies);
-            foreach (var t in talent)
+            foreach (var t in after)
             {
                 foreach(Enemy e in selectedEnemies)
                 {
@@ -43,8 +50,15 @@ public class Selection : MonoBehaviour
             {
                 selectedCharacters.Add(BattleManager.Instance.characters[i]);
             }
+            foreach (var t in before)
+            {
+                foreach (Character c in selectedCharacters)
+                {
+                    t.trigger(c);
+                }
+            }
             characterAction(selectedCharacters);
-            foreach (var t in talent)
+            foreach (var t in after)
             {
                 foreach (Character c in selectedCharacters)
                 {

@@ -33,7 +33,7 @@ public class Bronya : ACharacterTalents
         burstCrtDmgIns = (float)(double)self.metaData["burst"]["crtDmgIns"]["value"][self.burstLevel];
         burstCrtDmgPct = (float)(double)self.metaData["burst"]["crtDmgPct"]["value"][self.burstLevel];
         locationUp = (float)(double)self.metaData["talent"]["location"]["value"][self.talentLevel];
-        self.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
+        self.afterNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
         {
             talent_activated = true;
             self.mono?.ShowMessage("行动提前", Color.green);
@@ -54,7 +54,7 @@ public class Bronya : ACharacterTalents
         }));
         if (self.constellaLevel >= 1)
         {
-            self.onSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
+            self.afterSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
             {
                 if (!isC1CD && Utils.TwoRandom(.5f))
                 {
@@ -130,7 +130,7 @@ public class Bronya : ACharacterTalents
             }
             if(self.constellaLevel >= 4 && c != self)
             {
-                c.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstalltion4", t =>
+                c.afterNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstalltion4", t =>
                 {
                     if(t is Enemy)
                     {

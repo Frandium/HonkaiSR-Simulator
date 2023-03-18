@@ -151,12 +151,12 @@ public class BattleManager : MonoBehaviour
                         if (isAttackOrSkill)
                         {
                             curCharacter.mono.PlayAudio(AudioType.Attack);
-                            selection.ApplyAction(curCharacter.onNormalAttack);
+                            selection.ApplyAction(curCharacter.beforeNormalAttack, curCharacter.afterNormalAttack);
                         }
                         else
                         {
                             curCharacter.mono.PlayAudio(AudioType.Skill);
-                            selection.ApplyAction(curCharacter.onSkill);
+                            selection.ApplyAction(curCharacter.beforeSkill, curCharacter.afterSkill);
                         }
                     }
                 }
@@ -493,7 +493,7 @@ public class BattleManager : MonoBehaviour
         screenCanvas.SetActive(false);
         yield return new WaitForSeconds((float)seconds);
         videoPlayer.enabled = false;
-        selection.ApplyAction(curCharacter.onBurst);
+        selection.ApplyAction(curCharacter.beforeBurst, curCharacter.afterBurst);
         curStage = TurnStage.Animation;
         screenCanvas.SetActive(true);
         bgm.Play();

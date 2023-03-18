@@ -1,0 +1,7 @@
+{
+    "dbname": "streetFighter",
+    "disname": "街头出身的拳王",
+    "two": "物理属性伤害提高10%",
+    "four": "当装备者施放或受到攻击后，在本场战斗中攻击力提高5%，最多叠加5次。",
+    "isOrnament": false
+}

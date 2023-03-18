@@ -17,7 +17,7 @@ public class FireSmith : AArtifactTalent
             if (count >= 4)
             {
                 character.AddBuff("fireSmith4", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .12f, damageType: DamageType.Skill);
-                character.onBurst.Add(new TriggerEvent<Character.TalentUponTarget>("fireSmith4", e =>
+                character.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("fireSmith4", e =>
                 {
                     character.AddBuff("fireSmith4PyroDmg", BuffType.Buff, CommonAttribute.PyroBonus, ValueType.InstantNumber, .12f, cdtype: CountDownType.Trigger, triggertime: 1);
                 }));
@@ -29,6 +29,6 @@ public class FireSmith : AArtifactTalent
     {
         character.RemoveBuff("fireSmith2");
         character.RemoveBuff("fireSmith4");
-        character.onBurst.RemoveAll(t => t.tag == "fireSmith4");
+        character.afterBurst.RemoveAll(t => t.tag == "fireSmith4");
     }
 }

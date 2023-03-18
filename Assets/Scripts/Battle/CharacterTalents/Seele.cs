@@ -69,7 +69,7 @@ public class Seele : ACharacterTalents
         }
         if (self.config.abilityActivated[1])
         {
-            self.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
+            self.afterNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
             {
                 ability2Activated = true;
                 self.mono?.ShowMessage("行动提前", Color.green);

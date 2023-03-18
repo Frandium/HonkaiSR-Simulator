@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class CharacterDetailUI : MonoBehaviour
 {
-    List<string> artifactDisnames;
-    List<string> artifactDbnames;
+    List<string> artifactNormalDisnames;
+    List<string> artifactOrnamentDisnames;
+    List<string> artifactNormalDbnames;
+    List<string> artifactOrnamentDbnames;
     List<string> attributes;
     List<string> valueTypes;
     List<string> weaponDbnames;
@@ -109,15 +111,22 @@ public class CharacterDetailUI : MonoBehaviour
         });
 
 
-        artifactDisnames = new List<string>();
+        artifactOrnamentDbnames = new List<string>();
+        artifactOrnamentDisnames = new List<string>();
+        artifactNormalDbnames = new List<string>();
+        artifactNormalDisnames = new List<string>();
         foreach (var v in ArtifactDescription.GetAllArtifactSuits().Values)
         {
-            artifactDisnames.Add(v.disname);
-        }
-        artifactDbnames = new List<string>();
-        foreach (var v in ArtifactDescription.GetAllArtifactSuits().Values)
-        {
-            artifactDbnames.Add(v.dbname);
+            if (v.isOrnament)
+            {
+                artifactOrnamentDisnames.Add(v.disname);
+                artifactOrnamentDbnames.Add(v.dbname);
+            }
+            else
+            {
+                artifactNormalDisnames.Add(v.disname);
+                artifactNormalDbnames.Add(v.dbname);
+            }
         }
         attributes = new List<string>(Utils.attributeNames);
         attributes.RemoveAt(Utils.attributeNames.Length - 1);
@@ -131,10 +140,17 @@ public class CharacterDetailUI : MonoBehaviour
             Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
             InputField[] inputFields = art.GetComponentsInChildren<InputField>();
             dropdowns[0].ClearOptions();
-            dropdowns[0].AddOptions(artifactDisnames);
+            if (i < (int)ArtifactPosition.Rope)
+                dropdowns[0].AddOptions(artifactNormalDisnames);
+            else
+                dropdowns[0].AddOptions(artifactOrnamentDisnames);
+
             int num = i;
             dropdowns[0].onValueChanged.AddListener(v => {
-                curCharacter.config.artifacts[num].suitName = artifactDbnames[v];
+                if(num < (int) ArtifactPosition.Rope)
+                    curCharacter.config.artifacts[num].suitName = artifactNormalDbnames[v];
+                else
+                    curCharacter.config.artifacts[num].suitName = artifactOrnamentDbnames[v];
                 Refresh();
             });
 
@@ -406,7 +422,10 @@ public class CharacterDetailUI : MonoBehaviour
             art.GetComponentInChildren<Text>().text = Utils.ArtifactPositionName[(int)c.config.artifacts[i].position];
             Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
             InputField[] inputFields = art.GetComponentsInChildren<InputField>();
-            dropdowns[0].SetValueWithoutNotify(artifactDbnames.IndexOf(suitName));
+            if(i < (int)ArtifactPosition.Rope)
+                dropdowns[0].SetValueWithoutNotify(artifactNormalDbnames.IndexOf(suitName));
+            else
+                dropdowns[0].SetValueWithoutNotify(artifactOrnamentDbnames.IndexOf(suitName));
             dropdowns[0].interactable = _enableChange;
             imgs[2].sprite = Resources.Load<Sprite>("artifacts/" + suitName + "/" + Utils.ArtifactPositionPath[(int)c.config.artifacts[i].position]);
 
@@ -494,11 +513,18 @@ public class CharacterDetailUI : MonoBehaviour
                 texts[1].text = "固有";
             else
             {
-                texts[1].text = "剩余";
-                if (b.ctype == CountDownType.Trigger || b.ctype == CountDownType.All)
-                    texts[1].text += " <color=#80f>" + b._triggerTimes + "</color> 次";
-                if (b.ctype == CountDownType.Turn || b.ctype == CountDownType.All)
-                    texts[1].text += " <color=#80f>" + b._turnTimes + "</color> 回合";
+                if (b.ctype == CountDownType.Permanent)
+                {
+                    texts[1].text = "永久";
+                }
+                else
+                {
+                    texts[1].text = "剩余";
+                    if (b.ctype == CountDownType.Trigger || b.ctype == CountDownType.All)
+                        texts[1].text += " <color=#80f>" + b._triggerTimes + "</color> 次";
+                    if (b.ctype == CountDownType.Turn || b.ctype == CountDownType.All)
+                        texts[1].text += " <color=#80f>" + b._turnTimes + "</color> 回合";
+                }
             }
         }
         for (int i = 0; i < c.shields.Count; ++i)
