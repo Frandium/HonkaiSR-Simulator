@@ -123,10 +123,11 @@ public class Seele : ACharacterTalents
         base.BurstEnemyAction(enemies);
         if (self.constellaLevel >= 6)
         {
-            e.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleConstellation6ExtraDamage", (e, d) => {
+            e.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleConstellation6ExtraDamage", (s, d) => {
                 Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, burstDmg, DamageType.Burst);
                 dmg.value *= .18f;
-                return dmg;
+                e.TakeDamage(self, dmg);
+                return d;
             }, 1));
         }
     }

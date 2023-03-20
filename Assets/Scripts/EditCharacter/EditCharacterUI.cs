@@ -33,7 +33,7 @@ public class EditCharacterUI : MonoBehaviour
             return;
         scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(70 * files.Count, 0);
         // 对所有的角色，在上方的滚动条里 add 一个选项，然后找 Resources 里有没有他的照片，有就add，没有就 fall back 到默认图片
-        for(int i = 0; i < files.Count; ++i)
+        for(int i = 0; i < files.Count; ++i) 
         {
             string s = files[i];
             string dbname = Path.GetFileNameWithoutExtension(s);
