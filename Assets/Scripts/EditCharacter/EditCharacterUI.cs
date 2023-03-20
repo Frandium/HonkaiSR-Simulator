@@ -21,12 +21,13 @@ public class EditCharacterUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        detail.SetChangeable(true);
         ScanCharacters();
     }
 
     public void ScanCharacters()
     {
-        files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.characterDir));
+        files = new List<string>(Directory.GetFiles(GlobalInfoHolder.characterDir));
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         if (files.Count == 0)
             return;
@@ -53,7 +54,7 @@ public class EditCharacterUI : MonoBehaviour
     {
         character?.SaveConfig();
         character = new Character(name);
-        detail.ShowDetail(character, true);
+        detail.ShowDetail(character);
     }
 
 
@@ -82,7 +83,7 @@ public class EditCharacterUI : MonoBehaviour
     {
         BattleTemplate bt = new BattleTemplate();
         FileStream fs;
-        fs = File.Open(GlobalInfoHolder.Instance.battleDir + "/" + "default_battle.json", FileMode.OpenOrCreate);
+        fs = File.Open(GlobalInfoHolder.battleDir + "/" + "default_battle.json", FileMode.OpenOrCreate);
         string content = JsonMapper.ToJson(bt);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();
@@ -93,7 +94,7 @@ public class EditCharacterUI : MonoBehaviour
     {
         CharacterConfig c = new CharacterConfig();
         FileStream fs;
-        fs = File.Open(GlobalInfoHolder.Instance.characterConfigDir + "/" + "babara.json", FileMode.OpenOrCreate);
+        fs = File.Open(GlobalInfoHolder.characterConfigDir + "/" + "babara.json", FileMode.OpenOrCreate);
         string content = JsonMapper.ToJson(c);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();

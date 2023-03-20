@@ -48,7 +48,7 @@ public class Weapon: Equipment
     public void LoadJson(string _dbname)
     {
         dbName = _dbname;
-        string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbName + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.weaponDir + "/" + dbName + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // set character template
@@ -125,13 +125,13 @@ public class Weapon: Equipment
             dbname2Disname = new Dictionary<string, string>();
             dbname2Career = new Dictionary<string, int>();
 
-            List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.weaponDir));
+            List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.weaponDir));
             files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
             
             foreach (string s in files)
             {
                 string dbname = Path.GetFileNameWithoutExtension(s);
-                string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbname + ".json");
+                string jsonString = File.ReadAllText(GlobalInfoHolder.weaponDir + "/" + dbname + ".json");
                 JsonData data = JsonMapper.ToObject(jsonString);
                 dbname2Disname.Add(dbname, (string)data["disname"]);
                 dbname2Career.Add(dbname, (int)data["career"]);
@@ -147,13 +147,13 @@ public class Weapon: Equipment
             dbname2Disname = new Dictionary<string, string>();
             dbname2Career = new Dictionary<string, int>();
 
-            List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.weaponDir));
+            List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.weaponDir));
             files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
 
             foreach (string s in files)
             {
                 string dbname = Path.GetFileNameWithoutExtension(s);
-                string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/weapons/" + dbname + ".json");
+                string jsonString = File.ReadAllText(GlobalInfoHolder.weaponDir + "/" + dbname + ".json");
                 JsonData data = JsonMapper.ToObject(jsonString);
                 dbname2Disname.Add(dbname, (string)data["disname"]);
                 dbname2Career.Add(dbname, (int)data["career"]);

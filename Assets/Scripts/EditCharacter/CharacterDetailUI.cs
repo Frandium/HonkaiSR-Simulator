@@ -225,11 +225,23 @@ public class CharacterDetailUI : MonoBehaviour
         }
     }
 
-    public void ShowDetail(Character c, bool _enableChange = false)
+    public void SetChangeable(bool changeable)
+    {
+        enableChange = changeable;
+        if (!changeable)
+        {
+            saveArtifacts.onClick.RemoveAllListeners();
+            saveArtifacts.onClick.AddListener(() =>
+            {
+                gameObject.SetActive(false);
+            });
+            saveArtifacts.GetComponentInChildren<Text>().text = "关闭页面";
+        }
+    }
+
+    public void ShowDetail(Character c)
     {
         curCharacter = c;
-        enableChange = _enableChange;
-        saveArtifacts.interactable = enableChange;
 
         background.sprite = Resources.Load<Sprite>(c.dbname + "/splash");
         Text[] texts;
@@ -395,7 +407,7 @@ public class CharacterDetailUI : MonoBehaviour
         {
             constellaItems[i].GetComponentInChildren<Image>().sprite = Resources.Load<Sprite>(c.dbname + "/c" + i);
             texts = constellaItems[i].GetComponentsInChildren<Text>();
-            constellaItems[i].GetComponentInChildren<Button>().interactable = _enableChange;
+            constellaItems[i].GetComponentInChildren<Button>().interactable = enableChange;
             bool activated = c.constellaLevel >= i + 1;
             texts[0].text = (string)c.metaData["constellation"][i]["name"] + (activated? "" : "  未激活");
             texts[0].color = activated ? Color.black : Color.grey;
@@ -426,12 +438,12 @@ public class CharacterDetailUI : MonoBehaviour
                 dropdowns[0].SetValueWithoutNotify(artifactNormalDbnames.IndexOf(suitName));
             else
                 dropdowns[0].SetValueWithoutNotify(artifactOrnamentDbnames.IndexOf(suitName));
-            dropdowns[0].interactable = _enableChange;
+            dropdowns[0].interactable = enableChange;
             imgs[2].sprite = Resources.Load<Sprite>("artifacts/" + suitName + "/" + Utils.ArtifactPositionPath[(int)c.config.artifacts[i].position]);
 
             for (int j = 1; j <= 10; j += 2)
             {
-                dropdowns[j].interactable = _enableChange;
+                dropdowns[j].interactable = enableChange;
                 if (j == 1)
                     dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.attr);
                 else
@@ -440,7 +452,7 @@ public class CharacterDetailUI : MonoBehaviour
 
             for (int j = 2; j <= 10; j += 2)
             {
-                dropdowns[j].interactable = _enableChange;
+                dropdowns[j].interactable = enableChange;
                 if (j == 2)
                     dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.type);
                 else
@@ -449,7 +461,7 @@ public class CharacterDetailUI : MonoBehaviour
 
             for (int j = 0; j < 5; ++j)
             {
-                inputFields[j].interactable = _enableChange;
+                inputFields[j].interactable = enableChange;
                 double toshow;
                 if (j == 0)
                 {
@@ -486,7 +498,7 @@ public class CharacterDetailUI : MonoBehaviour
             suittext += "4件套：" + ad.four + "</color>\n";
             suittext += "\n";
         }
-        suittext += "\n<color=red>*遗器配置须点击左下角按钮保存*</color>";
+        suittext += "\n<color=red>*遗器数值须点击左下角按钮保存*</color>";
         artiSuitInfo.text = suittext;
 
         // Buff 界面
@@ -582,7 +594,7 @@ public class CharacterDetailUI : MonoBehaviour
     public void Refresh()
     {
         curCharacter.SaveConfig();
-        ShowDetail(curCharacter, enableChange);
+        ShowDetail(curCharacter);
     }
 
     public void ChangeTalentLevel(Slider slider)

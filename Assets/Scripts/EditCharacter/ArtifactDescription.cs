@@ -15,7 +15,7 @@ public class ArtifactDescription
 
     public ArtifactDescription(string _dbname)
     {
-        string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/artifacts/" + _dbname + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.artifactsDir + "/" + _dbname + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
 
         dbname = _dbname;
@@ -33,7 +33,7 @@ public class ArtifactDescription
             return artifacts;
 
         artifacts = new Dictionary<string, ArtifactDescription>();
-        List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.artifactsDir));
+        List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.artifactsDir));
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         foreach (string s in files)
         {

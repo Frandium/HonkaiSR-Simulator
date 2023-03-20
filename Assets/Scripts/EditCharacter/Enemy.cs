@@ -32,7 +32,7 @@ public class Enemy : Creature
     {
         dbname = name;
         // Load 角色基本属性
-        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.enemyDir + "/" + dbname + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + dbname + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // set character template

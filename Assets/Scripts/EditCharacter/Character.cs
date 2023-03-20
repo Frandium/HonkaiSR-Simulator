@@ -78,7 +78,7 @@ public class Character : Creature
         config = new CharacterConfig(name);
 
         // Load 角色基本属性
-        string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.characterDir + "/" + name + ".json");
         metaData = JsonMapper.ToObject(jsonString);
 
         // set character template

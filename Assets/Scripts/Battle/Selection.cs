@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Selection : MonoBehaviour
 {
+    public GameObject selectLeft;
+    public GameObject selectRight;
+
     public AudioClip changeSlelect;
     public AudioClip error;
     public AudioSource audioSource;
@@ -11,9 +14,13 @@ public class Selection : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (isDuringSelection)
+        if (Input.GetKeyDown(KeyCode.D))
         {
-            ResponseSelectionChange();
+            RespondtoKeycodeD();
+        }
+        else if (Input.GetKeyDown(KeyCode.A))
+        {
+            RespondtoKeycodeA();
         }
     }
 
@@ -68,6 +75,8 @@ public class Selection : MonoBehaviour
         }
         ClearSelection();
         isDuringSelection = false;
+        selectLeft.SetActive(false);
+        selectRight.SetActive(false);
     }
 
     public List<int> selectedCreatures = new List<int>();
@@ -90,6 +99,8 @@ public class Selection : MonoBehaviour
         characterAction = action;
         enemyAction = null;
         isDuringSelection = true;
+        selectRight.SetActive(true);
+        selectLeft.SetActive(true);
         curCharacterIndex = characters.FindIndex(c => c == curCharacter);
         switch (type)
         {
@@ -142,7 +153,9 @@ public class Selection : MonoBehaviour
         enemyAction = action;
         selectionType = type;
         characterAction = null;
-        isDuringSelection = true; 
+        isDuringSelection = true;
+        selectRight.SetActive(true);
+        selectLeft.SetActive(true);
         List<EnemyMono> enemies = new List<EnemyMono>();
         foreach (Enemy e in BattleManager.Instance.enemies)
         {
@@ -182,121 +195,142 @@ public class Selection : MonoBehaviour
         selectedCreatures.Clear();
     }
 
-    void ResponseSelectionChange()
+
+    public void RespondtoKeycodeD()
     {
+        if (!isDuringSelection)
+            return;
 
         if (selectionType == SelectionType.One)
         {
             if (isTargetEnemy)
             {
                 List<EnemyMono> enemies = new List<EnemyMono>();
-                foreach(Enemy e in BattleManager.Instance.enemies)
+                foreach (Enemy e in BattleManager.Instance.enemies)
                 {
                     enemies.Add(e.mono);
                 }
                 int curSelected = selectedCreatures[0];
-                if (Input.GetKeyDown(KeyCode.D))
+
+
+                bool change = curSelected > 0;
+                PlayAudio(change);
+                if (change)
                 {
-                    bool change = curSelected > 0;
-                    PlayAudio(change);
-                    if (change)
-                    {
-                        enemies[curSelected].SetUnselected();
-                        --curSelected;
-                        enemies[curSelected].SetSelected();
-                        selectedCreatures[0] = curSelected;
-                    }
+                    enemies[curSelected].SetUnselected();
+                    --curSelected;
+                    enemies[curSelected].SetSelected();
+                    selectedCreatures[0] = curSelected;
                 }
-                else if (Input.GetKeyDown(KeyCode.A))
-                {
-                    bool change = curSelected < enemies.Count - 1;
-                    PlayAudio(change);
-                    if (change)
-                    {
-                        enemies[curSelected].SetUnselected();
-                        ++curSelected;
-                        enemies[curSelected].SetSelected();
-                        selectedCreatures[0] = curSelected;
-                        audioSource.Play();
-                    }
-                }
+
             }
             else
             {
                 int curSelected = selectedCreatures[0];
-                if (Input.GetKeyDown(KeyCode.D))
+
+                bool change = curSelected < characters.Count - 1;
+                PlayAudio(change);
+                if (change)
                 {
-                    bool change = curSelected < characters.Count - 1;
-                    PlayAudio(change);
-                    if (change)
-                    {
-                        characters[curSelected].mono.SetUnselected();
-                        ++curSelected;
-                        characters[curSelected].mono.SetSelected();
-                        selectedCreatures[0] = curSelected;
-                    }
+                    characters[curSelected].mono.SetUnselected();
+                    ++curSelected;
+                    characters[curSelected].mono.SetSelected();
+                    selectedCreatures[0] = curSelected;
                 }
-                else if (Input.GetKeyDown(KeyCode.A))
-                {
-                    bool change = curSelected > 0;
-                    PlayAudio(change);
-                    if (change)
-                    {
-                        characters[curSelected].mono.SetUnselected();
-                        --curSelected;
-                        characters[curSelected].mono.SetSelected();
-                        selectedCreatures[0] = curSelected;
-                    }
-                }
+
             }
         }
         else if (selectionType == SelectionType.OneExceptSelf)
         {
             int curSelected = selectedCreatures[0];
-            if (Input.GetKeyDown(KeyCode.A))
+            if (curSelected > 0)
             {
-                if (curSelected < characters.Count - 1)
+                if (curSelected - 1 == curCharacterIndex)
                 {
-                    if (curSelected + 1 == curCharacterIndex)
-                    {
-                        if (curSelected + 2 < characters.Count)
-                        {
-                            characters[curSelected].mono.SetUnselected();
-                            curSelected += 2;
-                            characters[curSelected].mono.SetSelected();
-                            selectedCreatures[0] = curSelected;
-                        }
-                    }
-                    else
+                    if (curSelected - 2 >= 0)
                     {
                         characters[curSelected].mono.SetUnselected();
-                        ++curSelected;
+                        curSelected -= 2;
                         characters[curSelected].mono.SetSelected();
                         selectedCreatures[0] = curSelected;
                     }
                 }
-            }
-            else if (Input.GetKeyDown(KeyCode.D))
-            {
-                if (curSelected > 0)
+                else
                 {
-                    if (curSelected - 1 == curCharacterIndex)
-                    {
-                        if (curSelected - 2 >= 0)
-                        {
-                            characters[curSelected].mono.SetUnselected();
-                            curSelected -= 2;
-                            characters[curSelected].mono.SetSelected();
-                            selectedCreatures[0] = curSelected;
-                        }
-                    }
-                    else
+                    characters[curSelected].mono.SetUnselected();
+                    --curSelected;
+                    characters[curSelected].mono.SetSelected();
+                    selectedCreatures[0] = curSelected;
+                }
+            }
+
+        }
+    }
+
+    public void RespondtoKeycodeA()
+    {
+        if (!isDuringSelection)
+            return;
+
+        if (selectionType == SelectionType.One)
+        {
+            if (isTargetEnemy)
+            {
+                List<EnemyMono> enemies = new List<EnemyMono>();
+                foreach (Enemy e in BattleManager.Instance.enemies)
+                {
+                    enemies.Add(e.mono);
+                }
+                int curSelected = selectedCreatures[0];
+
+                bool change = curSelected < enemies.Count - 1;
+                PlayAudio(change);
+                if (change)
+                {
+                    enemies[curSelected].SetUnselected();
+                    ++curSelected;
+                    enemies[curSelected].SetSelected();
+                    selectedCreatures[0] = curSelected;
+                    audioSource.Play();
+                }
+
+            }
+            else
+            {
+                int curSelected = selectedCreatures[0];
+                bool change = curSelected > 0;
+                PlayAudio(change);
+                if (change)
+                {
+                    characters[curSelected].mono.SetUnselected();
+                    --curSelected;
+                    characters[curSelected].mono.SetSelected();
+                    selectedCreatures[0] = curSelected;
+                }
+
+            }
+        }
+        else if (selectionType == SelectionType.OneExceptSelf)
+        {
+            int curSelected = selectedCreatures[0];
+            if (curSelected < characters.Count - 1)
+            {
+                if (curSelected + 1 == curCharacterIndex)
+                {
+                    if (curSelected + 2 < characters.Count)
                     {
                         characters[curSelected].mono.SetUnselected();
-                        --curSelected;
+                        curSelected += 2;
                         characters[curSelected].mono.SetSelected();
                         selectedCreatures[0] = curSelected;
                     }
+                }
+                else
+                {
+                    characters[curSelected].mono.SetUnselected();
+                    ++curSelected;
+                    characters[curSelected].mono.SetSelected();
+                    selectedCreatures[0] = curSelected;
                 }
             }
         }
@@ -314,4 +348,5 @@ public class Selection : MonoBehaviour
         }
         audioSource.Play();
     }
+
 }

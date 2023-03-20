@@ -138,7 +138,7 @@ public class CharacterMono : CreatureMono
         burstFillingImage.fillAmount = self.energy / self.maxEnergy;
         Color elementColor = ElementColors[(int)self.element];
         if (self.energy < self.maxEnergy)
-            elementColor.a = .75f;
+            elementColor.a = .5f;
         burstFillingImage.color = elementColor;
     }
 

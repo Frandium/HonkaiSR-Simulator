@@ -4,35 +4,19 @@ using UnityEngine;
 
 public class GlobalInfoHolder
 {
-    public static GlobalInfoHolder Instance
-    {
-        get
-        {
-            if(_instance == null)
-            {
-                _instance = new GlobalInfoHolder();
-            }
-            return _instance;
-        }
-        private set
-        {
-            _instance = value;
-        }
-    }
 
-    static GlobalInfoHolder _instance;
 
-    public string characterDir { get; protected set; } = Application.streamingAssetsPath + "/characters";
-    public string weaponDir { get; protected set; } = Application.streamingAssetsPath + "/weapons";
-    public string artifactsDir { get; protected set; } = Application.streamingAssetsPath + "/artifacts";
-    public string enemyDir { get; protected set; } = Application.streamingAssetsPath + "/enemies";
-    public string battleDir { get; protected set; } = Application.streamingAssetsPath + "/battles";
-    public string characterConfigDir { get; protected set; } = Application.streamingAssetsPath + "/user";
+    public static string characterDir { get; protected set; } = Application.persistentDataPath + "/characters";
+    public static string weaponDir { get; protected set; } = Application.persistentDataPath + "/weapons";
+    public static string artifactsDir { get; protected set; } = Application.persistentDataPath + "/artifacts";
+    public static string enemyDir { get; protected set; } = Application.persistentDataPath + "/enemies";
+    public static string battleDir { get; protected set; } = Application.persistentDataPath + "/battles";
+    public static string characterConfigDir { get; protected set; } = Application.persistentDataPath + "/user";
 
-    public string battleFilePath = Application.streamingAssetsPath + "/battles/boss.json";
+    public static string battleFilePath = Application.persistentDataPath + "/battles/boss.json";
 
-    public string mystery = "tingyun";
+    public static string mystery = "tingyun";
 
-    public string[] teamMembers = new string[] { "bronya", "gepard", "seele", "tingyun" };
+    public static string[] teamMembers = new string[] { "bronya", "gepard", "seele", "tingyun" };
 
 }

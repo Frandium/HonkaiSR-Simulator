@@ -31,9 +31,10 @@ public class BattleManager : MonoBehaviour
     float turnTime = 0;
     float minTurnTime = 3; // 每个回合最少 3 秒，防止操作输入太快出 bug
     private bool isBurst = false;
-    bool chaDetailActivated = false;
     public List<Character> characters { get; protected set; } = new List<Character>();
     public List<Character> deadCharacters { get; protected set; } = new List<Character>();
+    public List<Character> allCharacters { get; protected set; } = new List<Character>();
+
     public List<CharacterMono> cMonos = new List<CharacterMono>();
     public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
@@ -60,6 +61,8 @@ public class BattleManager : MonoBehaviour
     public Image skillImage;
     public Image splash;
     public Image bannerImgae;
+    public Button QButton;
+    public Button EButton;
     public AudioClip EAudio;
     public AudioClip QAudio;
     public AudioClip error;
@@ -95,6 +98,7 @@ public class BattleManager : MonoBehaviour
         LoadBattle();
         skillPoint.GainPoint(2);
         NextTurn();
+        characterDetail.GetComponent<CharacterDetailUI>().SetChangeable(false);
     }
 
     void Update()
@@ -105,61 +109,12 @@ public class BattleManager : MonoBehaviour
         switch (curStage)
         {
             case TurnStage.Instruction:
-                if (Input.GetKeyDown(KeyCode.E) && isAttackOrSkill)
-                {
-                    if (skillPoint.IsPointEnough(curCharacter.skillConsumePointCount))
-                    {
-                        audioSource.clip = EAudio;
-                        audioSource.Play();
-                        skillPoint.StartConsumePointAnim(curCharacter.skillConsumePointCount);
-                        StartCoroutine(ChangeLocalScale(attackRecttrans, Vector3.one, animTime));
-                        StartCoroutine(ChangeLocalScale(skillRecttrans, Vector3.one * 1.2f, animTime));
-
-                        isAttackOrSkill = false;
-                        if (curCharacter.isSkillTargetEnemy)
-                            selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.talents.SkillEnemyAction);
-                        else
-                            selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.talents.SkillCharacterAction);
-                    }
-                    else
-                    {
-                        audioSource.clip = error;
-                        audioSource.Play();
-                    }
-                }
-                else if (Input.GetKeyDown(KeyCode.Q) && !isAttackOrSkill)
-                {
-                    SelectTarget();
-                    audioSource.clip = QAudio;
-                    audioSource.Play();
-                }
-
-                if (Input.GetKeyDown(KeyCode.Space))
-                {
-                    if (isBurst)
-                    {
-                        // 元素爆发回合，播放完 video 后才进 animation stage
-                        curCharacter.mono.PlayAudio(AudioType.Burst);
-                        videoPlayer.enabled = true;
-                        videoPlayer.clip = curCharacter.mono.burstVideo;
-                        videoPlayer.Play();
-                        StartCoroutine(CloseVideoAfterPlay(curCharacter.mono.burstVideo.length));
-                    }
-                    else
-                    {
-                        curStage = TurnStage.Animation;
-                        if (isAttackOrSkill)
-                        {
-                            curCharacter.mono.PlayAudio(AudioType.Attack);
-                            selection.ApplyAction(curCharacter.beforeNormalAttack, curCharacter.afterNormalAttack);
-                        }
-                        else
-                        {
-                            curCharacter.mono.PlayAudio(AudioType.Skill);
-                            selection.ApplyAction(curCharacter.beforeSkill, curCharacter.afterSkill);
-                        }
-                    }
-                }
+                if(Input.GetKeyDown(KeyCode.E))
+                    RespondtoKeycodeE();
+                else if (Input.GetKeyDown(KeyCode.Q))
+                    RespondtoKeycodeQ();
+                else if(Input.GetKeyDown(KeyCode.Space))
+                    RespondtoKeycodeSpace();
                 break;
             case TurnStage.Animation:
                 if (turnTime > minTurnTime && cMonos.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.mono.IsPerformanceFinished))
@@ -187,16 +142,21 @@ public class BattleManager : MonoBehaviour
 
         foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
         {
-            if (Input.GetKeyDown(p.Key) && p.Value < characters.Count) {
-                chaDetailActivated = false;
-                ShowCharacterDetail(p.Value);
-                curShowingDetail = p.Value;
-            }
-            if (Input.GetKeyUp(p.Key) && curShowingDetail == p.Value)
-            {
-                characterDetail.SetActive(false);
-                chaDetailActivated = false;
-                curShowingDetail = -1;
+            if (Input.GetKeyDown(p.Key)) {
+                if (characterDetail.activeSelf)
+                {
+                    if (curShowingDetail != p.Value)
+                        ShowCharacterDetail(p.Value);
+                    else
+                    {
+                        characterDetail.SetActive(false);
+                        curShowingDetail = -1;
+                    }
+                }
+                else
+                {
+                    ShowCharacterDetail(p.Value);
+                }
             }
         }
     }
@@ -204,7 +164,7 @@ public class BattleManager : MonoBehaviour
     // Game process
     public void LoadBattle()
     {
-        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.battleFilePath);
+        string jsonString = File.ReadAllText(GlobalInfoHolder.battleFilePath);
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // load json
@@ -219,9 +179,9 @@ public class BattleManager : MonoBehaviour
             enmNames.Add(enm);
         }
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < GlobalInfoHolder.Instance.teamMembers.Length; ++i)
+        for (int i = 0; i < GlobalInfoHolder.teamMembers.Length; ++i)
         {
-            string chaname = GlobalInfoHolder.Instance.teamMembers[i];
+            string chaname = GlobalInfoHolder.teamMembers[i];
             if (chaname == "none")
             {
                 cMonos[i].gameObject.SetActive(false);
@@ -230,12 +190,13 @@ public class BattleManager : MonoBehaviour
             else
             {
                 Character c = new Character(chaname);
+                allCharacters.Add(c);
                 characters.Add(c);
                 c.SetMono(cMonos[i]);
                 runway.AddCreature(c);
             }
         }
-        mystery = GlobalInfoHolder.Instance.mystery;
+        mystery = GlobalInfoHolder.mystery;
     }
 
     public void NextTurn()
@@ -366,6 +327,8 @@ public class BattleManager : MonoBehaviour
     {
         curCharacter.StartBurstTurn();
         BurstSplash(curCharacter.mono);
+        QButton.gameObject.SetActive(false);
+        EButton.gameObject.SetActive(false);
         curCharacter.mono.PlayAudio(AudioType.BurstPrepare);
         if (curCharacter.isBurstTargetEnemy)
             selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.talents.BurstEnemyAction);
@@ -387,9 +350,73 @@ public class BattleManager : MonoBehaviour
             selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.talents.AttackCharacterAction);
     }
 
-    private void TestAndInsertBurst(int i)
+    public void RespondtoKeycodeE()
     {
-        Character c = characters[i];
+        if (curStage != TurnStage.Instruction || !isAttackOrSkill)
+            return;
+        if (skillPoint.IsPointEnough(curCharacter.skillConsumePointCount))
+        {
+            audioSource.clip = EAudio;
+            audioSource.Play();
+            skillPoint.StartConsumePointAnim(curCharacter.skillConsumePointCount);
+            StartCoroutine(ChangeLocalScale(attackRecttrans, Vector3.one, animTime));
+            StartCoroutine(ChangeLocalScale(skillRecttrans, Vector3.one * 1.2f, animTime));
+
+            isAttackOrSkill = false;
+            if (curCharacter.isSkillTargetEnemy)
+                selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.talents.SkillEnemyAction);
+            else
+                selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.talents.SkillCharacterAction);
+        }
+        else
+        {
+            audioSource.clip = error;
+            audioSource.Play();
+        }
+    }
+
+    public void RespondtoKeycodeQ()
+    {
+        if (curStage != TurnStage.Instruction || isAttackOrSkill)
+            return;
+
+        SelectTarget();
+        audioSource.clip = QAudio;
+        audioSource.Play();
+    }
+
+    public void RespondtoKeycodeSpace()
+    {
+        if (curStage != TurnStage.Instruction)
+            return;
+        if (isBurst)
+        {
+            // 元素爆发回合，播放完 video 后才进 animation stage
+            curCharacter.mono.PlayAudio(AudioType.Burst);
+            videoPlayer.enabled = true;
+            videoPlayer.clip = curCharacter.mono.burstVideo;
+            videoPlayer.Play();
+            StartCoroutine(CloseVideoAfterPlay(curCharacter.mono.burstVideo.length));
+        }
+        else
+        {
+            curStage = TurnStage.Animation;
+            if (isAttackOrSkill)
+            {
+                curCharacter.mono.PlayAudio(AudioType.Attack);
+                selection.ApplyAction(curCharacter.beforeNormalAttack, curCharacter.afterNormalAttack);
+            }
+            else
+            {
+                curCharacter.mono.PlayAudio(AudioType.Skill);
+                selection.ApplyAction(curCharacter.beforeSkill, curCharacter.afterSkill);
+            }
+        }
+    }
+
+    public void TestAndInsertBurst(int i)
+    {
+        Character c = allCharacters[i];
         if (c.mono.isBurstActivated || !(c.hp > 0) || c.energy < c.maxEnergy)
             return;
 
@@ -413,13 +440,11 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void ShowCharacterDetail(int x)
+    public void ShowCharacterDetail(int x)
     {
-        if (chaDetailActivated)
-            return;
-        chaDetailActivated = true;
         characterDetail.SetActive(true);
-        characterDetail.GetComponent<CharacterDetailUI>().ShowDetail(characters[x]);
+        curShowingDetail = x;
+        characterDetail.GetComponent<CharacterDetailUI>().ShowDetail(allCharacters[x]);
     }
 
     public void RemoveEnemy(Enemy e)
@@ -497,6 +522,8 @@ public class BattleManager : MonoBehaviour
         curStage = TurnStage.Animation;
         screenCanvas.SetActive(true);
         bgm.Play();
+        QButton.gameObject.SetActive(true);
+        EButton.gameObject.SetActive(true);
     }
 
     IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)
