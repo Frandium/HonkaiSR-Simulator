@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 
-public class BattleNotEnd : AEquipmentTalents
+public class BattleNotEnd : AWeaponTalent
 {
     int refine;
     public BattleNotEnd(JsonData c, int _refine) : base(c)
@@ -18,7 +18,7 @@ public class BattleNotEnd : AEquipmentTalents
         selfEnergy = (float)(double)config["effect"]["selfEnergy"]["value"][refine];
         skilldmgUp = (float)(double)config["effect"]["dmgUp"]["value"][refine];
         character.AddBuff("battleNotEnd", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, selfEnergy);
-        character.onBurst.Add(new TriggerEvent<Character.TalentUponTarget>("battleNotEndBurstPoint", c => { 
+        character.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("battleNotEndBurstPoint", c => { 
             if(c is Character)
             {
                 if (gainSkillPointTurn != BattleManager.Instance.curTurnNumber)
@@ -28,7 +28,7 @@ public class BattleNotEnd : AEquipmentTalents
                 }
             }
         }));
-        character.onSkill.Add(new TriggerEvent<Character.TalentUponTarget>("battleNotEndSkill", c => {
+        character.afterSkill.Add(new TriggerEvent<Character.TalentUponTarget>("battleNotEndSkill", c => {
             foreach(Character cha in BattleManager.Instance.characters)
             {
                 Character thisTurn = cha;
@@ -57,7 +57,7 @@ public class BattleNotEnd : AEquipmentTalents
     public override void OnTakingOff(Character character)
     {
         character.buffs.RemoveAll( b => b.tag == "battleNotEnd");
-        character.onBurst.RemoveAll(t => t.tag == "battleNotEndBurstPoint");
-        character.onSkill.RemoveAll(t => t.tag == "battleNotEndSkillEnergy");
+        character.afterBurst.RemoveAll(t => t.tag == "battleNotEndBurstPoint");
+        character.afterSkill.RemoveAll(t => t.tag == "battleNotEndSkillEnergy");
     }
 }

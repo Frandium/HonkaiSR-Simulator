@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using LitJson;
 
-public class VictoryMoment : AEquipmentTalents
+public class VictoryMoment : AWeaponTalent
 {
     int refine;
     public VictoryMoment(JsonData c, int r) : base(c)

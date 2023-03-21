@@ -110,7 +110,7 @@ public class CharacterConfig
 
     public CharacterConfig(string name)
     {
-        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.characterConfigDir + "/" + name + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.characterConfigDir + "/" + name + ".json");
         JsonData config = JsonMapper.ToObject(jsonString);
         dbname = name;
         level = (int)config["level"];
@@ -140,7 +140,7 @@ public class CharacterConfig
     public void Save()
     {
         FileStream fs;
-        fs = File.Open(GlobalInfoHolder.Instance.characterConfigDir + "/" + dbname + ".json", FileMode.Create);
+        fs = File.Open(GlobalInfoHolder.characterConfigDir + "/" + dbname + ".json", FileMode.Create);
         string content = JsonMapper.ToJson(this);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();

@@ -30,12 +30,15 @@ public class Utils
         "防御力",
         "生命上限",
         "速度",
+        "嘲讽权重",
+        "正数与百分数分界线",
         "暴击率",
         "暴击伤害",
+        "击破特攻",
         "治疗加成",
         "受治疗加成",
+        "造成护盾加成",
         "充能效率",
-        "嘲讽权重",
         "效果命中",
         "效果抵抗",
         "全属性伤害加成",
@@ -61,6 +64,8 @@ public class Utils
         "风属性穿透",
         "量子属性穿透",
         "虚数属性穿透",
+        "无视防御",
+        "减伤",
         "占位符"
     };
 
@@ -93,6 +98,27 @@ public class Utils
         "直接数",
         "占位"
     };
+
+    public static string[] ArtifactPositionName = new string[(int)ArtifactPosition.Count]
+    {
+        "头部",
+        "手部",
+        "躯干",
+        "脚部",
+        "连结绳",
+        "位面球"
+    };
+    
+    public static string[] ArtifactPositionPath = new string[(int)ArtifactPosition.Count]
+    {
+        "head",
+        "hand",
+        "body",
+        "feet",
+        "rope",
+        "ball"
+    };
+
 
     public static bool TwoRandom(float rate)
     {

@@ -21,18 +21,19 @@ public class EditCharacterUI : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        detail.SetChangeable(true);
         ScanCharacters();
     }
 
     public void ScanCharacters()
     {
-        files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.characterDir));
+        files = new List<string>(Directory.GetFiles(GlobalInfoHolder.characterDir));
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         if (files.Count == 0)
             return;
         scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(70 * files.Count, 0);
         // 对所有的角色，在上方的滚动条里 add 一个选项，然后找 Resources 里有没有他的照片，有就add，没有就 fall back 到默认图片
-        for(int i = 0; i < files.Count; ++i)
+        for(int i = 0; i < files.Count; ++i) 
         {
             string s = files[i];
             string dbname = Path.GetFileNameWithoutExtension(s);
@@ -53,7 +54,7 @@ public class EditCharacterUI : MonoBehaviour
     {
         character?.SaveConfig();
         character = new Character(name);
-        detail.ShowDetail(character, true);
+        detail.ShowDetail(character);
     }
 
 
@@ -82,7 +83,7 @@ public class EditCharacterUI : MonoBehaviour
     {
         BattleTemplate bt = new BattleTemplate();
         FileStream fs;
-        fs = File.Open(GlobalInfoHolder.Instance.battleDir + "/" + "default_battle.json", FileMode.OpenOrCreate);
+        fs = File.Open(GlobalInfoHolder.battleDir + "/" + "default_battle.json", FileMode.OpenOrCreate);
         string content = JsonMapper.ToJson(bt);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();
@@ -93,7 +94,7 @@ public class EditCharacterUI : MonoBehaviour
     {
         CharacterConfig c = new CharacterConfig();
         FileStream fs;
-        fs = File.Open(GlobalInfoHolder.Instance.characterConfigDir + "/" + "babara.json", FileMode.OpenOrCreate);
+        fs = File.Open(GlobalInfoHolder.characterConfigDir + "/" + "babara.json", FileMode.OpenOrCreate);
         string content = JsonMapper.ToJson(c);
         fs.Write(Encoding.UTF8.GetBytes(content));
         fs.Close();

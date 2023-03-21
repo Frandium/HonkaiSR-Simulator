@@ -36,7 +36,7 @@ public class Character : Creature
     public new CharacterMono mono { get; protected set; }
     public CharacterConfig config { get; protected set; }
     public Weapon weapon;
-    public List<AEquipmentTalents> artifactsSuit = new List<AEquipmentTalents>();
+    public List<AArtifactTalent> artifactsSuit = new List<AArtifactTalent>();
     public List<Artifact> artifacts = new List<Artifact>((int)ArtifactPosition.Count);
 
     public bool isAttackTargetEnemy { get; protected set; } = true;
@@ -52,9 +52,12 @@ public class Character : Creature
     public float takeDmgGainEnergy { get; protected set; } = 2.5f;
 
     public delegate void TalentUponTarget(Creature target);
-    public List<TriggerEvent<TalentUponTarget>> onNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
-    public List<TriggerEvent<TalentUponTarget>> onSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
-    public List<TriggerEvent<TalentUponTarget>> onBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> beforeNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> afterNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> beforeSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> afterSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> beforeBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
+    public List<TriggerEvent<TalentUponTarget>> afterBurst { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
     public Character() { }
 
     public Character(string _dbname)
@@ -66,7 +69,7 @@ public class Character : Creature
     {
         // 先把之前的脱下来
         weapon?.OnTakingOff(this);
-        foreach(AEquipmentTalents t in artifactsSuit)
+        foreach(AEquipmentTalent t in artifactsSuit)
         {
             t.OnTakingOff(this);
         }
@@ -75,7 +78,7 @@ public class Character : Creature
         config = new CharacterConfig(name);
 
         // Load 角色基本属性
-        string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/characters/" + name + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.characterDir + "/" + name + ".json");
         metaData = JsonMapper.ToObject(jsonString);
 
         // set character template
@@ -86,35 +89,28 @@ public class Character : Creature
     public override void Initialize()
     {
         base.Initialize();
-        onBurst.Clear();
-        onSkill.Clear();
-        onNormalAttack.Clear();
+        afterBurst.Clear();
+        beforeBurst.Clear();
+        afterSkill.Clear();
+        beforeSkill.Clear();
+        afterNormalAttack.Clear();
+        beforeNormalAttack.Clear();
         artifacts.Clear();
         artifactsSuit.Clear();
         additionalAtkLevel = 0;
         additionalBurstLevel = 0;
         additionalSkillLevel = 0;
         additionalTalentLevel = 0;
-        
+
         // 之后改成反射 dict?
-        switch (dbname)
+        talents = dbname switch
         {
-            case "bronya":
-                talents = new Bronya(this);
-                break;
-            case "seele":
-                talents = new Seele(this);
-                break;
-            case "japard":
-                talents = new Japard(this);
-                break;
-            case "tingyun":
-                talents = new Tingyun(this);
-                break;
-            default:
-                talents = new Bronya(this);
-                break;
-        }
+            "bronya" => new Bronya(this),
+            "seele" => new Seele(this),
+            "gepard" => new Gepard(this),
+            "tingyun" => new Tingyun(this),
+            _ => new Bronya(this),
+        };
         talents.OnEquipping();
         base.talents = talents;
 
@@ -191,6 +187,35 @@ public class Character : Creature
             
             artifacts.Add(new Artifact(arti.mainPhrase, arti.vicePhrases));
         }
+        foreach(var p in suitCount)
+        {
+            AArtifactTalent artTalent = p.Key switch
+            {
+                "builderBLBG" => new BuilderBLBG(p.Value),
+                "cloudPassanger" => new CloudPassanger(p.Value),
+                "dawnEagle" => new DawnEagle(p.Value),
+                "electroBand" => new ElectroBand(p.Value),
+                "firesmith" => new FireSmith(p.Value),
+                "galaxyBussiness" => new GalaxyBussiness(p.Value),
+                "holyKnight" => new HolyKnight(p.Value),
+                "iceHunter" => new IceHunter(p.Value),
+                "immortalArk" => new ImmortalArk(p.Value),
+                "lifeVVK" => new LifeVVK(p.Value),
+                "meteorThief" => new MeteorThief(p.Value),
+                "snowGuard" => new SnowGuard(p.Value),
+                "spaceSeal" => new SpaceSeal(p.Value),
+                "starGenius" => new StarGenius(p.Value),
+                "starVariation" => new StarVariation(p.Value),
+                "stoppedSRST" => new StoppedSRST(p.Value),
+                "streetFighter" => new StreetFighter(p.Value),
+                "thiefCountry" => new ThiefCountry(p.Value),
+                "thiefDesert" => new ThiefDesert(p.Value),
+                "wheatGunner" => new WheatGunner(p.Value),
+                _ => new DefaultArtifact(p.Value),
+            };
+            artTalent.OnEquiping(this);
+            artifactsSuit.Add(artTalent);
+        }
 
         hp = GetFinalAttr(CommonAttribute.MaxHP);
     }
@@ -206,13 +231,13 @@ public class Character : Creature
         return base.GetBaseAttr(attr);
     }
 
-    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType)
+    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType, bool forView = false)
     {
-        float res = base.GetFinalAttr(c1, c2, attr, damageType);
-        res += weapon.CalBuffValue(null, null, attr, damageType);
+        float res = base.GetFinalAttr(c1, c2, attr, damageType, forView);
+        res += weapon.CalBuffValue(null, null, attr, damageType, forView);
         foreach(Artifact art in artifacts)
         {
-            res += art.CalBuffValue(this, this, attr, damageType);
+            res += art.CalBuffValue(this, this, attr, damageType, false);
         }
         return res;
     }
@@ -225,7 +250,7 @@ public class Character : Creature
 
     public void ChangeEnergy(float offset)
     {
-        energy += offset;
+        energy += offset * GetFinalAttr(CommonAttribute.EnergyRecharge);
         if (energy > maxEnergy) energy = maxEnergy;
         if (energy < 0) energy = 0;
         mono.UpdateEnergyIcon();
@@ -241,9 +266,12 @@ public class Character : Creature
     public override void EndNormalTurn()
     {
         base.EndNormalTurn();
-        onNormalAttack.RemoveAll(p => p.CountDown());
-        onSkill.RemoveAll(p => p.CountDown());
-        onBurst.RemoveAll(p => p.CountDown());        
+        beforeNormalAttack.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterNormalAttack.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeSkill.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterSkill.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeBurst.RemoveAll(p => p.CountDown(CountDownType.Turn));        
+        afterBurst.RemoveAll(p => p.CountDown(CountDownType.Turn));        
     }
 
     public virtual void StartBurstTurn()
@@ -252,7 +280,7 @@ public class Character : Creature
         {
             p.trigger();
         }
-        onTurnStart.RemoveAll(p => p.CountDown());
+        onTurnStart.RemoveAll(p => p.CountDown(CountDownType.Turn));
         mono?.StartMyTurn();
     }
 
@@ -263,12 +291,12 @@ public class Character : Creature
         {
             p.trigger();
         }
-        onTurnEnd.RemoveAll(p => p.CountDown());
+        onTurnEnd.RemoveAll(p => p.CountDown(CountDownType.Turn));
 
         // Remove Buff
         for (int i = buffs.Count - 1; i >= 0; --i)
         {
-            if (buffs[i].CountDown())
+            if (buffs[i].CountDown(CountDownType.Turn))
             {
                 Utils.valueBuffPool.ReturnOne(buffs[i]);
                 buffs.RemoveAt(i);
@@ -276,10 +304,10 @@ public class Character : Creature
         }
 
         // Remove shields
-        shields.RemoveAll(s => s.CountDown());
+        shields.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
         // Remove states
-        states.RemoveAll(s => s.CountDown());
+        states.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
         mono?.EndBurstTurn();
     }

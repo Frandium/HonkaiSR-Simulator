@@ -33,7 +33,7 @@ public class Bronya : ACharacterTalents
         burstCrtDmgIns = (float)(double)self.metaData["burst"]["crtDmgIns"]["value"][self.burstLevel];
         burstCrtDmgPct = (float)(double)self.metaData["burst"]["crtDmgPct"]["value"][self.burstLevel];
         locationUp = (float)(double)self.metaData["talent"]["location"]["value"][self.talentLevel];
-        self.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
+        self.afterNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("talent", e =>
         {
             talent_activated = true;
             self.mono?.ShowMessage("行动提前", Color.green);
@@ -54,7 +54,7 @@ public class Bronya : ACharacterTalents
         }));
         if (self.constellaLevel >= 1)
         {
-            self.onSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
+            self.afterSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
             {
                 if (!isC1CD && Utils.TwoRandom(.5f))
                 {
@@ -100,10 +100,10 @@ public class Bronya : ACharacterTalents
         foreach(Character c in characters)
         {
             c.AddBuff("bronyaBurstATK", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, burstAtkUp, 2);
-            c.AddBuff(Utils.valueBuffPool.GetOne().Set("bronyaBurstCrtDmg", BuffType.Buff, CommonAttribute.CriticalDamage, 2, (s, t, _) =>
+            c.AddBuff(Utils.valueBuffPool.GetOne().Set("bronyaBurstCrtDmg", BuffType.Buff, CommonAttribute.CriticalDamage, (s, t, _) =>
             {
                 return burstCrtDmgIns + self.GetBaseAttr(CommonAttribute.CriticalDamage) * burstCrtDmgPct;
-            }));
+            }, 2));
             c.mono?.ShowMessage("攻击提升", Color.green);
             c.mono?.ShowMessage("暴击伤害提升", Color.green);
         }
@@ -118,7 +118,7 @@ public class Bronya : ACharacterTalents
         }
     }
 
-    public override void OnBattleStart(List<Character> characters, List<Enemy> enemies)
+    public override void OnBattleStart(List<Character> characters)
     {
         foreach(Character c in characters)
         {
@@ -130,7 +130,7 @@ public class Bronya : ACharacterTalents
             }
             if(self.constellaLevel >= 4 && c != self)
             {
-                c.onNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstalltion4", t =>
+                c.afterNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstalltion4", t =>
                 {
                     if(t is Enemy)
                     {
@@ -139,6 +139,7 @@ public class Bronya : ACharacterTalents
                         {
                             Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
                             dmg.value *= .8f;
+                            dmg.type = DamageType.CoAttack;
                             e.TakeDamage(self, dmg);
                         }
                     }

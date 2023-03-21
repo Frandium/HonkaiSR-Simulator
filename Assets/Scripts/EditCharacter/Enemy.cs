@@ -12,6 +12,9 @@ public class Enemy : Creature
     public float weakMaxHp { get; protected set; } = 100;
     public float weakHp { get; protected set; } = 100;
 
+    public delegate void OnBreak(Creature source, Damage dmg);
+    public List<TriggerEvent<OnBreak>> onBreak { get; protected set; } = new List<TriggerEvent<OnBreak>>();
+
     public void SetMono(EnemyMono m)
     {
         mono = m;
@@ -29,7 +32,7 @@ public class Enemy : Creature
     {
         dbname = name;
         // Load 角色基本属性
-        string jsonString = File.ReadAllText(GlobalInfoHolder.Instance.enemyDir + "/" + dbname + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + dbname + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
 
         // set character template
@@ -77,8 +80,18 @@ public class Enemy : Creature
                 mono?.ShowMessage("击退25%", Color.green);
                 mono?.ShowMessage("减防30%", Color.green);
                 AddBuff("breakDefDown", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, -.3f);
+                foreach(var t in onBreak)
+                {
+                    t.trigger(source, damage);
+                }
             }
         }
         base.TakeDamage(source, damage);
+    }
+
+    public override void EndNormalTurn()
+    {
+        base.EndNormalTurn();
+        onBreak.RemoveAll(t => t.CountDown(CountDownType.Turn));
     }
 }

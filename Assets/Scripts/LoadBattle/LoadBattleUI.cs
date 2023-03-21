@@ -43,13 +43,13 @@ public class LoadBattleUI : MonoBehaviour
             teamCharacter[i].ClearOptions();
             teamCharacter[i].AddOptions(chaDisname);
             teamCharacter[i].SetValueWithoutNotify(chaDisname.Count - 1);
-            GlobalInfoHolder.Instance.teamMembers[i] = "none";
+            GlobalInfoHolder.teamMembers[i] = "none";
             teamCharacter[i].onValueChanged.AddListener(ci =>
             {
                 string newName = chaDbname[ci];
-                GlobalInfoHolder.Instance.teamMembers[idx] = newName;
+                GlobalInfoHolder.teamMembers[idx] = newName;
                 List<string> mysteryOptions = new();
-                foreach(string name in GlobalInfoHolder.Instance.teamMembers)
+                foreach(string name in GlobalInfoHolder.teamMembers)
                 {
                     if (name == "none")
                         continue;
@@ -61,7 +61,7 @@ public class LoadBattleUI : MonoBehaviour
                 mysteryList.AddOptions(mysteryOptions);
                 OnMysterySelected(0);
 
-                List<string> chas = new List<string>(GlobalInfoHolder.Instance.teamMembers);
+                List<string> chas = new List<string>(GlobalInfoHolder.teamMembers);
                 chas.RemoveAll(s => s == "none");
                 if(chas.Count == 0)
                 {
@@ -105,7 +105,7 @@ public class LoadBattleUI : MonoBehaviour
     public void ScanBattles()
     {
         battleList.ClearOptions();
-        files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.battleDir));
+        files = new List<string>(Directory.GetFiles(GlobalInfoHolder.battleDir));
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         if (files.Count == 0)
             return;
@@ -124,7 +124,7 @@ public class LoadBattleUI : MonoBehaviour
     public void OnBattleSelected(int o)
     {
         string file = files[o];
-        GlobalInfoHolder.Instance.battleFilePath = file;
+        GlobalInfoHolder.battleFilePath = file;
         string jsonString = File.ReadAllText(file);
         JsonData data = JsonMapper.ToObject(jsonString);
 
@@ -135,7 +135,7 @@ public class LoadBattleUI : MonoBehaviour
             s += "\nµÚ" + (i + 1) + "²¨£º ";
             for (int j = 0; j < data["enemies"][i].Count; ++j)
             {
-                JsonData d = JsonMapper.ToObject(File.ReadAllText(GlobalInfoHolder.Instance.enemyDir + "/" + (string)data["enemies"][i][j] + ".json"));
+                JsonData d = JsonMapper.ToObject(File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + (string)data["enemies"][i][j] + ".json"));
                 string disname = (string)d["disname"];
                 s += disname + "£¬ ";
             }
@@ -145,10 +145,10 @@ public class LoadBattleUI : MonoBehaviour
 
     public void OnMysterySelected(int o)
     {
-        if (o >= GlobalInfoHolder.Instance.teamMembers.Length)
-            GlobalInfoHolder.Instance.mystery = "none";
+        if (o >= GlobalInfoHolder.teamMembers.Length)
+            GlobalInfoHolder.mystery = "none";
         else
-            GlobalInfoHolder.Instance.mystery = GlobalInfoHolder.Instance.teamMembers[o];
+            GlobalInfoHolder.mystery = GlobalInfoHolder.teamMembers[o];
     }
 
     public GameObject cover;

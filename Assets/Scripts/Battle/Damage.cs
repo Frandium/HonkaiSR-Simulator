@@ -6,7 +6,7 @@ public class Damage
 {
     public float value { get; set; }
     public Element element { get; protected set; }
-    public DamageType type { get; protected set; }
+    public DamageType type { get; set; }
     public bool isCritical { get; protected set; }
 
     public Damage(float v, Element e, DamageType t, bool b)
@@ -32,14 +32,16 @@ public class Damage
         }
 
         float def = target.GetFinalAttr(source, target, CommonAttribute.DEF, damageType);
-        float defRate = 1 - def / (def + 2000);
+        float defIgnore = source.GetFinalAttr(source, target, CommonAttribute.DEFIgnore, damageType);
+        def *= (1 - defIgnore);
+        float defRate = 1 - def / (def + 200 + source.level * 10);
         float overallResist = 1 
             - target.GetFinalAttr(source, target, CommonAttribute.PhysicalResist + (int)element, damageType) 
             - target.GetFinalAttr(source, target, CommonAttribute.GeneralResist, damageType);
         if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
         if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
         overallResist -= source.GetFinalAttr(CommonAttribute.PhysicalPenetrate + (int)element);
-        dmg *= overallResist * defRate;
+        dmg *= overallResist * defRate * (1 - target.GetFinalAttr(CommonAttribute.DmgDown));
         return new Damage(dmg, element, damageType, critical);
     }
 

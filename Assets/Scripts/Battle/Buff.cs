@@ -10,7 +10,7 @@ public enum BuffType
     Count
 }
 
-public class Buff : AProgressWithTurn
+public class Buff : ACountDownBehaviour
 {
     // 可以做到高度可配置，一个 value buff 应该包含 收益属性、源属性、收益数值、源 min、源 max，目标 min，目标 max，过滤器、持续回合。
     public CommonAttribute targetAttribute { get; protected set; } = CommonAttribute.Count; // 收益属性
@@ -21,23 +21,9 @@ public class Buff : AProgressWithTurn
     
     public delegate float BuffContent(Creature source, Creature target, DamageType damageType);
 
-    public Buff(): base("default", int.MaxValue)
+    public Buff(): base("default", CountDownType.All, int.MaxValue, int.MaxValue)
     {
 
-    }
-
-    public Buff Set(SimpleValueBuff s)
-    {
-        buffType = BuffType.Permanent;
-        targetAttribute = s.attribute;
-        content = (c, e, t) =>
-        {
-            if (s.type == ValueType.InstantNumber)
-                return s.value;
-            float b = c.GetBaseAttr(s.attribute);
-            return b * s.value;
-        };
-        return this;
     }
 
     public Buff Set(PhraseConfig p)
@@ -54,22 +40,27 @@ public class Buff : AProgressWithTurn
         return this;
     }
 
-    public Buff Set(string _tag, BuffType type, CommonAttribute target_att, int _duration, BuffContent c)
+    public Buff Set(string _tag, BuffType type, CommonAttribute target_att, BuffContent c, int turntime = int.MaxValue,
+        CountDownType _ctype = CountDownType.Turn, int triggertime = int.MaxValue)
     {
         tag = _tag;
         buffType = type;
         targetAttribute = target_att;
-        times = _duration;
+
+        ctype = _ctype;
+        _turnTimes = turntime;
+        _triggerTimes = triggertime;
+
         content = c;
         return this;
     }
 
 
-    public override bool CountDown()
+    public override bool CountDown(CountDownType ct)
     {
         if (buffType == BuffType.Permanent)
             return false;
-        return base.CountDown();
+        return base.CountDown(ct);
     }
 
 
@@ -77,7 +68,8 @@ public class Buff : AProgressWithTurn
     {
         if (targetAttribute != attr)
             return 0;
-        return content(source, target, damageType);
+        float res = content(source, target, damageType);
+        return res;
     }
 
 }

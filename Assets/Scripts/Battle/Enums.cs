@@ -31,6 +31,7 @@ public enum Career
 public enum StateType
 {
     Frozen,   // 冻结 = 0
+    Restricted, // 禁锢 = 1
     Count
 }
 
@@ -38,11 +39,11 @@ public enum StateType
 public enum ArtifactPosition
 {
     Head,  // 头
-    Neck,  // 颈
-    Body,  // 身体
     Hand,  // 手
+    Body,  // 驱赶
     Foot,  // 脚
-    Stuff, // 饰品
+    Rope,  // 连结绳
+    Ball, // 位面球
     Count
 }
 
@@ -53,37 +54,42 @@ public enum CommonAttribute
     DEF, // 防御 = 1
     MaxHP, // 生命上限 = 2
     Speed, // 速度 = 3
-    CriticalRate, // 暴击率 = 4
-    CriticalDamage,  //暴击伤害 = 5
-    HealBonus,  // 治疗加成 = 6
-    HealedBonus, // 受治疗加成 = 7
-    EnergyRecharge, // 充能效率 = 8
-    Taunt, // 嘲讽权重 = 9
-    EffectHit, // 效果命中 = 10
-    EffectResist, // 效果抵抗 = 11
-    GeneralBonus, // 通用伤害加成 = 12
-    PhysicalBonus, // 物理伤害加成 = 13
-    PyroBonus, // 火元素伤害加成 = 14
-    CryoBonus, // 冰元素伤害加成 = 15
-    ElectroBonus, // 雷元素伤害加成 = 16
-    AnemoBonus, // 风元素伤害加成 = 17
-    QuantusBonus, // 量子伤害加成 = 18
-    ImaginaryBonus,  // 虚数伤害加成 = 19
-    GeneralResist, // 通用抗性 = 20
-    PhysicalResist, // 物理抗性 = 21
-    PyroResist, // 火抗性 = 22
-    CryoResist,  // 冰抗 = 23
-    ElectroResist,  // 雷抗 = 24
-    AnemoResist, // 风抗 = 25
-    QuantusResist, // 量子抗性 = 26
-    ImaginaryResist, // 虚数抗性 = 27
-    PhysicalPenetrate, // 物理穿透 = 28
-    PyroPenetrate,// 火元素穿透 = 28
-    CryoPenetrate,// 冰元素穿透 = 28
-    ElectroPenetrate,// 雷元素穿透 = 28
-    AmenoPenetrate,// 风元素穿透 = 28
-    QuantusPenetrate,// 量子穿透 = 28
-    ImaginaryPenetrate,// 虚数穿透 = 28
+    Taunt, // 嘲讽权重 = 4
+    InstantNumberPercentageDividing, // 分界线
+    CriticalRate, // 暴击率 = 5
+    CriticalDamage,  //暴击伤害 = 6
+    BreakBonus, // 击破特攻 = 7
+    HealBonus,  // 治疗加成 = 8
+    HealedBonus, // 受治疗加成 = 9
+    ShieldBonus, // 造成护盾强效 = 10
+    EnergyRecharge, // 充能效率 = 11
+    EffectHit, // 效果命中 = 12
+    EffectResist, // 效果抵抗 = 12
+    GeneralBonus, // 通用伤害加成 = 13
+    PhysicalBonus, // 物理伤害加成 = 14
+    PyroBonus, // 火元素伤害加成 = 15
+    CryoBonus, // 冰元素伤害加成 = 16
+    ElectroBonus, // 雷元素伤害加成 = 17
+    AnemoBonus, // 风元素伤害加成 = 18
+    QuantusBonus, // 量子伤害加成 = 19
+    ImaginaryBonus,  // 虚数伤害加成 = 20
+    GeneralResist, // 通用抗性 = 21
+    PhysicalResist, // 物理抗性 = 22
+    PyroResist, // 火抗性 = 23
+    CryoResist,  // 冰抗 = 24
+    ElectroResist,  // 雷抗 = 25
+    AnemoResist, // 风抗 = 26
+    QuantusResist, // 量子抗性 = 27
+    ImaginaryResist, // 虚数抗性 = 28
+    PhysicalPenetrate, // 物理穿透 = 29
+    PyroPenetrate,// 火元素穿透 = 30
+    CryoPenetrate,// 冰元素穿透 = 31
+    ElectroPenetrate,// 雷元素穿透 = 32
+    AmenoPenetrate,// 风元素穿透 = 33
+    QuantusPenetrate,// 量子穿透 = 34
+    ImaginaryPenetrate,// 虚数穿透 = 35
+    DEFIgnore, // 无视防御
+    DmgDown, // 减伤
     Count // = 28
 }
 
@@ -122,7 +128,9 @@ public enum DamageType
     Skill,
     Burst,
     Continue,
+    Additional,
     All,
+    CoAttack,
     Count
 }
 

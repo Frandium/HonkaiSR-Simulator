@@ -4,22 +4,25 @@ using UnityEngine;
 using LitJson;
 using System.IO;
 
+
 public class ArtifactDescription
 {
     public string dbname { get; protected set; }
     public string disname { get; protected set; }
     public string two { get; protected set; }
     public string four { get; protected set; }
+    public bool isOrnament { get; protected set; }
 
     public ArtifactDescription(string _dbname)
     {
-        string jsonString = File.ReadAllText(Application.streamingAssetsPath + "/artifacts/" + _dbname + ".json");
+        string jsonString = File.ReadAllText(GlobalInfoHolder.artifactsDir + "/" + _dbname + ".json");
         JsonData data = JsonMapper.ToObject(jsonString);
 
         dbname = _dbname;
         disname = (string)data["disname"];
         two = (string)data["two"];
         four = (string)data["four"];
+        isOrnament = (bool)data["isOrnament"];
     }
 
     public static Dictionary<string, ArtifactDescription> artifacts;
@@ -30,7 +33,7 @@ public class ArtifactDescription
             return artifacts;
 
         artifacts = new Dictionary<string, ArtifactDescription>();
-        List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.Instance.artifactsDir));
+        List<string> files = new List<string>(Directory.GetFiles(GlobalInfoHolder.artifactsDir));
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         foreach (string s in files)
         {

@@ -13,4 +13,9 @@ public abstract class AEnemyTalents: ACommomBattleTalents
     {
 
     }
+
+    public virtual void OnBattleStart(List<Character> characters, List<Enemy> enemies)
+    {
+
+    }
 }

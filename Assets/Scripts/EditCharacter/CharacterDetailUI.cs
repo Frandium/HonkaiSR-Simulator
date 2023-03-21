@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class CharacterDetailUI : MonoBehaviour
 {
-    List<string> artifactDisnames;
-    List<string> artifactDbnames;
+    List<string> artifactNormalDisnames;
+    List<string> artifactOrnamentDisnames;
+    List<string> artifactNormalDbnames;
+    List<string> artifactOrnamentDbnames;
     List<string> attributes;
     List<string> valueTypes;
     List<string> weaponDbnames;
@@ -109,15 +111,22 @@ public class CharacterDetailUI : MonoBehaviour
         });
 
 
-        artifactDisnames = new List<string>();
+        artifactOrnamentDbnames = new List<string>();
+        artifactOrnamentDisnames = new List<string>();
+        artifactNormalDbnames = new List<string>();
+        artifactNormalDisnames = new List<string>();
         foreach (var v in ArtifactDescription.GetAllArtifactSuits().Values)
         {
-            artifactDisnames.Add(v.disname);
-        }
-        artifactDbnames = new List<string>();
-        foreach (var v in ArtifactDescription.GetAllArtifactSuits().Values)
-        {
-            artifactDbnames.Add(v.dbname);
+            if (v.isOrnament)
+            {
+                artifactOrnamentDisnames.Add(v.disname);
+                artifactOrnamentDbnames.Add(v.dbname);
+            }
+            else
+            {
+                artifactNormalDisnames.Add(v.disname);
+                artifactNormalDbnames.Add(v.dbname);
+            }
         }
         attributes = new List<string>(Utils.attributeNames);
         attributes.RemoveAt(Utils.attributeNames.Length - 1);
@@ -131,12 +140,18 @@ public class CharacterDetailUI : MonoBehaviour
             Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
             InputField[] inputFields = art.GetComponentsInChildren<InputField>();
             dropdowns[0].ClearOptions();
-            dropdowns[0].AddOptions(artifactDisnames);
+            if (i < (int)ArtifactPosition.Rope)
+                dropdowns[0].AddOptions(artifactNormalDisnames);
+            else
+                dropdowns[0].AddOptions(artifactOrnamentDisnames);
+
             int num = i;
             dropdowns[0].onValueChanged.AddListener(v => {
-                Debug.Log("i = " + num);
-                Debug.Log("v = " + v);
-                curCharacter.config.artifacts[num].suitName = artifactDbnames[v];
+                if(num < (int) ArtifactPosition.Rope)
+                    curCharacter.config.artifacts[num].suitName = artifactNormalDbnames[v];
+                else
+                    curCharacter.config.artifacts[num].suitName = artifactOrnamentDbnames[v];
+                Refresh();
             });
 
             for (int j = 1; j <= 10; j += 2)
@@ -188,25 +203,49 @@ public class CharacterDetailUI : MonoBehaviour
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
+                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage ||
+                        curCharacter.config.artifacts[num].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
+                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s) / 100;
+                        else
+                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
                     });
                 }
                 else
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
+                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage || 
+                        curCharacter.config.artifacts[num].vicePhrases[num2 - 1].attr > CommonAttribute.InstantNumberPercentageDividing)
+                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s) / 100;
+                        else
+                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
                     });
                 }
             }
         }
     }
 
-    public void ShowDetail(Character c, bool _enableChange = false)
+    public void SetChangeable(bool changeable)
+    {
+        enableChange = changeable;
+        saveArtifacts.onClick.RemoveAllListeners();
+        if (!changeable)
+        {
+            saveArtifacts.onClick.AddListener(() =>
+            {
+                gameObject.SetActive(false);
+            });
+            saveArtifacts.GetComponentInChildren<Text>().text = "关闭页面";
+        }
+        else
+        {
+            saveArtifacts.onClick.AddListener(() => Refresh());
+        }
+    }
+
+    public void ShowDetail(Character c)
     {
         curCharacter = c;
-        enableChange = _enableChange;
-        saveArtifacts.interactable = enableChange;
 
         background.sprite = Resources.Load<Sprite>(c.dbname + "/splash");
         Text[] texts;
@@ -232,18 +271,41 @@ public class CharacterDetailUI : MonoBehaviour
         {
             Destroy(attrScroll.transform.GetChild(i).gameObject);
         }
-        for (int i = 0; i < (int)CommonAttribute.Count; ++i)
+        // 护盾，位置
+        GameObject posAttr = Instantiate(attrLine, attrScroll.transform);
+        posAttr.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -15);
+        posAttr.GetComponent<Image>().color = attrLineColor[1];
+        posAttr.name = "position";
+        texts = posAttr.GetComponentsInChildren<Text>();
+        texts[0].text = "位置：" + c.location;
+        texts[1].text = "距离终点还要 <color=green>" + 
+            Mathf.CeilToInt((Runway.Length - c.location) / c.GetFinalAttr(CommonAttribute.Speed, true)) + 
+            "</color> 次前进";
+        for (int i = 0; i < (int)CommonAttribute.InstantNumberPercentageDividing; ++i)
         {
             string attrName = Utils.attributeNames[i];
             GameObject go = Instantiate(attrLine, attrScroll.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 15);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 45);
             go.GetComponent<Image>().color = attrLineColor[i % 3];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
             texts[0].text = attrName;
             float b = c.GetBaseAttr((CommonAttribute)i);
-            float f = c.GetFinalAttr((CommonAttribute)i);
-            texts[1].text = b + " + <color=green>" + (f - b) + "</color> = " + (f);
+            float f = c.GetFinalAttr((CommonAttribute)i, true);
+            texts[1].text = b + " + <color=green>" + (f - b) + "</color> = " + f;
+        }
+        for (int i = (int)CommonAttribute.InstantNumberPercentageDividing + 1; i < (int)CommonAttribute.Count; ++i)
+        {
+            string attrName = Utils.attributeNames[i];
+            GameObject go = Instantiate(attrLine, attrScroll.transform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i -15);
+            go.GetComponent<Image>().color = attrLineColor[i % 3];
+            go.name = attrName;
+            texts = go.GetComponentsInChildren<Text>();
+            texts[0].text = attrName;
+            float b = c.GetBaseAttr((CommonAttribute)i);
+            float f = c.GetFinalAttr((CommonAttribute)i, true);
+            texts[1].text = b * 100 + " + <color=green>" + (f - b) * 100 + "</color> = " + f * 100 + "%";
         }
 
         // Talent 页面
@@ -349,7 +411,7 @@ public class CharacterDetailUI : MonoBehaviour
         {
             constellaItems[i].GetComponentInChildren<Image>().sprite = Resources.Load<Sprite>(c.dbname + "/c" + i);
             texts = constellaItems[i].GetComponentsInChildren<Text>();
-            constellaItems[i].GetComponentInChildren<Button>().interactable = _enableChange;
+            constellaItems[i].GetComponentInChildren<Button>().interactable = enableChange;
             bool activated = c.constellaLevel >= i + 1;
             texts[0].text = (string)c.metaData["constellation"][i]["name"] + (activated? "" : "  未激活");
             texts[0].color = activated ? Color.black : Color.grey;
@@ -365,21 +427,27 @@ public class CharacterDetailUI : MonoBehaviour
         Dictionary<string, int> suitCount = new Dictionary<string, int>();
         for (int i = 0; i < artifactInfos.Length; ++i)
         {
-            if (!suitCount.ContainsKey(c.config.artifacts[i].suitName))
+            string suitName = c.config.artifacts[i].suitName;
+            if (!suitCount.ContainsKey(suitName))
             {
-                suitCount[c.config.artifacts[i].suitName] = 0;
+                suitCount[suitName] = 0;
             }
-            suitCount[c.config.artifacts[i].suitName]++;
+            suitCount[suitName]++;
             GameObject art = artifactInfos[i];
+            imgs = art.GetComponentsInChildren<Image>();
+            art.GetComponentInChildren<Text>().text = Utils.ArtifactPositionName[(int)c.config.artifacts[i].position];
             Dropdown[] dropdowns = art.GetComponentsInChildren<Dropdown>();
             InputField[] inputFields = art.GetComponentsInChildren<InputField>();
-            dropdowns[0].SetValueWithoutNotify(artifactDbnames.IndexOf(c.config.artifacts[i].suitName));
-            dropdowns[0].interactable = _enableChange;
-
+            if(i < (int)ArtifactPosition.Rope)
+                dropdowns[0].SetValueWithoutNotify(artifactNormalDbnames.IndexOf(suitName));
+            else
+                dropdowns[0].SetValueWithoutNotify(artifactOrnamentDbnames.IndexOf(suitName));
+            dropdowns[0].interactable = enableChange;
+            imgs[2].sprite = Resources.Load<Sprite>("artifacts/" + suitName + "/" + Utils.ArtifactPositionPath[(int)c.config.artifacts[i].position]);
 
             for (int j = 1; j <= 10; j += 2)
             {
-                dropdowns[j].interactable = _enableChange;
+                dropdowns[j].interactable = enableChange;
                 if (j == 1)
                     dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.attr);
                 else
@@ -388,7 +456,7 @@ public class CharacterDetailUI : MonoBehaviour
 
             for (int j = 2; j <= 10; j += 2)
             {
-                dropdowns[j].interactable = _enableChange;
+                dropdowns[j].interactable = enableChange;
                 if (j == 2)
                     dropdowns[j].SetValueWithoutNotify((int)c.config.artifacts[i].mainPhrase.type);
                 else
@@ -397,11 +465,23 @@ public class CharacterDetailUI : MonoBehaviour
 
             for (int j = 0; j < 5; ++j)
             {
-                inputFields[j].interactable = _enableChange;
+                inputFields[j].interactable = enableChange;
+                double toshow;
                 if (j == 0)
-                    inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].mainPhrase.value.ToString());
+                {
+                    toshow = c.config.artifacts[i].mainPhrase.value;
+                    if (c.config.artifacts[i].mainPhrase.type == ValueType.Percentage || 
+                        c.config.artifacts[i].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
+                        toshow *= 100;
+                }
                 else
-                    inputFields[j].SetTextWithoutNotify(c.config.artifacts[i].vicePhrases[j - 1].value.ToString());
+                {
+                    toshow = c.config.artifacts[i].vicePhrases[j - 1].value;
+                    if (c.config.artifacts[i].vicePhrases[j - 1].type == ValueType.Percentage || 
+                        c.config.artifacts[i].vicePhrases[j - 1].attr > CommonAttribute.InstantNumberPercentageDividing)
+                        toshow *= 100;
+                }
+                inputFields[j].SetTextWithoutNotify(toshow.ToString());
             }
         }
         string suittext = "套装效果\n\n";
@@ -422,8 +502,7 @@ public class CharacterDetailUI : MonoBehaviour
             suittext += "4件套：" + ad.four + "</color>\n";
             suittext += "\n";
         }
-        suittext += "\n<color=red>*遗器套装效果暂未实装*</color>";
-        suittext += "\n<color=red>*遗器配置须点击左下角按钮保存*</color>";
+        suittext += "\n<color=red>*遗器数值须点击左下角按钮保存*</color>";
         artiSuitInfo.text = suittext;
 
         // Buff 界面
@@ -433,7 +512,7 @@ public class CharacterDetailUI : MonoBehaviour
         {
             Destroy(buffContent.transform.GetChild(i).gameObject);
         }
-        for(int i = 0; i < c.buffs.Count; ++i)
+        for (int i = 0; i < c.buffs.Count; ++i)
         {
             Buff b = c.buffs[i];
             string attrName = b.tag;
@@ -442,11 +521,43 @@ public class CharacterDetailUI : MonoBehaviour
             go.GetComponent<Image>().color = attrLineColor[i % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
-            texts[0].text = attrName + " " + b.buffType + " " + Utils.attributeNames[(int)b.targetAttribute];
+            texts[0].text = attrName;
+            if (b.buffType != BuffType.Permanent)
+                texts[0].text += " " + b.buffType;
+            texts[0].text += " " + Utils.attributeNames[(int)b.targetAttribute];
             if (b.buffType == BuffType.Permanent)
-                texts[1].text = "永久";
+                texts[1].text = "固有";
             else
-                texts[1].text = "剩余 <color=#80f>" +  b.times + "</color> 回合";
+            {
+                if (b.ctype == CountDownType.Permanent)
+                {
+                    texts[1].text = "永久";
+                }
+                else
+                {
+                    texts[1].text = "剩余";
+                    if (b.ctype == CountDownType.Trigger || b.ctype == CountDownType.All)
+                        texts[1].text += " <color=#80f>" + b._triggerTimes + "</color> 次";
+                    if (b.ctype == CountDownType.Turn || b.ctype == CountDownType.All)
+                        texts[1].text += " <color=#80f>" + b._turnTimes + "</color> 回合";
+                }
+            }
+        }
+        for (int i = 0; i < c.shields.Count; ++i)
+        {
+            Shield s = c.shields[i];
+            string attrName = s.tag;
+            GameObject go = Instantiate(attrLine, buffContent.transform);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * (i + c.buffs.Count) - 15);
+            go.GetComponent<Image>().color = attrLineColor[(i + c.buffs.Count) % 2];
+            go.name = attrName;
+            texts = go.GetComponentsInChildren<Text>();
+            texts[0].text = attrName + " " + s.hp;
+            texts[1].text = "剩余";
+            if (s.ctype == CountDownType.Trigger || s.ctype == CountDownType.All)
+                texts[1].text += " <color=#80f>" + s._triggerTimes + "</color> 次";
+            if (s.ctype == CountDownType.Turn || s.ctype == CountDownType.All)
+                texts[1].text += " <color=#80f>" + s._turnTimes + "</color> 回合";
         }
     }
 
@@ -487,7 +598,7 @@ public class CharacterDetailUI : MonoBehaviour
     public void Refresh()
     {
         curCharacter.SaveConfig();
-        ShowDetail(curCharacter, enableChange);
+        ShowDetail(curCharacter);
     }
 
     public void ChangeTalentLevel(Slider slider)
