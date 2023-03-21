@@ -6,7 +6,7 @@ public class Damage
 {
     public float value { get; set; }
     public Element element { get; protected set; }
-    public DamageType type { get; protected set; }
+    public DamageType type { get; set; }
     public bool isCritical { get; protected set; }
 
     public Damage(float v, Element e, DamageType t, bool b)

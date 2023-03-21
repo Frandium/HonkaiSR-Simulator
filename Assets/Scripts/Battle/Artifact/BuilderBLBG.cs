@@ -17,7 +17,7 @@ public class BuilderBLBG : AArtifactTalent
         character.AddBuff(Utils.valueBuffPool.GetOne().Set("builderBLBG2Cond", BuffType.Permanent, CommonAttribute.DEF, (s, t, d) => {
             if (character.GetFinalAttr(CommonAttribute.EffectHit) >= .5f)
             {
-                return .15f;
+                return character.GetBaseAttr(CommonAttribute.DEF) * .15f;
             }
             return 0;
         }));

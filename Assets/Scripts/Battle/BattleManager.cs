@@ -442,6 +442,8 @@ public class BattleManager : MonoBehaviour
 
     public void ShowCharacterDetail(int x)
     {
+        if (x >= allCharacters.Count)
+            return;
         characterDetail.SetActive(true);
         curShowingDetail = x;
         characterDetail.GetComponent<CharacterDetailUI>().ShowDetail(allCharacters[x]);

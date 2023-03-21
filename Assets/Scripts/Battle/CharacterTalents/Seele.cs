@@ -124,9 +124,13 @@ public class Seele : ACharacterTalents
         if (self.constellaLevel >= 6)
         {
             e.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleConstellation6ExtraDamage", (s, d) => {
-                Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, burstDmg, DamageType.Burst);
-                dmg.value *= .18f;
-                e.TakeDamage(self, dmg);
+                if (d.type != DamageType.CoAttack)
+                {
+                    Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, burstDmg, DamageType.Burst);
+                    dmg.value *= .18f;
+                    dmg.type = DamageType.CoAttack;
+                    e.TakeDamage(self, dmg);
+                }
                 return d;
             }, 1));
         }

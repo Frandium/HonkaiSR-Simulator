@@ -130,6 +130,7 @@ public enum DamageType
     Continue,
     Additional,
     All,
+    CoAttack,
     Count
 }
 

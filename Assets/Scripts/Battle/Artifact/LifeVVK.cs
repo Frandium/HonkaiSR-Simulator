@@ -13,7 +13,7 @@ public class LifeVVK : AArtifactTalent
     {
         if (count < 2)
             return;
-        character.AddBuff("lifeVVK2", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, .5f);
+        character.AddBuff("lifeVVK2", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, .05f);
     }
 
     public override void OnBattleStart(Character self, List<Character> characters)

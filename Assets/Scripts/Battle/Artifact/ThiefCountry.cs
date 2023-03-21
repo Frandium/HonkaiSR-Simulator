@@ -17,7 +17,7 @@ public class ThiefCountry : AArtifactTalent
         character.AddBuff(Utils.valueBuffPool.GetOne().Set("thiefCountry2Cond", BuffType.Permanent, CommonAttribute.BreakBonus, (s, t, d) => {
             if (character.GetFinalAttr(CommonAttribute.Speed) >= 145)
             {
-                return .28f * character.GetBaseAttr(CommonAttribute.BreakBonus);
+                return .28f;
             }
             return 0;
         }, _ctype: CountDownType.Permanent));

@@ -228,14 +228,18 @@ public class CharacterDetailUI : MonoBehaviour
     public void SetChangeable(bool changeable)
     {
         enableChange = changeable;
+        saveArtifacts.onClick.RemoveAllListeners();
         if (!changeable)
         {
-            saveArtifacts.onClick.RemoveAllListeners();
             saveArtifacts.onClick.AddListener(() =>
             {
                 gameObject.SetActive(false);
             });
             saveArtifacts.GetComponentInChildren<Text>().text = "关闭页面";
+        }
+        else
+        {
+            saveArtifacts.onClick.AddListener(() => Refresh());
         }
     }
 
@@ -275,7 +279,7 @@ public class CharacterDetailUI : MonoBehaviour
         texts = posAttr.GetComponentsInChildren<Text>();
         texts[0].text = "位置：" + c.location;
         texts[1].text = "距离终点还要 <color=green>" + 
-            Mathf.CeilToInt((Runway.Length - c.location) / c.GetFinalAttr(CommonAttribute.Speed)) + 
+            Mathf.CeilToInt((Runway.Length - c.location) / c.GetFinalAttr(CommonAttribute.Speed, true)) + 
             "</color> 次前进";
         for (int i = 0; i < (int)CommonAttribute.InstantNumberPercentageDividing; ++i)
         {

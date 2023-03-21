@@ -139,6 +139,7 @@ public class Bronya : ACharacterTalents
                         {
                             Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
                             dmg.value *= .8f;
+                            dmg.type = DamageType.CoAttack;
                             e.TakeDamage(self, dmg);
                         }
                     }

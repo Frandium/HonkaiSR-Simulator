@@ -32,7 +32,7 @@ public class Tingyun : ACharacterTalents
         base.OnEquipping();
         self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, d) =>
         {
-            if (curSkill != null) {
+            if (curSkill != null && d.type != DamageType.CoAttack) {
                 float dmgBase = curSkill.GetFinalAttr(CommonAttribute.ATK) * talentAtk;
                 float elebonus = self.GetFinalAttr(self, t, CommonAttribute.PhysicalBonus + (int)Element.Electro, DamageType.All);
                 float genebonus = self.GetFinalAttr(self, t, CommonAttribute.GeneralBonus, DamageType.All);
@@ -53,7 +53,7 @@ public class Tingyun : ACharacterTalents
                 if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
                 dmg *= overallResist * defRate;
 
-                t.TakeDamage(self, new Damage(dmg, Element.Electro, DamageType.All, critical));
+                t.TakeDamage(self, new Damage(dmg, Element.Electro, DamageType.CoAttack, critical));
             }
             return d;
         }));
@@ -96,6 +96,7 @@ public class Tingyun : ACharacterTalents
         c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
         {
             Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg + (self.constellaLevel >= 4? .2f : 0), d.type);
+            dmg.type = DamageType.CoAttack;
             t.TakeDamage(c, dmg);
             return d;
         }, 3));
@@ -107,7 +108,7 @@ public class Tingyun : ACharacterTalents
             c.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("tingyunConstellation1Trigger", c =>
             {
                 curSkill.AddBuff("tingyunConstellation1SpeedUp", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .2f, 2);
-            }));
+            }, 3));
             if (self.constellaLevel >= 2)
             {
                 c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunConstellation2", (t, d) =>
@@ -118,11 +119,11 @@ public class Tingyun : ACharacterTalents
                         curSkill.ChangeEnergy(10);
                     }
                     return d;
-                }));
+                }, 3));
                 c.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("tingyunConstellation2Refresh", () =>
                 {
                     constellation2Triggerd = false;
-                }));
+                }, 3));
             }
         }
         base.SkillCharacterAction(characters);
