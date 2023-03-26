@@ -22,7 +22,7 @@ public class Weapon: Equipment
     public Career career { get; protected set; } = Career.Count;
 
     WeaponConfig config;
-    AEquipmentTalent talents;
+    public AEquipmentTalent talents { get; protected set; }
 
     static Dictionary<string, string> dbname2Disname;
     static Dictionary<string, int> dbname2Career;
@@ -92,20 +92,17 @@ public class Weapon: Equipment
         effectDescription = Utils.FormatDescription((string)data["effect"]["description"], data["effect"], refine);
         career = (Career)(int)data["career"];
 
-        switch (_dbname)
+        talents = _dbname switch
         {
-            case "battleNotEnd":
-                talents = new BattleNotEnd(data, refine);
-                break;
-            case "inTheNight":
-                talents = new InTheNight(data, refine);
-                break;
-            case "victoryMoment":
-                talents = new VictoryMoment(data, refine);
-                break;
-            default:
-                break;
-        }
+            "battleNotEnd" => new BattleNotEnd(data, refine),
+            "inTheNight" => new InTheNight(data, refine),
+            "victoryMoment" => new VictoryMoment(data, refine),
+            "cutMoonCloud" => new CutMoonCloud(data, refine),
+            "timeNeverStop" => new TimeNeverStop(data, refine),
+            "beforeDawn" => new BeforeDawn(data, refine),
+            "soundlySleep" => new SoundlySleep(data, refine),
+            _ => new DefaultWeapon(data, refine),
+        };
     }
 
     public void OnEquipping(Character character)

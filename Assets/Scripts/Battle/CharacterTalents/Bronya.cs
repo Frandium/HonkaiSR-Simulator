@@ -54,8 +54,9 @@ public class Bronya : ACharacterTalents
         }));
         if (self.constellaLevel >= 1)
         {
-            self.afterSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", c =>
+            self.afterSkill.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstellation1", cs =>
             {
+                Character c = cs[0] as Character;
                 if (!isC1CD && Utils.TwoRandom(.5f))
                 {
                     BattleManager.Instance.skillPoint.GainPoint(1);
@@ -132,16 +133,13 @@ public class Bronya : ACharacterTalents
             {
                 c.afterNormalAttack.Add(new TriggerEvent<Character.TalentUponTarget>("bronyaConstalltion4", t =>
                 {
-                    if(t is Enemy)
+                    Enemy e = t[0] as Enemy;
+                    if (e != null && e.weakPoint.Contains(Element.Anemo))
                     {
-                        Enemy e = t as Enemy;
-                        if (e.weakPoint.Contains(Element.Anemo))
-                        {
-                            Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
-                            dmg.value *= .8f;
-                            dmg.type = DamageType.CoAttack;
-                            e.TakeDamage(self, dmg);
-                        }
+                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
+                        dmg.fullValue *= .8f;
+                        dmg.type = DamageType.CoAttack;
+                        e.TakeDamage(self, dmg);
                     }
                 }));
             }

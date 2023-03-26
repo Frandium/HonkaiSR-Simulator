@@ -3,7 +3,7 @@
     "disname": "杰帕德",
     "element": 2,
     "career": 5,
-    "maxEnergy": 60.0,
+    "maxEnergy": 80.0,
     "attrs": [
         [
             73.0,
@@ -93,12 +93,12 @@
     ],
     "isAttackTargetEnemy": true,
     "attackSelectionType": 1,
-    "attackGainEnergy": 5.0,
+    "attackGainEnergy": 10.0,
     "attackGainPointCount": 1,
     "isSkillTargetEnemy": true,
     "skillSelectionType": 1,
     "skillConsumePointCount": 1,
-    "skillGainEnergy": 10.0,
+    "skillGainEnergy": 15.0,
     "isBurstTargetEnemy": false,
     "burstSelectionType": 3,
     "takeDmgGainEnergy": 15.0,

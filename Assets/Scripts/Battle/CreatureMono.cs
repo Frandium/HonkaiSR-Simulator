@@ -13,9 +13,16 @@ public class CreatureMono : MonoBehaviour
         new Color(0, .625f, .25f, 1), // 风
         new Color(0, .125f, .75f, 1), // 量子
         new Color(1, .75f, .25f, 1),  // 虚数
-        new Color(0, 0, 0, 1) };      // 黑色，缺省
+        new Color(0, 0, 0, 1)   // 黑色，缺省 
+    };
 
-
+    public static Color PhysicalColor { get { return ElementColors[0]; } }
+    public static Color PyroColor { get { return ElementColors[1]; } }
+    public static Color CryoColor { get { return ElementColors[2]; } }
+    public static Color ElectroColor { get { return ElementColors[3];} }
+    public static Color AnemoColor { get { return ElementColors[4]; } }
+    public static Color QuantusColor { get { return ElementColors[5]; } }
+    public static Color ImaginaryColor { get { return ElementColors[6]; } }
 
     public int uniqueID { get; protected set; } = -1;
     protected Creature self;
@@ -62,7 +69,7 @@ public class CreatureMono : MonoBehaviour
     public virtual void TakeDamage(Damage d)
     {
         hpLine.fillAmount = hpPercentage;
-        int dmg = -Mathf.RoundToInt(d.value);
+        int dmg = -Mathf.RoundToInt(d.fullValue);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
         ShowMessage(content, ElementColors[(int)d.element], d.isCritical?2:1, () => { if (self.hp <= 0) OnDying(); });
     }
@@ -72,7 +79,7 @@ public class CreatureMono : MonoBehaviour
         hpLine.fillAmount = hpPercentage;
         int dmg = Mathf.RoundToInt(value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        ShowMessage(content, Color.white);
+        ShowMessage(content, Color.green);
     }
 
 
@@ -242,5 +249,9 @@ public class CreatureMono : MonoBehaviour
         {
             cardSR.material.SetColor("_bodyColor", Color.white);
         }
+    }
+
+    public virtual void UpdateHpLine() {
+        hpLine.fillAmount = hpPercentage;
     }
 }

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Selection : MonoBehaviour
@@ -26,51 +27,41 @@ public class Selection : MonoBehaviour
 
     public void ApplyAction(List<TriggerEvent<Character.TalentUponTarget>> before, List<TriggerEvent<Character.TalentUponTarget>> after)
     {
+        List<Creature> selectedCreatures = new List<Creature>();
         if (isTargetEnemy)
         {
-            List<Enemy> selectedEnemies = new List<Enemy>(); 
-            foreach (int i in selectedCreatures)
+            List<Enemy> selectedEnemies = new List<Enemy>();
+            foreach (int i in selectedCreatureIndices)
             {
                 selectedEnemies.Add(BattleManager.Instance.enemies[i]);
+                selectedCreatures.Add(BattleManager.Instance.enemies[i]);
             }
             foreach(var t in before)
             {
-                foreach (Enemy e in selectedEnemies)
-                {
-                    t.trigger(e);
-                }
+                t.trigger(selectedCreatures);   
             }
             enemyAction(selectedEnemies);
             foreach (var t in after)
             {
-                foreach(Enemy e in selectedEnemies)
-                {
-                    t.trigger(e);
-                }
+                t.trigger(selectedCreatures);
             }
-
         }
         else
         {
             List<Character> selectedCharacters = new List<Character>();
-            foreach (int i in selectedCreatures)
+            foreach (int i in selectedCreatureIndices)
             {
                 selectedCharacters.Add(BattleManager.Instance.characters[i]);
+                selectedCreatures.Add(BattleManager.Instance.characters[i]);
             }
             foreach (var t in before)
             {
-                foreach (Character c in selectedCharacters)
-                {
-                    t.trigger(c);
-                }
+                t.trigger(selectedCreatures);
             }
             characterAction(selectedCharacters);
             foreach (var t in after)
             {
-                foreach (Character c in selectedCharacters)
-                {
-                    t.trigger(c);
-                }
+                t.trigger(selectedCreatures);
             }
         }
         ClearSelection();
@@ -79,7 +70,7 @@ public class Selection : MonoBehaviour
         selectRight.SetActive(false);
     }
 
-    public List<int> selectedCreatures = new List<int>();
+    public List<int> selectedCreatureIndices = new List<int>();
     public delegate void ActionUponCharacter(List<Character> characters);
     public delegate void ActionUponEnemy(List<Enemy> enemies);
 
@@ -106,11 +97,11 @@ public class Selection : MonoBehaviour
         {
             case SelectionType.Self:
                 curCharacter.mono.SetSelected();
-                selectedCreatures.Add(curCharacterIndex);
+                selectedCreatureIndices.Add(curCharacterIndex);
                 break;
             case SelectionType.One:
                 characters[0].mono.SetSelected();
-                selectedCreatures.Add(0);
+                selectedCreatureIndices.Add(0);
                 break;
             case SelectionType.OneExceptSelf:
                 for(int i = 0;i<characters.Count; ++i)
@@ -119,7 +110,7 @@ public class Selection : MonoBehaviour
                     if(c != curCharacter)
                     {
                         c.mono.SetSelected();
-                        selectedCreatures.Add(i);
+                        selectedCreatureIndices.Add(i);
                         break;
                     }
                 }
@@ -129,7 +120,7 @@ public class Selection : MonoBehaviour
                 {
                     Character c = characters[i];
                     c.mono.SetSelected();
-                    selectedCreatures.Add(i);
+                    selectedCreatureIndices.Add(i);
                 }
                 break;
             case SelectionType.AllExceptSelf:
@@ -139,7 +130,7 @@ public class Selection : MonoBehaviour
                     if (c != curCharacter)
                     {
                         c.mono.SetSelected();
-                        selectedCreatures.Add(i);
+                        selectedCreatureIndices.Add(i);
                     }
                 }
                 break;
@@ -170,13 +161,13 @@ public class Selection : MonoBehaviour
                 break;
             case SelectionType.One:
                 enemies[0].SetSelected();
-                selectedCreatures.Add(0);
+                selectedCreatureIndices.Add(0);
                 break;
             case SelectionType.All:
                 for (int i = 0;i<enemies.Count;++i)
                 {
                     enemies[i].SetSelected();
-                    selectedCreatures.Add(i);
+                    selectedCreatureIndices.Add(i);
                 }
                 break;
         }
@@ -192,7 +183,7 @@ public class Selection : MonoBehaviour
         {
             e.mono.SetUnselected();
         }
-        selectedCreatures.Clear();
+        selectedCreatureIndices.Clear();
     }
 
 
@@ -210,7 +201,7 @@ public class Selection : MonoBehaviour
                 {
                     enemies.Add(e.mono);
                 }
-                int curSelected = selectedCreatures[0];
+                int curSelected = selectedCreatureIndices[0];
 
 
                 bool change = curSelected > 0;
@@ -220,13 +211,13 @@ public class Selection : MonoBehaviour
                     enemies[curSelected].SetUnselected();
                     --curSelected;
                     enemies[curSelected].SetSelected();
-                    selectedCreatures[0] = curSelected;
+                    selectedCreatureIndices[0] = curSelected;
                 }
 
             }
             else
             {
-                int curSelected = selectedCreatures[0];
+                int curSelected = selectedCreatureIndices[0];
 
                 bool change = curSelected < characters.Count - 1;
                 PlayAudio(change);
@@ -235,14 +226,14 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetUnselected();
                     ++curSelected;
                     characters[curSelected].mono.SetSelected();
-                    selectedCreatures[0] = curSelected;
+                    selectedCreatureIndices[0] = curSelected;
                 }
 
             }
         }
         else if (selectionType == SelectionType.OneExceptSelf)
         {
-            int curSelected = selectedCreatures[0];
+            int curSelected = selectedCreatureIndices[0];
             if (curSelected > 0)
             {
                 if (curSelected - 1 == curCharacterIndex)
@@ -252,7 +243,7 @@ public class Selection : MonoBehaviour
                         characters[curSelected].mono.SetUnselected();
                         curSelected -= 2;
                         characters[curSelected].mono.SetSelected();
-                        selectedCreatures[0] = curSelected;
+                        selectedCreatureIndices[0] = curSelected;
                     }
                 }
                 else
@@ -260,7 +251,7 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetUnselected();
                     --curSelected;
                     characters[curSelected].mono.SetSelected();
-                    selectedCreatures[0] = curSelected;
+                    selectedCreatureIndices[0] = curSelected;
                 }
             }
 
@@ -281,7 +272,7 @@ public class Selection : MonoBehaviour
                 {
                     enemies.Add(e.mono);
                 }
-                int curSelected = selectedCreatures[0];
+                int curSelected = selectedCreatureIndices[0];
 
                 bool change = curSelected < enemies.Count - 1;
                 PlayAudio(change);
@@ -290,14 +281,14 @@ public class Selection : MonoBehaviour
                     enemies[curSelected].SetUnselected();
                     ++curSelected;
                     enemies[curSelected].SetSelected();
-                    selectedCreatures[0] = curSelected;
+                    selectedCreatureIndices[0] = curSelected;
                     audioSource.Play();
                 }
 
             }
             else
             {
-                int curSelected = selectedCreatures[0];
+                int curSelected = selectedCreatureIndices[0];
                 bool change = curSelected > 0;
                 PlayAudio(change);
                 if (change)
@@ -305,14 +296,14 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetUnselected();
                     --curSelected;
                     characters[curSelected].mono.SetSelected();
-                    selectedCreatures[0] = curSelected;
+                    selectedCreatureIndices[0] = curSelected;
                 }
 
             }
         }
         else if (selectionType == SelectionType.OneExceptSelf)
         {
-            int curSelected = selectedCreatures[0];
+            int curSelected = selectedCreatureIndices[0];
             if (curSelected < characters.Count - 1)
             {
                 if (curSelected + 1 == curCharacterIndex)
@@ -322,7 +313,7 @@ public class Selection : MonoBehaviour
                         characters[curSelected].mono.SetUnselected();
                         curSelected += 2;
                         characters[curSelected].mono.SetSelected();
-                        selectedCreatures[0] = curSelected;
+                        selectedCreatureIndices[0] = curSelected;
                     }
                 }
                 else
@@ -330,7 +321,7 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetUnselected();
                     ++curSelected;
                     characters[curSelected].mono.SetSelected();
-                    selectedCreatures[0] = curSelected;
+                    selectedCreatureIndices[0] = curSelected;
                 }
             }
         }

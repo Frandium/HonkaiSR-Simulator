@@ -124,13 +124,13 @@ public enum ValueType
 
 public enum DamageType
 {
-    Attack,
-    Skill,
-    Burst,
-    Continue,
-    Additional,
+    Attack, // ÆÕ¹¥ÉËº¦
+    Skill,  // ¼¼ÄÜÉËº¦
+    Burst,  // ±¬·¢ÉËº¦
+    Continue, // ³ÖĞøÉËº¦
+    Additional, // ×·¼Ó¹¥»÷ÉËº¦
     All,
-    CoAttack,
+    CoAttack, // ¸½¼ÓÉËº¦
     Count
 }
 

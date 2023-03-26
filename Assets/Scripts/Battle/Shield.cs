@@ -16,7 +16,7 @@ public class Shield : ACountDownBehaviour
 
     public float TakeDamage(Damage d)
     {
-        hp -= d.value;
+        hp -= d.fullValue;
         return hp;
     }
 

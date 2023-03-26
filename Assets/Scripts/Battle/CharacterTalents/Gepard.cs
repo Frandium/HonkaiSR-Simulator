@@ -78,13 +78,12 @@ public class Gepard : ACharacterTalents
         TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("gepardTalent");
         t.trigger = (s, d) =>
         {
-            if (self.hp - d.value <= 0)
+            if (self.hp <= 0)
             {
                 self.hp = ((self.constellaLevel >= 6 ? .5f : 0) + talentHp) * self.GetFinalAttr(CommonAttribute.MaxHP);
                 self.mono.hpLine.fillAmount = self.mono.hpPercentage;
                 self.mono?.ShowMessage("不屈之身", Color.blue);
                 t.Zero();
-                d.value = 0;
                 if (self.constellaLevel >= 6)
                 {
                     self.mono?.ShowMessage("行动提前", Color.blue);
@@ -93,7 +92,7 @@ public class Gepard : ACharacterTalents
             }
             return d;
         };
-        self.onTakingDamage.Add(t);
+        self.afterTakingDamage.Add(t);
     }
 
     public override void Mystery(List<Character> characters, List<Enemy> enemies)

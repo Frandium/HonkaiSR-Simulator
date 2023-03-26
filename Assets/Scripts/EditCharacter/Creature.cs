@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEditor.UI;
 using UnityEngine;
 
 public class Creature
@@ -22,13 +23,18 @@ public class Creature
     public ACommomBattleTalents talents { get; protected set; }
 
     public delegate Damage DamageEvent(Creature sourceOrTarget, Damage damage);
-    public List<TriggerEvent<DamageEvent>> onTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
-    public List<TriggerEvent<DamageEvent>> onDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public DamageEvent d;
+    public List<TriggerEvent<DamageEvent>> beforeTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public List<TriggerEvent<DamageEvent>> beforeDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public List<TriggerEvent<DamageEvent>> afterDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public List<TriggerEvent<DamageEvent>> afterTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
 
-    public delegate float HealEvent(Creature sourceOrTarget, float value);
+    public delegate Heal HealEvent(Creature sourceOrTarget, Heal heal);
 
-    public List<TriggerEvent<HealEvent>> onTakingHeal { get; protected set; } = new List<TriggerEvent<HealEvent>>();
-    public List<TriggerEvent<HealEvent>> onDealingHeal { get; protected set; } = new List<TriggerEvent<HealEvent>>();
+    public List<TriggerEvent<HealEvent>> beforeTakingHeal { get; protected set; } = new List<TriggerEvent<HealEvent>>();
+    public List<TriggerEvent<HealEvent>> afterTakingHeal { get; protected set; } = new List<TriggerEvent<HealEvent>>();
+    public List<TriggerEvent<HealEvent>> beforeDealingHeal { get; protected set; } = new List<TriggerEvent<HealEvent>>();
+    public List<TriggerEvent<HealEvent>> afterDealingHeal { get; protected set; } = new List<TriggerEvent<HealEvent>>();
 
     public delegate void TurnStartEndEvent();
     public List<TriggerEvent<TurnStartEndEvent>> onTurnStart { get; protected set; } = new List<TriggerEvent<TurnStartEndEvent>>();
@@ -103,19 +109,24 @@ public class Creature
 
     public void DealDamage(Creature target, Damage damage)
     {
-        // 先 take damage，再触发事件，不然 damage 可能就错了
+        // 附加伤害视为同一次伤害，不会触发额外的 damage 事件了
+        if (damage.type != DamageType.CoAttack)
+            foreach(var p in beforeDealingDamage)
+            {
+                p.trigger(target, damage);
+            }
         target.TakeDamage(this, damage);
-        List<string> toremove = new List<string>();
-        foreach (var p in onDealingDamage)
-        {
-            p.trigger(target, damage);
-        }
+        if(damage.type != DamageType.CoAttack)
+            foreach (var p in afterDealingDamage)
+            {
+                p.trigger(target, damage);
+            }
     }
 
     public virtual void TakeDamage(Creature source, Damage damage)
     {
         // value 是正数
-        float remain = damage.value;
+        float remain = damage.fullValue;
         foreach(var p in shields)
         {
             float r = - p.TakeDamage(damage);
@@ -123,16 +134,21 @@ public class Creature
         }
         shields.RemoveAll(s => s.CountDown(CountDownType.Trigger) || s.hp <= 0);
         remain = Mathf.Max(0, remain);
-        damage.value = remain;
+        damage.realValue = remain;
 
-        foreach (var p in onTakingDamage)
+        foreach (var p in beforeTakingDamage)
         {
-            damage = p.trigger(source, damage);
+            p.trigger(source, damage);
         }
 
-        hp -= damage.value;
+        hp -= damage.realValue;
+        foreach (var p in afterTakingDamage)
+        {
+            p.trigger(source, damage);
+        }
         if (hp < 0)
         {
+            hp = 0;
             foreach(var p in onDying)
             {
                 p.trigger();
@@ -141,31 +157,29 @@ public class Creature
         mono?.TakeDamage(damage);
     }
 
-    public virtual void TakeHeal(Creature source, float value)
+    public virtual void TakeHeal(Creature source, Heal heal)
     {
-        if (hp + value > GetFinalAttr(CommonAttribute.MaxHP))
+        foreach(var p in beforeTakingHeal) { p.trigger(source, heal); }
+        heal.fullValue *= 1 + GetFinalAttr(CommonAttribute.HealedBonus);
+        if (hp + heal.fullValue > GetFinalAttr(CommonAttribute.MaxHP))
         {
-            value = GetFinalAttr(CommonAttribute.MaxHP) - hp;
+            heal.realValue = GetFinalAttr(CommonAttribute.MaxHP) - hp;
             hp = GetFinalAttr(CommonAttribute.MaxHP);
         }
         else
         {
-            hp += value;
+            hp += heal.fullValue;
+            heal.realValue = heal.fullValue;
         }
-        foreach (var p in onTakingHeal)
-        {
-            p.trigger(source, value);
-        }
-        mono?.TakeHeal(value);
+        foreach (var p in afterTakingHeal) { p.trigger(source, heal); }
+        mono?.TakeHeal(heal.fullValue);
     }
 
-    public virtual void DealHeal(Creature target, float value)
+    public virtual void DealHeal(Creature target, Heal heal)
     {
-        foreach (var p in onDealingHeal)
-        {
-            p.trigger(target, value);
-        }
-        target.TakeHeal(this, value);
+        foreach (var p in beforeDealingHeal) { p.trigger(target, heal); }
+        target.TakeHeal(this, heal);
+        foreach(var p in afterDealingHeal) { p.trigger(target, heal); }
     }
 
     public virtual bool StartNormalTurn()
@@ -194,16 +208,21 @@ public class Creature
         }
         onTurnEnd.RemoveAll(p => p.CountDown(CountDownType.Turn));
         onTurnStart.RemoveAll(p => p.CountDown(CountDownType.Turn));
-        onDealingDamage.RemoveAll(p => p.CountDown(CountDownType.Turn));
-        onTakingDamage.RemoveAll(p => p.CountDown(CountDownType.Turn));
-        onDealingHeal.RemoveAll(p => p.CountDown(CountDownType.Turn));
-        onTakingHeal.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeDealingDamage.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeTakingDamage.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterTakingDamage.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterDealingDamage.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeDealingHeal.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        beforeTakingHeal.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterTakingHeal.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        afterDealingHeal.RemoveAll(p => p.CountDown(CountDownType.Turn));
         
         // Remove Buff
         for(int i = buffs.Count - 1; i >=0; --i)
         {
             if (buffs[i].CountDown(CountDownType.Turn))
             {
+                buffs[i].onRemove?.Invoke(this);
                 Utils.valueBuffPool.ReturnOne(buffs[i]);
                 buffs.RemoveAt(i);
             }
@@ -224,7 +243,27 @@ public class Creature
         {
             buffs.RemoveAll(b => b.tag == buff.tag);
         }
+        if (buff.buffType != BuffType.Permanent && buff.targetAttribute == CommonAttribute.MaxHP)
+        {
+            // 非固有的生命上限变化会触发生命上限变化逻辑
+            float oldMaxHP = GetFinalAttr(CommonAttribute.MaxHP);
+            float newMaxHP = oldMaxHP + buff.CalBuffValue(this, this, CommonAttribute.MaxHP, DamageType.All);
+            float oldPercentage = hp / oldMaxHP;
+            float newPercentage = hp / newMaxHP;
+            if(oldPercentage > newPercentage)
+            {
+                // 生命上限降低时，保持生命值不变
+                hp = Mathf.Min(hp, newMaxHP);
+            }
+            else
+            {
+                // 生命上限提升时，保持生命值百分比不变
+                hp = oldPercentage * newMaxHP;
+            }
+            mono?.UpdateHpLine();
+        }
         buffs.Add(buff);
+        
     }
 
     public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, ValueType valueType, float value, int turntime = int.MaxValue,
@@ -276,6 +315,7 @@ public class Creature
     {
         if (b != null)
         {
+            b.onRemove?.Invoke(this);
             buffs.Remove(b);
             Utils.valueBuffPool.ReturnOne(b);
         }       
@@ -285,6 +325,7 @@ public class Creature
     {
         foreach(Buff b in toremoves)
         {
+            b.onRemove?.Invoke(this);
             RemoveBuff(b);
         }
     }
@@ -300,12 +341,13 @@ public class Creature
         return states.Find(s => s.state == t) != null;
     }
 
+
     public virtual void Initialize()
     {
-        onTakingDamage.Clear();
-        onDealingDamage.Clear();
-        onTakingHeal.Clear();
-        onDealingHeal.Clear();
+        beforeTakingDamage.Clear();
+        afterDealingDamage.Clear();
+        afterTakingHeal.Clear();
+        beforeDealingHeal.Clear();
         buffs.Clear();
         states.Clear();
         onTurnEnd.Clear();

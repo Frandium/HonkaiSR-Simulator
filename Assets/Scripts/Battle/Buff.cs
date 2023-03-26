@@ -18,6 +18,8 @@ public class Buff : ACountDownBehaviour
     public int stack { get; protected set; } = 0; // µþ¼Ó´ÎÊý
 
     public BuffContent content;
+    public BuffRemove onRemove;
+    public delegate void BuffRemove(Creature host);
     
     public delegate float BuffContent(Creature source, Creature target, DamageType damageType);
 
@@ -41,7 +43,7 @@ public class Buff : ACountDownBehaviour
     }
 
     public Buff Set(string _tag, BuffType type, CommonAttribute target_att, BuffContent c, int turntime = int.MaxValue,
-        CountDownType _ctype = CountDownType.Turn, int triggertime = int.MaxValue)
+        CountDownType _ctype = CountDownType.Turn, int triggertime = int.MaxValue, BuffRemove remove = null)
     {
         tag = _tag;
         buffType = type;

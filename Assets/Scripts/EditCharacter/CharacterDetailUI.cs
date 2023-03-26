@@ -184,21 +184,34 @@ public class CharacterDetailUI : MonoBehaviour
                 {
                     dropdowns[j].onValueChanged.AddListener(v =>
                     {
-                        curCharacter.config.artifacts[num].mainPhrase.type = (ValueType)v;
+                        if ((ValueType)v != curCharacter.config.artifacts[num].mainPhrase.type) {
+                            if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.InstantNumber)
+                                curCharacter.config.artifacts[num].mainPhrase.value /= 100;
+                            else
+                                curCharacter.config.artifacts[num].mainPhrase.value *= 100;
+                            curCharacter.config.artifacts[num].mainPhrase.type = (ValueType)v;
+                        }
                     });
                 }
                 else
                 {
                     dropdowns[j].onValueChanged.AddListener(v =>
                     {
-                        curCharacter.config.artifacts[num].vicePhrases[(num2 - 3) / 2].type = (ValueType)v;
+                        if ((ValueType)v != curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].type)
+                        {
+                            if (curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].type == ValueType.InstantNumber)
+                                curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].value /= 100;
+                            else
+                                curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].value *= 100;
+                            curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].type = (ValueType)v;
+                        }
                     });
                 }
             }
 
             for (int j = 0; j < 5; ++j)
             {
-                int num2 = j;
+                int num2 = j - 1;
                 if (j == 0)
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
@@ -214,11 +227,11 @@ public class CharacterDetailUI : MonoBehaviour
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage || 
-                        curCharacter.config.artifacts[num].vicePhrases[num2 - 1].attr > CommonAttribute.InstantNumberPercentageDividing)
-                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s) / 100;
+                        if (curCharacter.config.artifacts[num].vicePhrases[num2].type == ValueType.Percentage || 
+                        curCharacter.config.artifacts[num].vicePhrases[num2].attr > CommonAttribute.InstantNumberPercentageDividing)
+                            curCharacter.config.artifacts[num].vicePhrases[num2].value = double.Parse(s) / 100;
                         else
-                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
+                            curCharacter.config.artifacts[num].vicePhrases[num2].value = double.Parse(s);
                     });
                 }
             }

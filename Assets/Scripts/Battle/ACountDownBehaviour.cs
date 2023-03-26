@@ -44,4 +44,14 @@ public abstract class ACountDownBehaviour
         _triggerTimes = 0;
         _turnTimes = 0;
     }
+
+    public void ChangeTurnTime(int offset)
+    {
+        _turnTimes += offset;
+    }
+
+    public void ChangeTriggerTime(int offset)
+    {
+        _triggerTimes += offset;
+    }
 }

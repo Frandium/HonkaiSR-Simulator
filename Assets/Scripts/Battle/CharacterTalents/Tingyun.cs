@@ -30,7 +30,7 @@ public class Tingyun : ACharacterTalents
         burstDmgUp = (float)(double)self.metaData["burst"]["dmgUp"]["value"][self.burstLevel];
         talentAtk = (float)(double)self.metaData["talent"]["atk"]["value"][self.talentLevel];
         base.OnEquipping();
-        self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, d) =>
+        self.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunTalent", (t, d) =>
         {
             if (curSkill != null && d.type != DamageType.CoAttack) {
                 float dmgBase = curSkill.GetFinalAttr(CommonAttribute.ATK) * talentAtk;
@@ -74,13 +74,13 @@ public class Tingyun : ACharacterTalents
         if (curSkill != null)
         {
             curSkill.RemoveBuff("tingyunSkillATK");
-            curSkill.onDealingDamage.RemoveAll(t => t.tag == "tingyunHelp");
+            curSkill.afterDealingDamage.RemoveAll(t => t.tag == "tingyunHelp");
             if(self.constellaLevel >= 1)
             {
                 curSkill.afterBurst.RemoveAll(t => t.tag == "tingyunConstellation1Trigger");
                 if(self.constellaLevel >= 2)
                 {
-                    curSkill.onDealingDamage.RemoveAll(t => t.tag == "tingyunConstellation2");
+                    curSkill.afterDealingDamage.RemoveAll(t => t.tag == "tingyunConstellation2");
                     curSkill.onTurnStart.RemoveAll(t => t.tag == "tingyunConstellation2Refresh");
                 }
             }
@@ -93,7 +93,7 @@ public class Tingyun : ACharacterTalents
             res = Mathf.Min(res, self.GetFinalAttr(CommonAttribute.ATK) * skillAtkMax);
             return res;
         }, 3));
-        c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
+        c.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
         {
             Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg + (self.constellaLevel >= 4? .2f : 0), d.type);
             dmg.type = DamageType.CoAttack;
@@ -111,7 +111,7 @@ public class Tingyun : ACharacterTalents
             }, 3));
             if (self.constellaLevel >= 2)
             {
-                c.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunConstellation2", (t, d) =>
+                c.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunConstellation2", (t, d) =>
                 {
                     if (t.hp <= 0 && !constellation2Triggerd)
                     {

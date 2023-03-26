@@ -3,7 +3,7 @@
     "disname": "停云",
     "element": 3,
     "career": 3,
-    "maxEnergy": 60.0,
+    "maxEnergy": 100.0,
     "attrs": [
         [
             72.0,
@@ -93,12 +93,12 @@
     ],
     "isAttackTargetEnemy": true,
     "attackSelectionType": 1,
-    "attackGainEnergy": 5.0,
+    "attackGainEnergy": 10.0,
     "attackGainPointCount": 1,
     "isSkillTargetEnemy": false,
     "skillSelectionType": 1,
     "skillConsumePointCount": 1,
-    "skillGainEnergy": 10.0,
+    "skillGainEnergy": 15.0,
     "isBurstTargetEnemy": false,
     "burstSelectionType": 1,
     "takeDmgGainEnergy": 15.0,

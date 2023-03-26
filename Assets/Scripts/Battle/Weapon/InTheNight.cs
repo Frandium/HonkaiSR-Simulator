@@ -5,11 +5,11 @@ using LitJson;
 
 public class InTheNight : AWeaponTalent
 {
-    int refine = 0;
-    public InTheNight(JsonData d, int r): base(d)
+    public InTheNight(JsonData d, int r): base(d, r)
     {
-        refine = r;
+
     }
+
     float crit, atkSkill, burst;
     public override void OnEquiping(Character character)
     {

@@ -41,8 +41,9 @@ public class Database: MonoBehaviour
         if (sourceCompleteChecked)
             gameObject.SetActive(false);
         else
-        // 读取 allfiles.txt
-           StartCoroutine(CopyStreamingAssets());
+        {
+            StartCoroutine(CopyStreamingAssets());
+        }
     }
 
 
@@ -67,7 +68,9 @@ public class Database: MonoBehaviour
             log.text = "checking: " + targetPath;
             if (filePath.EndsWith(".json"))
             {
+#if !UNITY_EDITOR
                 if (!File.Exists(targetPath))
+#endif
                 {
                     string safilePath = Application.streamingAssetsPath + filePath;
                     UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(safilePath);

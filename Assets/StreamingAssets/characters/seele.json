@@ -3,7 +3,7 @@
     "disname": "希儿",
     "element": 5,
     "career": 1,
-    "maxEnergy": 60.0,
+    "maxEnergy": 80.0,
     "attrs": [
         [
             79.0,
@@ -93,15 +93,15 @@
     ],
     "isAttackTargetEnemy": true,
     "attackSelectionType": 1,
-    "attackGainEnergy": 5.0,
+    "attackGainEnergy": 10.0,
     "attackGainPointCount": 1,
     "isSkillTargetEnemy": true,
     "skillSelectionType": 1,
     "skillConsumePointCount": 1,
-    "skillGainEnergy": 10.0,
+    "skillGainEnergy": 15.0,
     "isBurstTargetEnemy": true,
     "burstSelectionType": 1,
-    "takeDmgGainEnergy": 5.0,
+    "takeDmgGainEnergy": 15.0,
     "atk": {
         "name": "强袭",
         "description": "对指定敌方单体造成等同于希儿#dmg#攻击力的量子属性伤害。",

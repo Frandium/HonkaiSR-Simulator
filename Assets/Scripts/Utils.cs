@@ -140,7 +140,7 @@ public class Utils
                 if((string)d[strs[i]]["type"] == "instant")
                 {
                     if (d[strs[i]]["value"][0].IsDouble)
-                        res += "<color=#f08>" + ((float)(double)d[strs[i]]["value"][l] * 100).ToString() + "</color>";
+                        res += "<color=#f08>" + ((float)(double)d[strs[i]]["value"][l]).ToString() + "</color>";
                     else if (d[strs[i]]["value"][0].IsInt)
                         res += "<color=#f08>" + ((int)d[strs[i]]["value"][l]).ToString() + "</color>";
                 }

@@ -5,10 +5,9 @@ using LitJson;
 
 public class BattleNotEnd : AWeaponTalent
 {
-    int refine;
-    public BattleNotEnd(JsonData c, int _refine) : base(c)
+    public BattleNotEnd(JsonData c, int r) : base(c, r)
     {
-        refine = _refine;
+
     }
 
     int gainSkillPointTurn = -1;
@@ -19,7 +18,7 @@ public class BattleNotEnd : AWeaponTalent
         skilldmgUp = (float)(double)config["effect"]["dmgUp"]["value"][refine];
         character.AddBuff("battleNotEnd", BuffType.Permanent, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, selfEnergy);
         character.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("battleNotEndBurstPoint", c => { 
-            if(c is Character)
+            if(c[0] is Character)
             {
                 if (gainSkillPointTurn != BattleManager.Instance.curTurnNumber)
                 {

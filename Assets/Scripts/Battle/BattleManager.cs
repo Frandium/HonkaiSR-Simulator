@@ -267,6 +267,7 @@ public class BattleManager : MonoBehaviour
                 {
                     at.OnBattleStart(c, characters);
                 }
+                c.weapon.talents.OnBattleStart(c, characters);
                 if (c.dbname == mystery)
                     c.talents.Mystery(characters, enemies);
             }

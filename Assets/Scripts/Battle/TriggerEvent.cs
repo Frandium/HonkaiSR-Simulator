@@ -18,4 +18,6 @@ public class TriggerEvent<T> : ACountDownBehaviour
         tag = _tag;
         trigger = e;
     }
+
+    
 }

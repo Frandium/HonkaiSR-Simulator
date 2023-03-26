@@ -4,14 +4,15 @@ using UnityEngine;
 
 public class Damage
 {
-    public float value { get; set; }
+    public float fullValue { get; set; }
+    public float realValue { get; set; }
     public Element element { get; protected set; }
     public DamageType type { get; set; }
     public bool isCritical { get; protected set; }
 
     public Damage(float v, Element e, DamageType t, bool b)
     {
-        value = v;
+        fullValue = v;
         element = e;
         type = t;
         isCritical = b;

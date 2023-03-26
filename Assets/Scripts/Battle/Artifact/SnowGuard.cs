@@ -20,7 +20,7 @@ public class SnowGuard : AArtifactTalent
         {
             if(character.hp < character.GetFinalAttr(CommonAttribute.MaxHP) * .5f)
             {
-                character.TakeHeal(character, .08f * character.GetFinalAttr(CommonAttribute.MaxHP));
+                character.TakeHeal(character, new Heal(.08f * character.GetFinalAttr(CommonAttribute.MaxHP)));
                 character.ChangeEnergy(5);
             }
         }));

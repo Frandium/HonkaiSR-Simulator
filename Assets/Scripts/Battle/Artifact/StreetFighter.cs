@@ -16,12 +16,12 @@ public class StreetFighter : AArtifactTalent
         character.AddBuff("streetFighter2", BuffType.Permanent, CommonAttribute.PhysicalBonus, ValueType.InstantNumber, .1f);
         if (count < 4)
             return;
-        character.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("streetFighter4Dealdmg", (s, d) =>
+        character.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("streetFighter4Dealdmg", (s, d) =>
         {
             character.AddBuff("streetFighter4ATKUp", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, .05f, cdtype: CountDownType.Permanent, maxStack: 5);
             return d;
         }));
-        character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("streetFighter4Takedmg", (s, d) =>
+        character.beforeTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("streetFighter4Takedmg", (s, d) =>
         {
             character.AddBuff("streetFighter4ATKUp", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, .05f, cdtype: CountDownType.Permanent, maxStack: 5);
             return d;
@@ -33,7 +33,7 @@ public class StreetFighter : AArtifactTalent
     public override void OnTakingOff(Character character)
     {
         character.RemoveBuff("streetFighter2");
-        character.onDealingDamage.RemoveAll(t => t.tag == "streetFighter4Dealdmg");
-        character.onTakingDamage.RemoveAll(t => t.tag == "streetFighter4Takedmg");
+        character.afterDealingDamage.RemoveAll(t => t.tag == "streetFighter4Dealdmg");
+        character.beforeTakingDamage.RemoveAll(t => t.tag == "streetFighter4Takedmg");
     }
 }

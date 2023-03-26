@@ -29,7 +29,7 @@ public class Seele : ACharacterTalents
         skillDmg = (float)(double)self.metaData["skill"]["atk"]["value"][self.atkLevel];
         burstDmg = (float)(double)self.metaData["burst"]["atk"]["value"][self.atkLevel];
         talentDmgUp = (float)(double)self.metaData["talent"]["dmgUp"]["value"][self.atkLevel];
-        self.onDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleAdditionalTurn",
+        self.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleAdditionalTurn",
             (target, dmg) =>
         {
             if (target.hp <= 0)
@@ -123,11 +123,11 @@ public class Seele : ACharacterTalents
         base.BurstEnemyAction(enemies);
         if (self.constellaLevel >= 6)
         {
-            e.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleConstellation6ExtraDamage", (s, d) => {
+            e.beforeTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleConstellation6ExtraDamage", (s, d) => {
                 if (d.type != DamageType.CoAttack)
                 {
                     Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, burstDmg, DamageType.Burst);
-                    dmg.value *= .18f;
+                    dmg.fullValue *= .18f;
                     dmg.type = DamageType.CoAttack;
                     e.TakeDamage(self, dmg);
                 }

@@ -19,13 +19,13 @@ public class Character : Creature
     public new int level { get { return config.level; } }
     public int breakLevel { get { return config.breakLevel; } }
     public int constellaLevel { get { return config.constellaLevel; }} // 命之座
-    public int atkLevel { get { return Mathf.Min(15, config.atkLevel + additionalAtkLevel); } }
+    public int atkLevel { get { return Mathf.Min(10, config.atkLevel + additionalAtkLevel); } }
     int additionalAtkLevel = 0;
     public int skillLevel { get { return Mathf.Min(15, config.skillLevel + additionalSkillLevel); } }
     int additionalSkillLevel = 0;
     public int burstLevel { get { return Mathf.Min(15, config.burstLevel + additionalBurstLevel); } }
     int additionalBurstLevel = 0;
-    public int talentLevel { get { return config.talentLevel + additionalTalentLevel; } }
+    public int talentLevel { get { return Mathf.Min(10, config.talentLevel + additionalTalentLevel); } }
     int additionalTalentLevel = 0;
     public Element element { get; protected set; } = Element.Count;
     public Career career { get; protected set; } = Career.Count;
@@ -51,7 +51,9 @@ public class Character : Creature
     public float skillGainEnergy { get; protected set; } = 2.5f;
     public float takeDmgGainEnergy { get; protected set; } = 2.5f;
 
-    public delegate void TalentUponTarget(Creature target);
+    public delegate void TalentUponTarget(List<Creature> target);
+    // 1. 把这些合并到一起，变成 before & after，然后用一个枚举类或者什么东西的
+    // 2. 如果我想用，比方说，我方角色普攻造成啥啥伤害的时候，但是触发一个技能不一定会造成伤害，所以这类逻辑果然还是放到 after dealing damage 比较好。
     public List<TriggerEvent<TalentUponTarget>> beforeNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
     public List<TriggerEvent<TalentUponTarget>> afterNormalAttack { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
     public List<TriggerEvent<TalentUponTarget>> beforeSkill { get; protected set; } = new List<TriggerEvent<TalentUponTarget>>();
@@ -109,7 +111,8 @@ public class Character : Creature
             "seele" => new Seele(this),
             "gepard" => new Gepard(this),
             "tingyun" => new Tingyun(this),
-            _ => new Bronya(this),
+            "bailu" => new Bailu(this),
+            _ => new DefaultCharacterTalents(this),
         };
         talents.OnEquipping();
         base.talents = talents;
