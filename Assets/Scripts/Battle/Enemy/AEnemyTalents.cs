@@ -9,7 +9,7 @@ public abstract class AEnemyTalents: ACommomBattleTalents
     {
         self = _self;
     }
-    public virtual void MyTurn()
+    public virtual void MyTurn(List<Character> characters, List<Enemy> enemies)
     {
 
     }

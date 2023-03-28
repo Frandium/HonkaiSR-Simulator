@@ -4,9 +4,9 @@ using UnityEngine;
 
 public abstract class ASummonTalents : ACommomBattleTalents
 {
-    public ACommomBattleTalents summoner;
+    public Creature summoner;
     public Summon self;
-    public ASummonTalents(Summon self, ACommomBattleTalents summoner)
+    public ASummonTalents(Summon self, Creature summoner)
     {
         this.summoner = summoner;
         this.self = self;

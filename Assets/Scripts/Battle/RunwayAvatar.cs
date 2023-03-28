@@ -7,6 +7,7 @@ public class RunwayAvatar : MonoBehaviour
 {
     public RectTransform rect;
     public Image avatarImage;
+    public Text turnToEnd;
 
     public Creature creature { get; private set; }
     public bool IsBurst { get; private set; }
@@ -18,12 +19,21 @@ public class RunwayAvatar : MonoBehaviour
     {
         creature = _c;
         IsBurst = isBurst;
+        Debug.Log(creature);
+        Debug.Log(creature.mono);
+        Debug.Log(creature.mono.runwayAvatar);
         avatarImage.sprite = creature.mono.runwayAvatar;
     }
 
     public void MoveTowards(Vector3 pos, AnyAction nextToDo = null)
     {
         StopAllCoroutines();
+        if (!IsBurst)
+        {
+            float location = creature.location;
+            float speeed = creature.GetFinalAttr(CommonAttribute.Speed, true);
+            turnToEnd.text = Mathf.CeilToInt((Runway.Length - location) / speeed).ToString();
+        }
         StartCoroutine(AvatarAnim(pos, nextToDo));
     }
 

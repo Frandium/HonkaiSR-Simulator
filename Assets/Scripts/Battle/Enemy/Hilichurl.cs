@@ -14,9 +14,8 @@ public class Hilichurl : AEnemyTalents
 
     }
 
-    public override void MyTurn()
+    public override void MyTurn(List<Character> characters, List<Enemy> enemies)
     {
-        List<Character> characters = BattleManager.Instance.characters;
         float tauntWeight = 0;
         foreach(Character c in characters)
         {

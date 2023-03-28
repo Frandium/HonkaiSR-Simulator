@@ -10,6 +10,7 @@ public class GlobalInfoHolder
     public static string weaponDir { get; protected set; } = Application.persistentDataPath + "/weapons";
     public static string artifactsDir { get; protected set; } = Application.persistentDataPath + "/artifacts";
     public static string enemyDir { get; protected set; } = Application.persistentDataPath + "/enemies";
+    public static string summonDir { get; protected set; } = Application.persistentDataPath + "/summons";
     public static string battleDir { get; protected set; } = Application.persistentDataPath + "/battles";
     public static string characterConfigDir { get; protected set; } = Application.persistentDataPath + "/user";
 

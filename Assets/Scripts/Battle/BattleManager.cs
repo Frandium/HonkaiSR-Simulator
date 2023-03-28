@@ -338,7 +338,15 @@ public class BattleManager : MonoBehaviour
             bool skip = e.StartNormalTurn();
             curStage = TurnStage.Animation;
             if(!skip)
-                e.talents.MyTurn();
+                e.talents.MyTurn(characters, enemies);
+        }else if (curCreature is Summon)
+        {
+            ++curTurnNumber;
+            Summon s = curCreature as Summon;
+            bool skip = s.StartNormalTurn();
+            curStage = TurnStage.Animation;
+            if (!skip)
+                s.talents.MyTurn(characters, enemies);
         }
     }
 

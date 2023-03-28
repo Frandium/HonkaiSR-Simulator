@@ -77,17 +77,16 @@ public class Jingyuan : ACharacterTalents
     {
         if (self.config.abilityActivated[1])
             self.ChangeEnergy(15);
-        shenjun = new Summon("jingyuanShenjun");
-        shenjun.talents = new JingyuanShenjun(shenjun, this);
-        self.onDying.Add(new TriggerEvent<Creature.DyingEvent>("jingyuanDyingRemoveShenjun", () =>
-        {
-            BattleManager.Instance.RemoveSummon(shenjun);
-        }));
         base.OnBattleStart(characters);
     }
 
     public override Summon Summon()
     {
+        shenjun = new Summon("jingyuanShenjun", self);
+        self.onDying.Add(new TriggerEvent<Creature.DyingEvent>("jingyuanDyingRemoveShenjun", () =>
+        {
+            BattleManager.Instance.RemoveSummon(shenjun);
+        }));
         return shenjun;
     }
 

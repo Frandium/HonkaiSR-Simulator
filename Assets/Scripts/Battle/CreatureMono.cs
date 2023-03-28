@@ -69,7 +69,7 @@ public class CreatureMono : MonoBehaviour
     public virtual void TakeDamage(Damage d)
     {
         hpLine.fillAmount = hpPercentage;
-        int dmg = -Mathf.RoundToInt(d.fullValue);
+        int dmg = -Mathf.RoundToInt(d.realValue);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
         ShowMessage(content, ElementColors[(int)d.element], d.isCritical?2:1, () => { if (self.hp <= 0) OnDying(); });
     }

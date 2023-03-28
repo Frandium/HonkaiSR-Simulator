@@ -42,6 +42,9 @@
 /enemies
 /enemies/boss.json
 /enemies/hilichurl.json
+/summon
+/summons
+/summons/jingyuanShenjun.json
 /user
 /user/bailu.json
 /user/bronya.json
