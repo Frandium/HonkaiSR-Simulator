@@ -49,6 +49,7 @@ public class Database: MonoBehaviour
 
     IEnumerator CopyStreamingAssets()
     {
+#if !UNITY_EDITOR
         string afPath = Application.streamingAssetsPath + "/allfiles.txt";
         string result;
         if (afPath.Contains("://") || afPath.Contains(":///"))
@@ -68,9 +69,7 @@ public class Database: MonoBehaviour
             log.text = "checking: " + targetPath;
             if (filePath.EndsWith(".json"))
             {
-#if !UNITY_EDITOR
                 if (!File.Exists(targetPath))
-#endif
                 {
                     string safilePath = Application.streamingAssetsPath + filePath;
                     UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(safilePath);
@@ -92,7 +91,10 @@ public class Database: MonoBehaviour
                 }
             }
             progress.fillAmount = ++i / (float)filePaths.Length;
-        }
+            }
+#else
+        yield return null;
+#endif
         sourceCompleteChecked = true;
         gameObject.SetActive(false);
     }

@@ -9,6 +9,11 @@ public class Hilichurl : AEnemyTalents
 
     }
 
+    public override void OnEquipping()
+    {
+
+    }
+
     public override void MyTurn()
     {
         List<Character> characters = BattleManager.Instance.characters;

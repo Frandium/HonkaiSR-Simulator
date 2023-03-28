@@ -34,11 +34,13 @@ public class BattleManager : MonoBehaviour
     public List<Character> characters { get; protected set; } = new List<Character>();
     public List<Character> deadCharacters { get; protected set; } = new List<Character>();
     public List<Character> allCharacters { get; protected set; } = new List<Character>();
+    public List<Summon> summons { get; protected set; } = new List<Summon>();
 
     public List<CharacterMono> cMonos = new List<CharacterMono>();
     public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
     public GameObject enemyPrefab;
+    public GameObject summonPrefab;
     public GameObject screenCanvas;
     public GameObject characterDetail;
 
@@ -259,15 +261,31 @@ public class BattleManager : MonoBehaviour
         }
         else
         {
-            // 第一回合发动秘技
+            // 第一回合流程
+            // 1. 生成所有角色召唤物
             foreach(Character c in characters)
             {
+                Summon s = c.talents.Summon();
+                if(s != null)
+                {
+                    summons.Add(s);
+                    SummonMono sm = Instantiate(summonPrefab).GetComponent<SummonMono>();
+                    s.SetMono(sm);
+                    runway.AddCreature(s);
+                }
+            }
+            // 2. 触发角色 on battle start
+            // 3. 触发角色武器 on battle start
+            // 4. 触发角色遗器套装 on battle start
+            // 5. 触发角色秘技
+            foreach (Character c in characters)
+            {
                 c.talents.OnBattleStart(characters);
-                foreach(AArtifactTalent at in c.artifactsSuit)
+                c.weapon.talents.OnBattleStart(c, characters);
+                foreach (AArtifactTalent at in c.artifactsSuit)
                 {
                     at.OnBattleStart(c, characters);
                 }
-                c.weapon.talents.OnBattleStart(c, characters);
                 if (c.dbname == mystery)
                     c.talents.Mystery(characters, enemies);
             }
@@ -465,6 +483,14 @@ public class BattleManager : MonoBehaviour
         runway.RemoveCreature(c);
         characters.Remove(c);
         deadCharacters.Add(c);
+    }
+
+    public void RemoveSummon(Summon s)
+    {
+        if (!summons.Contains(s))
+            return;
+        summons.Remove(s);
+        runway.RemoveCreature(s);
     }
 
 

@@ -16,9 +16,10 @@ public class CutMoonCloud : AWeaponTalent
         atk = (float)(double)config["effect"]["atk"]["value"][refine];
         crtdmg = (float)(double)config["effect"]["crtdmg"]["value"][refine];
         echarge = (float)(double)config["effect"]["echarge"]["value"][refine];
-        character.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("cutMoonCloudTrigger", () =>
+        character.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("cutMoonCloudTrigger", () =>
         {
             Effect(BattleManager.Instance.characters);
+            return true;
         }));
         character.onDying.Add(new TriggerEvent<Creature.DyingEvent>("cutMoonCloudRemove", () =>
         {

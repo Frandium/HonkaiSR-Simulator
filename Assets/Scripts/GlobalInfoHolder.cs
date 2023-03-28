@@ -17,6 +17,6 @@ public class GlobalInfoHolder
 
     public static string mystery = "tingyun";
 
-    public static string[] teamMembers = new string[] { "bronya", "gepard", "seele", "tingyun" };
+    public static string[] teamMembers = new string[] { "bailu", "gepard", "jingyuan", "bronya" };
 
 }

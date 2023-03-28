@@ -41,7 +41,7 @@ public class TimeNeverStop : AWeaponTalent
     void DealDamage(List<Creature> targets)
     {
         Enemy target = targets[Random.Range(0, targets.Count)] as Enemy;
-        if (target == null)
+        if (healAmount <= 0 || target == null)
         {
             return;
         }

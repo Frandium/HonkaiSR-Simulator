@@ -24,7 +24,7 @@ public class SoundlySleep : AWeaponTalent
             }
             return d;
         }));
-        character.onTurnEnd.Add(new TriggerEvent<Creature.TurnStartEndEvent>("soundlySleepTimerTrigger", () =>
+        character.onTurnEnd.Add(new TriggerEvent<Creature.TurnEndEvent>("soundlySleepTimerTrigger", () =>
         {
             timer -= 1;
         }));

@@ -32,9 +32,10 @@ public class BattleNotEnd : AWeaponTalent
             {
                 Character thisTurn = cha;
                 cha.onTurnStart.Add(
-                    new TriggerEvent<Creature.TurnStartEndEvent>("battleNotEndSkillStart", () => {
+                    new TriggerEvent<Creature.TurnStartEvent>("battleNotEndSkillStart", () => {
                         thisTurn.AddBuff("battleNotEndSkillDmgUp", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, skilldmgUp, 1);
                         RemoveUnusedSkillBuff(thisTurn);
+                        return true;
                     })
                 );
             }

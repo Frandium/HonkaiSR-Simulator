@@ -90,6 +90,7 @@ public enum CommonAttribute
     ImaginaryPenetrate,// 虚数穿透 = 35
     DEFIgnore, // 无视防御
     DmgDown, // 减伤
+    DmgUp, // 易伤
     Count // = 28
 }
 
