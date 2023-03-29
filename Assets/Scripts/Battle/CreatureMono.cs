@@ -48,10 +48,9 @@ public class CreatureMono : MonoBehaviour
     protected float dmgBgBaseAlpha = .5f;
     public bool IsPerformanceFinished
     {
-        get { return isAnimFinished && isAudioFinished; }
-        protected set { isAudioFinished = value; isAnimFinished = value; }
+        get { return finishedMessageCount >= messageCount && isAudioFinished; }
     }
-    protected bool isAnimFinished = true;
+//    protected bool isAnimFinished = true;
     protected bool isAudioFinished = true;
 
     public delegate void Then();
@@ -106,9 +105,12 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
+    int messageCount = 0;
+    int finishedMessageCount = 0;
     public virtual IEnumerator ConsumeMessage()
     {
-        while (messages.Count > 0) { 
+        while (messages.Count > 0) {
+            messageCount++;
             StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), fontSize.Dequeue(), thens.Dequeue()));
             yield return new WaitForSeconds(.3f);
         }
@@ -117,7 +119,6 @@ public class CreatureMono : MonoBehaviour
 
     protected virtual IEnumerator TakeDamangeAnim(string content, Color c, int fontsize, Then then = null)
     {
-        isAnimFinished = false;
         GameObject go = Instantiate(dmgGO);
         go.SetActive(true);
         go.transform.SetParent(canvas, false);
@@ -142,7 +143,7 @@ public class CreatureMono : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         Destroy(go);
-        isAnimFinished = true;
+        finishedMessageCount++;
         then?.Invoke();
     }
 
@@ -151,6 +152,8 @@ public class CreatureMono : MonoBehaviour
         isMyTurn = true;
         cardSR.material.SetColor("_lineColor", Color.blue);
         alpha = 1;
+        messageCount = 0;
+        finishedMessageCount = 0;
     }
 
     public virtual void EndMyTurn()

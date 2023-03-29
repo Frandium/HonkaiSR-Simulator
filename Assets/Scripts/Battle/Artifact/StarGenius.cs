@@ -17,17 +17,10 @@ public class StarGenius : AArtifactTalent
         
         if (count < 4)
             return;
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("starGenius4", BuffType.Permanent, CommonAttribute.DEFIgnore, (s, t, dt) =>
-        {
-            if (t is Enemy)
-            {
-                Enemy e = t as Enemy;
-                if (e.weakPoint.Contains(Element.Quantus))
-                    return .25f;
-            }
-            return 0;
-        }
-        ));
+        character.AddBuff("starGenius4", BuffType.Permanent, CommonAttribute.DEFIgnore, ValueType.InstantNumber, .25f, 
+            (s, t, dt) =>{
+            return t is Enemy && (t as Enemy).weakPoint.Contains(Element.Quantus);
+        });
     }
 
     public override void OnTakingOff(Character character)

@@ -60,6 +60,7 @@
 /weapons/cutMoonCloud.json
 /weapons/inTheNameOfWorld.json
 /weapons/inTheNight.json
+/weapons/raining.json
 /weapons/soundlySleep.json
 /weapons/starRailNight.json
 /weapons/timeNeverStop.json

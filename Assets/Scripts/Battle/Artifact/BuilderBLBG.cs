@@ -14,13 +14,8 @@ public class BuilderBLBG : AArtifactTalent
         if (count < 2)
             return;
         character.AddBuff("builderBLBG2", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, .15f);
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("builderBLBG2Cond", BuffType.Permanent, CommonAttribute.DEF, (s, t, d) => {
-            if (character.GetFinalAttr(CommonAttribute.EffectHit) >= .5f)
-            {
-                return character.GetBaseAttr(CommonAttribute.DEF) * .15f;
-            }
-            return 0;
-        }));
+        character.AddBuff("builderBLBG2Cond", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, .15f,
+            (s, t, d) => { return character.GetFinalAttr(CommonAttribute.EffectHit) >= .5f; });
     }
 
 

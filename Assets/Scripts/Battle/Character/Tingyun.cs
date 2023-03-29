@@ -34,21 +34,21 @@ public class Tingyun : ACharacterTalents
         {
             if (curSkill != null && d.type != DamageType.CoAttack) {
                 float dmgBase = curSkill.GetFinalAttr(CommonAttribute.ATK) * talentAtk;
-                float elebonus = self.GetFinalAttr(self, t, CommonAttribute.PhysicalBonus + (int)Element.Electro, DamageType.All);
-                float genebonus = self.GetFinalAttr(self, t, CommonAttribute.GeneralBonus, DamageType.All);
+                float elebonus = self.GetFinalAttr(self, t, CommonAttribute.PhysicalBonus + (int)Element.Electro, DamageType.CoAttack);
+                float genebonus = self.GetFinalAttr(self, t, CommonAttribute.GeneralBonus, DamageType.CoAttack);
                 float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限
                 float dmg = dmgBase * overallBonus;
-                bool critical = Utils.TwoRandom(self.GetFinalAttr(self, t, CommonAttribute.CriticalRate, DamageType.All));
+                bool critical = Utils.TwoRandom(self.GetFinalAttr(self, t, CommonAttribute.CriticalRate, DamageType.CoAttack));
                 if (critical)
                 {
-                    dmg *= self.GetFinalAttr(self, t, CommonAttribute.CriticalDamage, DamageType.All);
+                    dmg *= self.GetFinalAttr(self, t, CommonAttribute.CriticalDamage, DamageType.CoAttack);
                 }
 
-                float def = t.GetFinalAttr(self, t, CommonAttribute.DEF, DamageType.All);
+                float def = t.GetFinalAttr(self, t, CommonAttribute.DEF, DamageType.CoAttack);
                 float defRate = 1 - def / (def + 2000);
                 float overallResist = 1
-                    - t.GetFinalAttr(self, t, CommonAttribute.PhysicalResist + (int)Element.Electro, DamageType.All)
-                    - t.GetFinalAttr(self, t, CommonAttribute.GeneralResist, DamageType.All);
+                    - t.GetFinalAttr(self, t, CommonAttribute.PhysicalResist + (int)Element.Electro, DamageType.CoAttack)
+                    - t.GetFinalAttr(self, t, CommonAttribute.GeneralResist, DamageType.CoAttack);
                 if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
                 if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
                 dmg *= overallResist * defRate;
@@ -87,16 +87,16 @@ public class Tingyun : ACharacterTalents
         }
         Character c = characters[0];
         curSkill = c;
-        c.AddBuff(Utils.valueBuffPool.GetOne().Set("tingyunSkillATK", BuffType.Buff, CommonAttribute.ATK, (s, t, d) =>
+        float lockAtk = self.GetFinalAttr(CommonAttribute.ATK);
+        c.AddBuff("tingyunSkillATK", BuffType.Buff, CommonAttribute.ATK, (s, t, d) =>
         {
             float res = t.GetBaseAttr(CommonAttribute.ATK) * skillAtkUp;
-            res = Mathf.Min(res, self.GetFinalAttr(CommonAttribute.ATK) * skillAtkMax);
+            res = Mathf.Min(res, lockAtk * skillAtkMax);
             return res;
-        }, 3));
+        }, null, 3);
         c.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("tingyunHelp", (t, d) =>
         {
-            Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg + (self.constellaLevel >= 4? .2f : 0), d.type);
-            dmg.type = DamageType.CoAttack;
+            Damage dmg = Damage.NormalDamage(c, t, CommonAttribute.ATK, Element.Electro, skillDmg + (self.constellaLevel >= 4? .2f : 0), DamageType.CoAttack);
             t.TakeDamage(c, dmg);
             return d;
         }, 3));

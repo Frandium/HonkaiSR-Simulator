@@ -101,10 +101,10 @@ public class Bronya : ACharacterTalents
         foreach(Character c in characters)
         {
             c.AddBuff("bronyaBurstATK", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, burstAtkUp, 2);
-            c.AddBuff(Utils.valueBuffPool.GetOne().Set("bronyaBurstCrtDmg", BuffType.Buff, CommonAttribute.CriticalDamage, (s, t, _) =>
+            c.AddBuff("bronyaBurstCrtDmg", BuffType.Buff, CommonAttribute.CriticalDamage, (s, t, _) =>
             {
                 return burstCrtDmgIns + self.GetBaseAttr(CommonAttribute.CriticalDamage) * burstCrtDmgPct;
-            }, 2));
+            }, null, 2);
             c.mono?.ShowMessage("¹¥»÷ÌáÉý", Color.green);
             c.mono?.ShowMessage("±©»÷ÉËº¦ÌáÉý", Color.green);
         }

@@ -24,12 +24,10 @@ public class Gepard : ACharacterTalents
         Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
         self.DealDamage(e, dmg);
         float hit = (self.constellaLevel >= 1 ? 1 : .65f) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
-        float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageType.Skill));
-        if (Utils.TwoRandom(hit) && !Utils.TwoRandom(resist))
+        if (Utils.TwoRandom(hit))
         {
             // ¶³½áµÐÈË
             e.AddState(self, new State(StateType.Frozen, 1));
-            e.mono?.ShowMessage("¶³½á", Color.blue);
             if(e.onTurnStart.Find(t => t.tag == "gepardFreeze") == null)
                 e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("gepardFreeze", () =>
                 {

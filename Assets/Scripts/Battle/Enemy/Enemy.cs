@@ -71,7 +71,15 @@ public class Enemy : Creature
     {
         if (weakHp > 0 && weakPoint.Contains(damage.element))
         {
-            weakHp -= 50.0f;
+            weakHp -= damage.type switch
+            {
+                DamageType.Attack => 25.0f,
+                DamageType.Skill => 35.0f,
+                DamageType.Burst => 60.0f,
+                DamageType.Additional => 20.0f,
+                DamageType.CoAttack => 5.0f,
+                _ => 0.0f
+            };
             if (weakHp <= 0)
             {
                 weakHp = 0;

@@ -17,10 +17,11 @@ public class Buff : ACountDownBehaviour
     public BuffType buffType { get; protected set; } = BuffType.Debuff;
     public int stack { get; protected set; } = 0; // µþ¼Ó´ÎÊý
 
+    public BuffFilter filter;
     public BuffContent content;
-    public BuffRemove onRemove;
-    public delegate void BuffRemove(Creature host);
-    
+    public OnBuffRemove onRemove;
+    public delegate void OnBuffRemove(Creature host);
+    public delegate bool BuffFilter(Creature source, Creature target, DamageType damageType);
     public delegate float BuffContent(Creature source, Creature target, DamageType damageType);
 
     public Buff(): base("default", CountDownType.All, int.MaxValue, int.MaxValue)
@@ -42,8 +43,8 @@ public class Buff : ACountDownBehaviour
         return this;
     }
 
-    public Buff Set(string _tag, BuffType type, CommonAttribute target_att, BuffContent c, int turntime = int.MaxValue,
-        CountDownType _ctype = CountDownType.Turn, int triggertime = int.MaxValue, BuffRemove remove = null)
+    public Buff Set(string _tag, BuffType type, CommonAttribute target_att, BuffContent c, BuffFilter f = null, int turntime = int.MaxValue,
+        CountDownType _ctype = CountDownType.Turn, int triggertime = int.MaxValue, OnBuffRemove remove = null)
     {
         tag = _tag;
         buffType = type;
@@ -53,6 +54,7 @@ public class Buff : ACountDownBehaviour
         _turnTimes = turntime;
         _triggerTimes = triggertime;
 
+        filter = f;
         content = c;
         return this;
     }
@@ -68,10 +70,13 @@ public class Buff : ACountDownBehaviour
 
     public float CalBuffValue(Creature source, Creature target, CommonAttribute attr, DamageType damageType)
     {
-        if (targetAttribute != attr)
+        if (targetAttribute != attr || 
+            (filter!=null && !filter(source, target, damageType))
+            )
             return 0;
         float res = content(source, target, damageType);
         return res;
     }
-
+    
+    
 }

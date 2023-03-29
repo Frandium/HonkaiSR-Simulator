@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.TextCore.Text;
 
 public class Bailu : ACharacterTalents
 {
@@ -74,7 +75,7 @@ public class Bailu : ACharacterTalents
             }
             else
             {
-                character.AddBuff(GetShengxi(2));
+                GetShengxi(character, 2);
             }
         }
         base.BurstCharacterAction(characters);
@@ -113,13 +114,9 @@ public class Bailu : ACharacterTalents
             }));
             if (self.config.abilityActivated[2])
             {
-                thisone.AddBuff(Utils.valueBuffPool.GetOne().Set("bailuShengxiDmgDown", BuffType.Permanent, CommonAttribute.DmgDown, (s, t, d) => {
-                    if(thisone.buffs.Find(t => t.tag == "bailuShengxi") != null)
-                    {
-                        return .1f;
-                    }
-                    return 0;
-                }));
+                thisone.AddBuff("bailuShengxiDmgDown", BuffType.Permanent, CommonAttribute.DmgDown, ValueType.InstantNumber, .1f, (s, t, d) => {
+                    return thisone.buffs.Find(t => t.tag == "bailuShengxi") != null;
+                });
             }
         }
         self.afterDealingHeal.Add(new TriggerEvent<Creature.HealEvent>("bailuAbility1", (t, h) =>
@@ -144,21 +141,20 @@ public class Bailu : ACharacterTalents
     {
         foreach(Character character in characters)
         {
-            character.AddBuff(GetShengxi(1));
+            GetShengxi(character, 1);
         }
     }
 
-    Buff GetShengxi(int turn)
+    void GetShengxi(Character c, int turn)
     {
-        Buff b = Utils.valueBuffPool.GetOne().Set("bailuShengxi", BuffType.Buff, CommonAttribute.Count, (_, _, _) => { return 0; }, turn);
-        b.onRemove = (c) =>
+        c.AddBuff("bailuShengxi", BuffType.Buff, CommonAttribute.Count, (_, _, _) => { return 0; }, null, turn, onremove:
+        (c) =>
         {
             Character cha = c as Character;
             if (cha != null && self.constellaLevel >= 1)
             {
                 cha.ChangeEnergy(8);
             }
-        };
-        return b;
+        });
     }
 }

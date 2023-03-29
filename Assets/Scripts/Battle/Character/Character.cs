@@ -113,6 +113,7 @@ public class Character : Creature
             "tingyun" => new Tingyun(this),
             "bailu" => new Bailu(this),
             "jingyuan" => new Jingyuan(this),
+            "yanqing" => new Yanqing(this),
             _ => new DefaultCharacterTalents(this),
         };
         talents.OnEquipping();

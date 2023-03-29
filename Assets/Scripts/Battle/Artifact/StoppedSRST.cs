@@ -14,13 +14,10 @@ public class StoppedSRST : AArtifactTalent
         if (count < 2)
             return;
         character.AddBuff("stoppedSRST2", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, .08f);
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("stoppedSRST2Cond", BuffType.Permanent, CommonAttribute.GeneralBonus, (s, t, d) => {
-            if (character.GetFinalAttr(CommonAttribute.Speed) >= .5f && (d == DamageType.Burst || d == DamageType.Additional))
-            {
-                return .15f;
-            }
-            return 0;
-        }));
+        character.AddBuff("stoppedSRST2Cond", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .15f, (s, t, d) =>
+        {
+            return character.GetFinalAttr(CommonAttribute.Speed) >= .5f && (d == DamageType.Burst || d == DamageType.Additional);
+        });
     }
 
 

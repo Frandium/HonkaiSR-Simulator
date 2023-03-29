@@ -19,9 +19,10 @@ public class RunwayAvatar : MonoBehaviour
     {
         creature = _c;
         IsBurst = isBurst;
-        Debug.Log(creature);
-        Debug.Log(creature.mono);
-        Debug.Log(creature.mono.runwayAvatar);
+        if(isBurst)
+        {
+            turnToEnd.transform.parent.gameObject.SetActive(false);
+        }
         avatarImage.sprite = creature.mono.runwayAvatar;
     }
 
@@ -57,4 +58,5 @@ public class RunwayAvatar : MonoBehaviour
         firstMove = false;
         nextToDo?.Invoke();
     }
+
 }

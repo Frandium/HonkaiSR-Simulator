@@ -20,13 +20,8 @@ public class ImmortalArk : AArtifactTalent
     {
         foreach(Character c in characters)
         {
-            c.AddBuff(Utils.valueBuffPool.GetOne().Set("immortalArk4_" + self.dbname, BuffType.Permanent, CommonAttribute.ATK, (s, t, d) => { 
-                if(self.GetFinalAttr(CommonAttribute.Speed) >= 120)
-                {
-                    return .08f * c.GetBaseAttr(CommonAttribute.ATK);
-                }
-                return 0;
-            }));
+            c.AddBuff("immortalArk4_" + self.dbname, BuffType.Permanent, CommonAttribute.ATK, ValueType.Percentage, .08f,
+                (s, t, d) => { return self.GetFinalAttr(CommonAttribute.Speed) >= 120; });
         }
     }
 

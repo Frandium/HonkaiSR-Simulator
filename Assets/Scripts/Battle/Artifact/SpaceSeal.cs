@@ -14,13 +14,8 @@ public class SpaceSeal : AArtifactTalent
         if (count < 2)
             return;
         character.AddBuff("spaceSeal2", BuffType.Permanent, CommonAttribute.ATK, ValueType.Percentage, .12f);
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("spaceSeal2Cond", BuffType.Permanent, CommonAttribute.ATK, (s, t, d) => {
-            if (character.GetFinalAttr(CommonAttribute.Speed) >= 120)
-            {
-                return .12f * character.GetBaseAttr(CommonAttribute.ATK);
-            }
-            return 0;
-        }));
+        character.AddBuff("spaceSeal2Cond", BuffType.Permanent, CommonAttribute.ATK, ValueType.Percentage, .12f,
+            (s, t, d) => { return character.GetFinalAttr(CommonAttribute.Speed) >= 120; });
     }
 
 

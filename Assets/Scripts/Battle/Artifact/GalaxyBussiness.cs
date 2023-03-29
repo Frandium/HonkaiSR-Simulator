@@ -14,9 +14,10 @@ public class GalaxyBussiness : AArtifactTalent
         if (count < 2)
             return;
         character.AddBuff("galaxyBussiness2EffectHit", BuffType.Permanent, CommonAttribute.EffectHit, ValueType.InstantNumber, .1f);
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("galaxyBussiness2ATK", BuffType.Permanent, CommonAttribute.ATK, (s, t, d) => {
+        character.AddBuff("galaxyBussiness2ATK", BuffType.Permanent, CommonAttribute.ATK, (s, t, d) =>
+        {
             return Mathf.Min(character.GetFinalAttr(CommonAttribute.EffectHit), 1) * .25f * character.GetBaseAttr(CommonAttribute.ATK);
-        }));
+        }, null);
     }
 
 

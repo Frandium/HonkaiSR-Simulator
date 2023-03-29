@@ -20,11 +20,7 @@ public class JingyuanShenjun : ASummonTalents
     {
         if (jingyuan.character.config.abilityActivated[0])
         {
-            jingyuan.character.AddBuff(Utils.valueBuffPool.GetOne().Set("jingyuanShenjunCrtDmg", BuffType.Permanent, CommonAttribute.CriticalDamage,
-                (s, t, dt) => {
-                    return jingyuan.shenjunAttackTimes * 10;
-                })
-            );
+            jingyuan.character.AddBuff("jingyuanShenjunCrtDmg", BuffType.Permanent, CommonAttribute.CriticalDamage, ValueType.InstantNumber, .2f, (s, t, dt) => { return jingyuan.shenjunAttackTimes >= 6; });
         }
         for (int i = 0; i < jingyuan.shenjunAttackTimes;  i++) {
             int j = Random.Range(0, enemies.Count);
@@ -56,11 +52,8 @@ public class JingyuanShenjun : ASummonTalents
         jingyuan.shenjunAttackTimes = 3;
         if(jingyuan.character.constellaLevel >= 2)
         {
-            jingyuan.character.AddBuff(Utils.valueBuffPool.GetOne().Set("jingyuanC2DmgUp", BuffType.Buff, CommonAttribute.GeneralBonus, (s, t, dt) => {
-                if (dt == DamageType.Attack || dt == DamageType.Skill || dt == DamageType.Burst)
-                    return .2f;
-                return 0;
-            }, 2));
+            jingyuan.character.AddBuff("jingyuanC2DmgUp", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .2f, 
+                (s,t,dt)=> { return dt == DamageType.Attack || dt == DamageType.Skill || dt == DamageType.Burst;  }, 2);
         }
     }
 
@@ -73,11 +66,11 @@ public class JingyuanShenjun : ASummonTalents
     public override void OnEquipping()
     {
         jingyuan.shenjunAttackTimes = 3;
-        
-        self.AddBuff(Utils.valueBuffPool.GetOne().Set("jingyuanShenjunSpeed", BuffType.Permanent, CommonAttribute.Speed, 
+
+        self.AddBuff("jingyuanShenjunSpeed", BuffType.Permanent, CommonAttribute.Speed,
             (s, t, dt) => {
                 return jingyuan.shenjunAttackTimes * 10;
-            })
+            }, null
         );
         if(jingyuan.character.constellaLevel >= 1)
         {

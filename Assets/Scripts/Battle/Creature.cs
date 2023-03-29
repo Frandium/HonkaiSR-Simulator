@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using UnityEditor.UI;
 using UnityEngine;
@@ -137,16 +138,27 @@ public class Creature
         remain = Mathf.Max(0, remain);
         damage.realValue = remain;
 
-        foreach (var p in beforeTakingDamage)
+        if (damage.realValue <= 0)
         {
-            p.trigger(source, damage);
+            mono?.TakeDamage(damage);
+            return;
         }
 
+        if (damage.type != DamageType.CoAttack)
+            foreach (var p in beforeTakingDamage)
+            {
+                p.trigger(source, damage);
+            }
+
         hp -= damage.realValue;
-        foreach (var p in afterTakingDamage)
-        {
-            p.trigger(source, damage);
-        }
+        mono?.TakeDamage(damage);
+
+        if(damage.type != DamageType.CoAttack)
+            foreach (var p in afterTakingDamage)
+            {
+                p.trigger(source, damage);
+            }
+        
         if (hp < 0)
         {
             hp = 0;
@@ -155,7 +167,6 @@ public class Creature
                 p.trigger();
             }
         }
-        mono?.TakeDamage(damage);
     }
 
     public virtual void TakeHeal(Creature source, Heal heal)
@@ -267,20 +278,32 @@ public class Creature
     }
 
     public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, ValueType valueType, float value, int turntime = int.MaxValue,
-        DamageType damageType = DamageType.All, CountDownType cdtype = CountDownType.Turn, int triggertime = int.MaxValue,  int maxStack = 1)
+        DamageType damageType = DamageType.All, CountDownType cdtype = CountDownType.Turn, int triggertime = int.MaxValue, int maxStack = 1)
     {
         DamageType dt = damageType;
+        AddBuff(tag, buffType, attr, valueType, value, (s, t, d) => { return dt == DamageType.All || d == dt; },
+            turntime, cdtype, triggertime, maxStack);
+    }
+
+    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, ValueType valueType, float value, Buff.BuffFilter f,
+        int turntime = int.MaxValue, CountDownType cdtype = CountDownType.Turn, int triggertime = int.MaxValue,  int maxStack = 1)
+    {
         ValueType vt = valueType;
         float v = value;
         CommonAttribute a = attr;
-        Buff b = Utils.valueBuffPool.GetOne().Set(tag, buffType, attr, (s, t, d) =>
+        AddBuff(tag, buffType, attr, (s, t, d) =>
         {
-            if (dt != DamageType.All && d != dt)
-                return 0;
             if (vt == ValueType.InstantNumber)
                 return v;
             return s.GetBaseAttr(a) * v;
-        },  turntime, cdtype, triggertime);
+        }, f, turntime, cdtype, triggertime, maxStack);
+    }
+
+    public virtual void AddBuff(string tag, BuffType buffType, CommonAttribute attr, Buff.BuffContent c, Buff.BuffFilter f, int turntime = int.MaxValue,
+        CountDownType cdtype = CountDownType.Turn, int triggertime = int.MaxValue, int maxStack = 1, Buff.OnBuffRemove onremove = null)
+    {
+        CommonAttribute a = attr;
+        Buff b = Utils.valueBuffPool.GetOne().Set(tag, buffType, attr, c, f, turntime, cdtype, triggertime, onremove);
         if (maxStack > 1)
         {
             List<Buff> stacks = buffs.FindAll(t => t.tag == tag);
@@ -332,7 +355,32 @@ public class Creature
 
     public virtual void AddState(Creature source, State state)
     {
-        states.Add(state);
+        float resist = 1 - 1 / (1 + GetFinalAttr(source, this, CommonAttribute.EffectResist, DamageType.Skill));
+        if(!Utils.TwoRandom(resist))
+        {
+            states.Add(state);
+            mono?.UpdateState();
+            switch (state.state)
+            {
+                case StateType.Frozen:
+                    mono?.ShowMessage("¶³½á", CreatureMono.CryoColor);
+                    break;
+                case StateType.Restricted:
+                    mono?.ShowMessage("Êø¸¿", CreatureMono.ImaginaryColor);
+                    break;
+                default:
+                    break;
+            }
+        }
+        else
+        {
+            mono?.ShowMessage("µÖ¿¹", Color.red);
+        }
+    }
+
+    public virtual void RemoveState(StateType t)
+    {
+        states.RemoveAll(s => s.state == t);
         mono?.UpdateState();
     }
 

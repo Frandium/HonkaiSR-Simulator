@@ -17,7 +17,8 @@ public class BeforeDawn : AWeaponTalent
         add = (float)(double)config["effect"]["add"]["value"][refine];
         dmgup = (float)(double)config["effect"]["dmgup"]["value"][refine];
         character.AddBuff("beforeDawnCrtDmg", BuffType.Permanent, CommonAttribute.CriticalDamage, ValueType.InstantNumber, crtdmg);
-        character.AddBuff("beforeDawnSkillDmgUp", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, dmgup);
+        character.AddBuff("beforeDawnSkillDmgUp", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, dmgup, damageType: DamageType.Skill);
+        character.AddBuff("beforeDawnSkillDmgUp", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, dmgup, damageType: DamageType.Burst);
         character.afterBurst.Add(new TriggerEvent<Character.TalentUponTarget>("beforeDawn", t =>
         {
             character.AddBuff("MengShen", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, add, 

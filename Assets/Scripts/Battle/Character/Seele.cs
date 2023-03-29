@@ -61,12 +61,10 @@ public class Seele : ACharacterTalents
         }));
         if (self.config.abilityActivated[0])
         {
-            self.AddBuff(Utils.valueBuffPool.GetOne().Set("seeleAbility1TauntDown", BuffType.Permanent, CommonAttribute.Taunt, (s, t, dt) =>
+            self.AddBuff("seeleAbility1TauntDown", BuffType.Permanent, CommonAttribute.Taunt, ValueType.InstantNumber, -50, (s, t, dt) =>
             {
-                if (self.hp <= self.GetFinalAttr(CommonAttribute.MaxHP) / 2)
-                    return -50;
-                return 0;
-            }));
+                return self.hp <= self.GetFinalAttr(CommonAttribute.MaxHP) / 2;
+            });
         }
         if (self.config.abilityActivated[1])
         {
@@ -86,13 +84,8 @@ public class Seele : ACharacterTalents
         }
         if(self.config.constellaLevel >= 2)
         {
-            self.AddBuff(Utils.valueBuffPool.GetOne().Set("seeleConstellation2CriticalRate", BuffType.Permanent, CommonAttribute.CriticalRate, (s, t, dt)=> {
-                if(t.hp <= t.GetFinalAttr(CommonAttribute.MaxHP) / 2)
-                {
-                    return .15f;
-                }
-                return 0;
-            }));
+            self.AddBuff("seeleConstellation2CriticalRate", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, .15f,
+                (s, t, dt) => { return t.hp <= t.GetFinalAttr(CommonAttribute.MaxHP) / 2; });
         }
     }
     

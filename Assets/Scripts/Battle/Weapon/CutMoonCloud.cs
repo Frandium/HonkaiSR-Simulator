@@ -47,14 +47,14 @@ public class CutMoonCloud : AWeaponTalent
         {
             if(i == 0)
             {
-                c.AddBuff("cutMoonCloudRandom", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, atk);
+                c.AddBuff("cutMoonCloudRandom", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, atk, cdtype: CountDownType.Permanent);
             }else if(i == 1)
             {
-                c.AddBuff("cutMoonCloudRandom", BuffType.Buff, CommonAttribute.CriticalDamage, ValueType.InstantNumber, crtdmg);
+                c.AddBuff("cutMoonCloudRandom", BuffType.Buff, CommonAttribute.CriticalDamage, ValueType.InstantNumber, crtdmg, cdtype: CountDownType.Permanent);
             }
             else
             {
-                c.AddBuff("cutMoonCloudRandom", BuffType.Buff, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, echarge);
+                c.AddBuff("cutMoonCloudRandom", BuffType.Buff, CommonAttribute.EnergyRecharge, ValueType.InstantNumber, echarge, cdtype: CountDownType.Permanent);
             }
         }
     }
