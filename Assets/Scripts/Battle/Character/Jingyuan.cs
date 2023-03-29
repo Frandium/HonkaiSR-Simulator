@@ -37,7 +37,7 @@ public class Jingyuan : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy enemy = enemies[0];
-        Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, Element.Electro, dmg, DamageType.Attack);
+        Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, dmg, new DamageConfig(DamageType.Attack, Element.Electro));
         self.DealDamage(enemy, d);
         base.AttackEnemyAction(enemies);
     }
@@ -45,7 +45,7 @@ public class Jingyuan : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         foreach (Enemy enemy in enemies) { 
-            Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, Element.Electro, skillAtk, DamageType.Attack);
+            Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, skillAtk, new DamageConfig(DamageType.Attack, Element.Electro));
             self.DealDamage(enemy, d);
         }
         shenjunAttackTimes += 2;
@@ -60,7 +60,7 @@ public class Jingyuan : ACharacterTalents
     {
         foreach(Enemy enemy in enemies)
         {
-            Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, Element.Electro, burstAtk, DamageType.Attack);
+            Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, burstAtk, new DamageConfig(DamageType.Attack, Element.Electro));
             self.DealDamage(enemy, d);
         }
         shenjunAttackTimes += 3;

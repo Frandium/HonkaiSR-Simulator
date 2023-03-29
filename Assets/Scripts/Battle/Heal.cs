@@ -15,9 +15,9 @@ public class Heal
 
     public static Heal NormalHeal(Creature source, Creature target, CommonAttribute attr, float rate, float offset = 0)
     {
-        float heal_base = source.GetFinalAttr(source, target, attr, DamageType.All) * rate + offset;
+        float heal_base = source.GetFinalAttr(source, target, attr, DamageConfig.defaultDC) * rate + offset;
         // ÷Œ¡∆º”≥…
-        float healbonues = source.GetFinalAttr(source, target, CommonAttribute.HealBonus, DamageType.All);
+        float healbonues = source.GetFinalAttr(source, target, CommonAttribute.HealBonus, DamageConfig.defaultDC);
         heal_base *= (1 + healbonues);
         return new Heal(heal_base);
     }

@@ -119,6 +119,7 @@ public class BattleManager : MonoBehaviour
                     RespondtoKeycodeSpace();
                 break;
             case TurnStage.Animation:
+                // 问题出在，敌人死了，被从列表里移除，但这个时候它的动画可能还没播完，不能进下一回合。
                 if (turnTime > minTurnTime && cMonos.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.mono.IsPerformanceFinished))
                 {
                     NextTurn();
@@ -244,7 +245,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        // 对上一回合进行收尾，= null 时是第一回合，跳过这个阶段
+        // 对上一回合进行收尾，= null 时是第一回合
         if (curCreature != null)
         {
             // 刚结束的回合是元素爆发回合
@@ -255,8 +256,11 @@ public class BattleManager : MonoBehaviour
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.ChangePercentageLocation(-1);
-                curCreature.EndNormalTurn();
+                if (curCreature.hp > 0)
+                {
+                    curCreature.ChangePercentageLocation(-1);
+                    curCreature.EndNormalTurn();
+                } 
             }
         }
         else
@@ -337,7 +341,7 @@ public class BattleManager : MonoBehaviour
             Enemy e = curCreature as Enemy;
             bool skip = e.StartNormalTurn();
             curStage = TurnStage.Animation;
-            if(!skip)
+            if(!skip && e.hp > 0)
                 e.talents.MyTurn(characters, enemies);
         }else if (curCreature is Summon)
         {

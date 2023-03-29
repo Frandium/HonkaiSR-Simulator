@@ -35,6 +35,19 @@ public class Selection : MonoBehaviour
             {
                 selectedEnemies.Add(BattleManager.Instance.enemies[i]);
                 selectedCreatures.Add(BattleManager.Instance.enemies[i]);
+                if (selectionType == SelectionType.OneAndNeighbour)
+                {
+                    if(i - 1 >= 0)
+                    {
+                        selectedEnemies.Add(BattleManager.Instance.enemies[i - 1]);
+                        selectedCreatures.Add(BattleManager.Instance.enemies[i - 1]);
+                    }
+                    if(i + 1 < BattleManager.Instance.enemies.Count)
+                    {
+                        selectedEnemies.Add(BattleManager.Instance.enemies[i + 1]);
+                        selectedCreatures.Add(BattleManager.Instance.enemies[i + 1]);
+                    }
+                }
             }
             foreach(var t in before)
             {
@@ -147,11 +160,7 @@ public class Selection : MonoBehaviour
         isDuringSelection = true;
         selectRight.SetActive(true);
         selectLeft.SetActive(true);
-        List<EnemyMono> enemies = new List<EnemyMono>();
-        foreach (Enemy e in BattleManager.Instance.enemies)
-        {
-            enemies.Add(e.mono);
-        }
+        List<Enemy> enemies = BattleManager.Instance.enemies;
         switch (type)
         {
             case SelectionType.Self:
@@ -160,14 +169,22 @@ public class Selection : MonoBehaviour
                 Debug.LogError($"Wrong Selection type detected in StartEnemySelection : {selectionType}.");
                 break;
             case SelectionType.One:
-                enemies[0].SetSelected();
+                enemies[0].mono.SetSelected();
                 selectedCreatureIndices.Add(0);
                 break;
             case SelectionType.All:
                 for (int i = 0;i<enemies.Count;++i)
                 {
-                    enemies[i].SetSelected();
+                    enemies[i].mono.SetSelected();
                     selectedCreatureIndices.Add(i);
+                }
+                break;
+            case SelectionType.OneAndNeighbour:
+                enemies[0].mono.SetSelected();
+                selectedCreatureIndices.Add(0);
+                if (enemies.Count >= 2)
+                {
+                    enemies[1].mono.SetSelected(false);
                 }
                 break;
         }
@@ -228,7 +245,6 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetSelected();
                     selectedCreatureIndices[0] = curSelected;
                 }
-
             }
         }
         else if (selectionType == SelectionType.OneExceptSelf)
@@ -254,7 +270,35 @@ public class Selection : MonoBehaviour
                     selectedCreatureIndices[0] = curSelected;
                 }
             }
+        }
+        else if (selectionType == SelectionType.OneAndNeighbour)
+        {
+            if (isTargetEnemy)
+            {
+                List<EnemyMono> enemies = new List<EnemyMono>();
+                foreach (Enemy e in BattleManager.Instance.enemies)
+                {
+                    enemies.Add(e.mono);
+                }
+                int curSelected = selectedCreatureIndices[0];
 
+                // d 会向 id 小的那边选择，所以必须
+                bool change = curSelected > 0;
+                PlayAudio(change);
+                if (change)
+                {
+                    if (curSelected + 1 < enemies.Count)
+                        enemies[curSelected + 1].SetUnselected();
+                    enemies[curSelected].SetSelected(false);
+                    --curSelected;
+                    selectedCreatureIndices[0] = curSelected;
+                    enemies[curSelected].SetSelected(true);
+                    if (curSelected - 1 >= 0)
+                    {
+                        enemies[curSelected - 1].SetSelected(false);
+                    }
+                }
+            }
         }
     }
 
@@ -267,20 +311,16 @@ public class Selection : MonoBehaviour
         {
             if (isTargetEnemy)
             {
-                List<EnemyMono> enemies = new List<EnemyMono>();
-                foreach (Enemy e in BattleManager.Instance.enemies)
-                {
-                    enemies.Add(e.mono);
-                }
+                List<Enemy> enemies = BattleManager.Instance.enemies;
                 int curSelected = selectedCreatureIndices[0];
 
                 bool change = curSelected < enemies.Count - 1;
                 PlayAudio(change);
                 if (change)
                 {
-                    enemies[curSelected].SetUnselected();
+                    enemies[curSelected].mono.SetUnselected();
                     ++curSelected;
-                    enemies[curSelected].SetSelected();
+                    enemies[curSelected].mono.SetSelected();
                     selectedCreatureIndices[0] = curSelected;
                     audioSource.Play();
                 }
@@ -321,6 +361,29 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetUnselected();
                     ++curSelected;
                     characters[curSelected].mono.SetSelected();
+                    selectedCreatureIndices[0] = curSelected;
+                }
+            }
+        }
+        else if (selectionType == SelectionType.OneAndNeighbour)
+        {
+            if (isTargetEnemy)
+            {
+                List<Enemy> enemies = BattleManager.Instance.enemies;
+                int curSelected = selectedCreatureIndices[0];
+
+                // a 会向 id 大的那边选择，所以必须
+                bool change = curSelected < BattleManager.Instance.enemies.Count - 1;
+                PlayAudio(change);
+                if (change)
+                {
+                    enemies[curSelected].mono.SetSelected(false);
+                    if (curSelected - 1 >= 0)
+                        enemies[curSelected - 1].mono.SetUnselected();
+                    ++curSelected;
+                    enemies[curSelected].mono.SetSelected(true);
+                    if(curSelected + 1 < enemies.Count)
+                        enemies[curSelected + 1].mono.SetSelected(false);
                     selectedCreatureIndices[0] = curSelected;
                 }
             }

@@ -10,6 +10,19 @@ public enum BuffType
     Count
 }
 
+public struct DamageConfig
+{
+    public DamageType type;
+    public Element element;
+    public DamageConfig(DamageType type =DamageType.All, Element element = Element.Count)
+    {
+        this.type = type;
+        this.element = element;
+    }
+
+    public static DamageConfig defaultDC = new DamageConfig();
+}
+
 public class Buff : ACountDownBehaviour
 {
     // 可以做到高度可配置，一个 value buff 应该包含 收益属性、源属性、收益数值、源 min、源 max，目标 min，目标 max，过滤器、持续回合。
@@ -21,8 +34,8 @@ public class Buff : ACountDownBehaviour
     public BuffContent content;
     public OnBuffRemove onRemove;
     public delegate void OnBuffRemove(Creature host);
-    public delegate bool BuffFilter(Creature source, Creature target, DamageType damageType);
-    public delegate float BuffContent(Creature source, Creature target, DamageType damageType);
+    public delegate bool BuffFilter(Creature source, Creature target, DamageConfig damageAttr);
+    public delegate float BuffContent(Creature source, Creature target, DamageConfig damageAttr);
 
     public Buff(): base("default", CountDownType.All, int.MaxValue, int.MaxValue)
     {
@@ -68,13 +81,13 @@ public class Buff : ACountDownBehaviour
     }
 
 
-    public float CalBuffValue(Creature source, Creature target, CommonAttribute attr, DamageType damageType)
+    public float CalBuffValue(Creature source, Creature target, CommonAttribute attr, DamageConfig damageAttr)
     {
         if (targetAttribute != attr || 
-            (filter!=null && !filter(source, target, damageType))
+            (filter!=null && !filter(source, target, damageAttr))
             )
             return 0;
-        float res = content(source, target, damageType);
+        float res = content(source, target, damageAttr);
         return res;
     }
     

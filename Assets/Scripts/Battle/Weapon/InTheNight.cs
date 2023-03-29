@@ -24,7 +24,7 @@ public class InTheNight : AWeaponTalent
             int times = (int)additionalSpeed / 10;
             if (times > 8) times = 8;
             return atkSkill * times;
-        }, (s, d, t) => { return t == DamageType.Attack || t == DamageType.Skill; });
+        }, (s, d, t) => { return t.type == DamageType.Attack || t.type == DamageType.Skill; });
         character.AddBuff("inTheNightBurst", BuffType.Permanent, CommonAttribute.GeneralBonus, (c, e, t) =>
         {
             float additionalSpeed = c.GetFinalAttr(CommonAttribute.Speed) - 100;
@@ -32,7 +32,7 @@ public class InTheNight : AWeaponTalent
             int times = (int)additionalSpeed / 10;
             if (times > 8) times = 8;
             return burst * times;
-        }, (s, t, d) => { return d == DamageType.Attack || d == DamageType.Skill; }
+        }, (s, t, d) => { return d.type == DamageType.Attack || d.type == DamageType.Skill; }
             );
     }
 

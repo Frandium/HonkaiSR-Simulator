@@ -16,7 +16,7 @@ public class StoppedSRST : AArtifactTalent
         character.AddBuff("stoppedSRST2", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, .08f);
         character.AddBuff("stoppedSRST2Cond", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .15f, (s, t, d) =>
         {
-            return character.GetFinalAttr(CommonAttribute.Speed) >= .5f && (d == DamageType.Burst || d == DamageType.Additional);
+            return character.GetFinalAttr(CommonAttribute.Speed) >= .5f && (d.type == DamageType.Burst || d.type == DamageType.Additional);
         });
     }
 

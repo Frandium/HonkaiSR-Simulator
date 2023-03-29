@@ -93,7 +93,7 @@ public class Seele : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, atkDmg, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, atkDmg, new DamageConfig(DamageType.Attack, Element.Quantus));
         self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -101,7 +101,7 @@ public class Seele : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, skillDmg, DamageType.Skill);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillDmg, new DamageConfig(DamageType.Skill, Element.Quantus));
         self.DealDamage(e, dmg);
         self.AddBuff("seeleSkillSpeed", BuffType.Buff, CommonAttribute.Speed, ValueType.Percentage, .25f, 3, maxStack: self.constellaLevel >= 1 ? 2 : 1);
         self.mono?.ShowMessage("ËÙ¶ÈÌáÉý", Color.blue);
@@ -112,7 +112,7 @@ public class Seele : ACharacterTalents
     {
         Enemy e = enemies[0];
         SeeleUp();
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, burstDmg, DamageType.Burst);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, burstDmg, new DamageConfig(DamageType.Burst, Element.Quantus));
         self.DealDamage(e, dmg);
         base.BurstEnemyAction(enemies);
         if (self.constellaLevel >= 6)
@@ -120,7 +120,7 @@ public class Seele : ACharacterTalents
             e.beforeTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("seeleConstellation6ExtraDamage", (s, d) => {
                 if (d.type != DamageType.CoAttack)
                 {
-                    Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Quantus, burstDmg, DamageType.Burst);
+                    Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, burstDmg, new DamageConfig(DamageType.Burst, Element.Quantus));
                     dmg.fullValue *= .18f;
                     dmg.type = DamageType.CoAttack;
                     e.TakeDamage(self, dmg);

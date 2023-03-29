@@ -32,6 +32,7 @@ public enum StateType
 {
     Frozen,   // 冻结 = 0
     Restricted, // 禁锢 = 1
+    Burning, // 灼烧
     Count
 }
 
@@ -102,6 +103,7 @@ public enum SelectionType
     OneExceptSelf, // 除自身外的一个 = 2
     All, // 全体 = 3
     AllExceptSelf, //除自身外全体 = 4
+    OneAndNeighbour, // 单体和邻居
     Count
 }
 

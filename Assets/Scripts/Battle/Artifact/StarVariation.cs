@@ -16,7 +16,7 @@ public class StarVariation : AArtifactTalent
         character.AddBuff("starVariation2", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, .08f);
         character.AddBuff("starVariation2Cond", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .2f,
             (s, t, d) => {
-                return character.GetFinalAttr(CommonAttribute.Speed) >= .8f && (d == DamageType.Attack || d == DamageType.Skill);
+                return character.GetFinalAttr(CommonAttribute.Speed) >= .8f && (d.type == DamageType.Attack || d.type == DamageType.Skill);
         });
     }
 

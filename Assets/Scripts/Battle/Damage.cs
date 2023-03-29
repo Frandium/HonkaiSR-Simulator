@@ -19,10 +19,10 @@ public class Damage
     }
 
     public static Damage NormalDamage(Creature source, Creature target, CommonAttribute attr, 
-        Element element, float rate, DamageType damageType, float offset = 0)
+        float rate, DamageConfig damageType, float offset = 0)
     {
         float dmgBase = source.GetFinalAttr(source, target, attr, damageType) * rate+ offset;
-        float elebonus = source.GetFinalAttr(source, target, CommonAttribute.PhysicalBonus + (int)element, damageType);
+        float elebonus = source.GetFinalAttr(source, target, CommonAttribute.PhysicalBonus + (int)damageType.element, damageType);
         float genebonus = source.GetFinalAttr(source, target, CommonAttribute.GeneralBonus, damageType);
         float overallBonus = 1 + Mathf.Max(0, elebonus + genebonus); // 伤害加成下限 0，无上限
         float dmg = dmgBase * overallBonus;
@@ -37,13 +37,13 @@ public class Damage
         def *= (1 - defIgnore);
         float defRate = 1 - def / (def + 200 + source.level * 10);
         float overallResist = 1 
-            - target.GetFinalAttr(source, target, CommonAttribute.PhysicalResist + (int)element, damageType) 
+            - target.GetFinalAttr(source, target, CommonAttribute.PhysicalResist + (int)damageType.element, damageType) 
             - target.GetFinalAttr(source, target, CommonAttribute.GeneralResist, damageType);
         if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
         if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
-        overallResist -= source.GetFinalAttr(CommonAttribute.PhysicalPenetrate + (int)element);
+        overallResist -= source.GetFinalAttr(CommonAttribute.PhysicalPenetrate + (int)damageType.element);
         dmg *= overallResist * defRate * (1 - target.GetFinalAttr(CommonAttribute.DmgDown));
-        return new Damage(dmg, element, damageType, critical);
+        return new Damage(dmg, damageType.element, damageType.type, critical);
     }
 
     public static float Heal(CreatureMono source, CreatureMono target, CommonAttribute attr, float rate, float offset)

@@ -98,6 +98,7 @@ public class CreatureMono : MonoBehaviour
         colors.Enqueue(c);
         fontSize.Enqueue(fontsize);
         thens.Enqueue(t);
+        messageCount++;
         if (!isMessageShowing)
         {
             isMessageShowing = true;
@@ -110,7 +111,6 @@ public class CreatureMono : MonoBehaviour
     public virtual IEnumerator ConsumeMessage()
     {
         while (messages.Count > 0) {
-            messageCount++;
             StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), fontSize.Dequeue(), thens.Dequeue()));
             yield return new WaitForSeconds(.3f);
         }
@@ -143,8 +143,8 @@ public class CreatureMono : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         Destroy(go);
-        finishedMessageCount++;
         then?.Invoke();
+        finishedMessageCount++;
     }
 
     public virtual void StartMyTurn()
@@ -188,11 +188,11 @@ public class CreatureMono : MonoBehaviour
         cardSR.material.SetFloat("_alpha", 0);
     }
 
-    public virtual void SetSelected()
+    public virtual void SetSelected(bool isMainTarget = true)
     {
         alpha = 1;
         isSelected = true;
-        cardSR.material.SetColor("_lineColor", Color.red);
+        cardSR.material.SetColor("_lineColor", isMainTarget ? Color.red : new Color(1, .5f, 0));
     }
 
     void UpdateBuffIcon(List<Buff> valueBuffs)

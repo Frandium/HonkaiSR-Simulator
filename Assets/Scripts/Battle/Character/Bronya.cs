@@ -79,7 +79,7 @@ public class Bronya : ACharacterTalents
         {
             self.AddBuff("tempCritDmg", BuffType.Buff, CommonAttribute.CriticalRate, ValueType.InstantNumber, 10, 1);
         }
-        Damage dmg = Damage.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, enemies[0], CommonAttribute.ATK, atkdmg, new DamageConfig(DamageType.Attack, Element.Anemo));
         self.RemoveBuff("tempCritDmg");
         self.DealDamage(enemies[0], dmg);
         base.AttackEnemyAction(enemies);
@@ -136,7 +136,7 @@ public class Bronya : ACharacterTalents
                     Enemy e = t[0] as Enemy;
                     if (e != null && e.weakPoint.Contains(Element.Anemo))
                     {
-                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Anemo, atkdmg, DamageType.Attack);
+                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, atkdmg, new DamageConfig(DamageType.Attack, Element.Anemo));
                         dmg.fullValue *= .8f;
                         dmg.type = DamageType.CoAttack;
                         e.TakeDamage(self, dmg);

@@ -1,5 +1,6 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEditor.UI;
 using UnityEngine;
 
@@ -56,7 +57,7 @@ public class Creature
 
     public virtual float GetFinalAttr(CommonAttribute attr, bool forView = false)
     {
-        return GetFinalAttr(this, this, attr, DamageType.All, forView);
+        return GetFinalAttr(this, this, attr, new DamageConfig(), forView);
     }
 
     public virtual void SetMono(CreatureMono m)
@@ -64,13 +65,13 @@ public class Creature
         mono = m;
     }
 
-    public virtual float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType, bool forView = false)
+    public virtual float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageConfig damageAttr, bool forView = false)
     {
         // 为了满足【攻击 XX 类敌人时，攻击力提升 XXX】这种功能
         float res = attrs[(int)attr];
         for(int i = buffs.Count - 1; i>=0; --i)
         {
-            float b = buffs[i].CalBuffValue(c1, c2, attr, damageType);
+            float b = buffs[i].CalBuffValue(c1, c2, attr, damageAttr);
             res += b;
             if(!forView && b > 0)
             {
@@ -197,11 +198,12 @@ public class Creature
     public virtual bool StartNormalTurn()
     {
         bool canMoveThisTurn = IsUnderControlledDebuff();
+        mono?.StartMyTurn();
+        // 必须先调用 mono 再调用 trigger，因为 trigger 的表现需要 mono
         foreach (var p in onTurnStart)
         {
-            canMoveThisTurn = canMoveThisTurn && p.trigger();
+            canMoveThisTurn = p.trigger() && canMoveThisTurn;
         }
-        mono?.StartMyTurn();
 
         return canMoveThisTurn;
     }
@@ -243,7 +245,13 @@ public class Creature
         shields.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
         // Remove states
-        states.RemoveAll(s => s.CountDown(CountDownType.Turn));
+        for(int i = states.Count - 1; i >= 0; --i) {
+            if (states[i].CountDown(CountDownType.Turn))
+            {
+                states[i].onremove();
+                states.RemoveAt(i);
+            }
+        }
         
         mono?.EndMyTurn();
     }
@@ -258,7 +266,7 @@ public class Creature
         {
             // 非固有的生命上限变化会触发生命上限变化逻辑
             float oldMaxHP = GetFinalAttr(CommonAttribute.MaxHP);
-            float newMaxHP = oldMaxHP + buff.CalBuffValue(this, this, CommonAttribute.MaxHP, DamageType.All);
+            float newMaxHP = oldMaxHP + buff.CalBuffValue(this, this, CommonAttribute.MaxHP, DamageConfig.defaultDC);
             float oldPercentage = hp / oldMaxHP;
             float newPercentage = hp / newMaxHP;
             if(oldPercentage > newPercentage)
@@ -281,7 +289,7 @@ public class Creature
         DamageType damageType = DamageType.All, CountDownType cdtype = CountDownType.Turn, int triggertime = int.MaxValue, int maxStack = 1)
     {
         DamageType dt = damageType;
-        AddBuff(tag, buffType, attr, valueType, value, (s, t, d) => { return dt == DamageType.All || d == dt; },
+        AddBuff(tag, buffType, attr, valueType, value, (s, t, d) => { return dt == DamageType.All || d.type == dt; },
             turntime, cdtype, triggertime, maxStack);
     }
 
@@ -355,7 +363,7 @@ public class Creature
 
     public virtual void AddState(Creature source, State state)
     {
-        float resist = 1 - 1 / (1 + GetFinalAttr(source, this, CommonAttribute.EffectResist, DamageType.Skill));
+        float resist = 1 - 1 / (1 + GetFinalAttr(source, this, CommonAttribute.EffectResist, DamageConfig.defaultDC));
         if(!Utils.TwoRandom(resist))
         {
             states.Add(state);
@@ -368,19 +376,29 @@ public class Creature
                 case StateType.Restricted:
                     mono?.ShowMessage("束缚", CreatureMono.ImaginaryColor);
                     break;
+                case StateType.Burning:
+                    mono?.ShowMessage("灼烧", CreatureMono.PyroColor); 
+                    break;
                 default:
                     break;
             }
         }
         else
         {
-            mono?.ShowMessage("抵抗", Color.red);
+            mono?.ShowMessage("抵抗", Color.black);
         }
     }
 
     public virtual void RemoveState(StateType t)
     {
-        states.RemoveAll(s => s.state == t);
+        for (int i = states.Count - 1; i >= 0; --i)
+        {
+            if (states[i].state == t)
+            {
+                states[i].onremove();
+                states.RemoveAt(i);
+            }
+        }
         mono?.UpdateState();
     }
 

@@ -47,19 +47,20 @@ public class TimeNeverStop : AWeaponTalent
         }
         float dmg = healAmount * rate;
         healAmount = 0;
-        bool critical = Utils.TwoRandom(self.GetFinalAttr(self, target, CommonAttribute.CriticalRate, DamageType.CoAttack));
+        DamageConfig dc = new DamageConfig(DamageType.CoAttack, self.element);
+        bool critical = Utils.TwoRandom(self.GetFinalAttr(self, target, CommonAttribute.CriticalRate, dc));
         if (critical)
         {
-            dmg *= (1 + self.GetFinalAttr(self, target, CommonAttribute.CriticalDamage, DamageType.CoAttack));
+            dmg *= 1 + self.GetFinalAttr(self, target, CommonAttribute.CriticalDamage, dc);
         }
 
-        float def = target.GetFinalAttr(self, target, CommonAttribute.DEF, DamageType.CoAttack);
-        float defIgnore = self.GetFinalAttr(self, target, CommonAttribute.DEFIgnore, DamageType.CoAttack);
+        float def = target.GetFinalAttr(self, target, CommonAttribute.DEF, dc);
+        float defIgnore = self.GetFinalAttr(self, target, CommonAttribute.DEFIgnore, dc);
         def *= (1 - defIgnore);
         float defRate = 1 - def / (def + 200 + self.level * 10);
         float overallResist = 1
-        - target.GetFinalAttr(self, target, CommonAttribute.PhysicalResist + (int)self.element, DamageType.CoAttack)
-            - target.GetFinalAttr(self, target, CommonAttribute.GeneralResist, DamageType.CoAttack);
+        - target.GetFinalAttr(self, target, CommonAttribute.PhysicalResist + (int)self.element, dc)
+            - target.GetFinalAttr(self, target, CommonAttribute.GeneralResist, dc);
         if (overallResist < .05f) overallResist = .05f; // 抗性上限 95%，无下限，但 0 以下折半
         if (overallResist > 1) overallResist = 1 + (overallResist - 1) * .5f;
         overallResist -= self.GetFinalAttr(CommonAttribute.PhysicalPenetrate + (int)self.element);

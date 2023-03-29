@@ -7,7 +7,7 @@ public class Equipment
     // 自身能提供的 buff。
     protected List<Buff> buffs = new List<Buff>();
 
-    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a, DamageType damageType, bool forView)
+    public virtual float CalBuffValue(Creature source, Creature target,  CommonAttribute a, DamageConfig damageType, bool forView)
     {
         float res = 0;
         for(int i = buffs.Count - 1; i>=0; --i)

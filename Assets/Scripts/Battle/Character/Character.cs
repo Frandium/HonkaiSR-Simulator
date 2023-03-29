@@ -114,6 +114,7 @@ public class Character : Creature
             "bailu" => new Bailu(this),
             "jingyuan" => new Jingyuan(this),
             "yanqing" => new Yanqing(this),
+            "himeko" => new Himeko(this),
             _ => new DefaultCharacterTalents(this),
         };
         talents.OnEquipping();
@@ -236,13 +237,13 @@ public class Character : Creature
         return base.GetBaseAttr(attr);
     }
 
-    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageType damageType, bool forView = false)
+    public override float GetFinalAttr(Creature c1, Creature c2, CommonAttribute attr, DamageConfig damageAttr, bool forView = false)
     {
-        float res = base.GetFinalAttr(c1, c2, attr, damageType, forView);
-        res += weapon.CalBuffValue(null, null, attr, damageType, forView);
+        float res = base.GetFinalAttr(c1, c2, attr, damageAttr, forView);
+        res += weapon.CalBuffValue(null, null, attr, damageAttr, forView);
         foreach(Artifact art in artifacts)
         {
-            res += art.CalBuffValue(this, this, attr, damageType, false);
+            res += art.CalBuffValue(this, this, attr, damageAttr, false);
         }
         return res;
     }

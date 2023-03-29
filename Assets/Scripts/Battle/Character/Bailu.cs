@@ -35,7 +35,7 @@ public class Bailu : ACharacterTalents
 
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
-        Damage dmg = Damage.NormalDamage(self, enemies[0], CommonAttribute.ATK, Element.Electro, atkdmg, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, enemies[0], CommonAttribute.ATK, atkdmg, new DamageConfig(DamageType.Attack, Element.Electro));
         self.DealDamage(enemies[0], dmg);
         base.AttackEnemyAction(enemies);
     }

@@ -46,7 +46,7 @@ public class Yanqing : ACharacterTalents
             {
                 if (target == null)
                     continue;
-                Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, Element.Cryo, talentAtk1, DamageType.Additional);
+                Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk1, new DamageConfig(DamageType.Additional, Element.Cryo));
                 self.DealDamage(target, d);
 
                 if (!Utils.TwoRandom(self.GetFinalAttr(CommonAttribute.EffectHit)))
@@ -54,7 +54,7 @@ public class Yanqing : ACharacterTalents
                 target.AddState(self, new State(StateType.Frozen, 1));
                 target.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("yanqingTalentCryoDmg", () =>
                 {
-                    Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, Element.Cryo, talentAtk2, DamageType.Continue);
+                    Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk2, new DamageConfig(DamageType.Continue, Element.Cryo));
                     self.DealDamage(target, d);
                     return true;
                 }));
@@ -74,7 +74,7 @@ public class Yanqing : ACharacterTalents
             {
                 if(t is Enemy && (t as Enemy).weakPoint.Contains(Element.Cryo))
                 {
-                    Damage dmg = Damage.NormalDamage(self, t, CommonAttribute.ATK, Element.Cryo, .3f, DamageType.CoAttack);
+                    Damage dmg = Damage.NormalDamage(self, t, CommonAttribute.ATK, .3f, new DamageConfig(DamageType.CoAttack, Element.Cryo));
                     self.DealDamage(t, dmg);
                 }
                 return d;
@@ -102,7 +102,7 @@ public class Yanqing : ACharacterTalents
             self.afterDealingDamage.Add(new TriggerEvent<Creature.DamageEvent>("yanqingC1CoAttack", (t, d) => {
                 if (t.IsUnderState(StateType.Frozen))
                 {
-                    Damage dmg = Damage.NormalDamage(self, t, CommonAttribute.ATK, Element.Cryo, 1, DamageType.CoAttack);
+                    Damage dmg = Damage.NormalDamage(self, t, CommonAttribute.ATK, 1, new DamageConfig(DamageType.CoAttack, Element.Cryo));
                     self.DealDamage(t, dmg);
                     t.RemoveState(StateType.Frozen);
                 }
@@ -136,7 +136,7 @@ public class Yanqing : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, atkDmg, DamageType.Attack);
+        Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, atkDmg, new DamageConfig(DamageType.Attack, Element.Cryo));
         self.DealDamage(e, d);
         base.AttackEnemyAction(enemies);
     }
@@ -144,7 +144,7 @@ public class Yanqing : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
+        Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillAtk, new DamageConfig(DamageType.Skill, Element.Cryo));
         self.DealDamage(e, d);
         self.AddBuff("yanqingZhijianlianxin", BuffType.Buff, CommonAttribute.Count, ValueType.Count, 0, 2);
         base.SkillEnemyAction(enemies);
@@ -158,7 +158,7 @@ public class Yanqing : ACharacterTalents
             self.AddBuff("yanqingBurstCrtDmg", BuffType.Buff, CommonAttribute.CriticalDamage, ValueType.InstantNumber, burstCrtDmg, burstTurn);
         }
         Enemy e = enemies[0];
-        Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, burstAtk, DamageType.Burst);
+        Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, burstAtk, new DamageConfig(DamageType.Burst, Element.Cryo));
         self.DealDamage(e, d);
         base.BurstEnemyAction(enemies);
     }

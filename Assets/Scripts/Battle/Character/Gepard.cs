@@ -13,7 +13,7 @@ public class Gepard : ACharacterTalents
     public override void AttackEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, atkDmg, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, atkDmg, new DamageConfig(DamageType.Attack, Element.Cryo));
         self.DealDamage(e, dmg);
         base.AttackEnemyAction(enemies);
     }
@@ -21,19 +21,21 @@ public class Gepard : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillAtk, DamageType.Skill);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillAtk, new DamageConfig(DamageType.Skill, Element.Cryo));
         self.DealDamage(e, dmg);
-        float hit = (self.constellaLevel >= 1 ? 1 : .65f) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageType.Skill));
+        float hit = (self.constellaLevel >= 1 ? 1 : .65f) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, new DamageConfig(DamageType.Skill, Element.Cryo)));
         if (Utils.TwoRandom(hit))
         {
             // ¶³½áµÐÈË
-            e.AddState(self, new State(StateType.Frozen, 1));
+            e.AddState(self, new State(StateType.Frozen, 1, () => {
+                e.onTurnStart.RemoveAll(s => s.tag == "gepardFreeze");
+            }));
             if(e.onTurnStart.Find(t => t.tag == "gepardFreeze") == null)
                 e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("gepardFreeze", () =>
                 {
                     if (e.IsUnderState(StateType.Frozen))
                     {
-                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, Element.Cryo, skillFreeze, DamageType.Continue);
+                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillFreeze, new DamageConfig(DamageType.Continue, Element.Cryo));
                         self.DealDamage(e, dmg);
                     }
                     return true;

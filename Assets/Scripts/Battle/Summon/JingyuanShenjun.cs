@@ -24,7 +24,7 @@ public class JingyuanShenjun : ASummonTalents
         }
         for (int i = 0; i < jingyuan.shenjunAttackTimes;  i++) {
             int j = Random.Range(0, enemies.Count);
-            Damage d = Damage.NormalDamage(jingyuan.character, enemies[j], CommonAttribute.ATK, Element.Electro, jingyuan.talentAtk, DamageType.Additional);
+            Damage d = Damage.NormalDamage(jingyuan.character, enemies[j], CommonAttribute.ATK,jingyuan.talentAtk, new DamageConfig(DamageType.Additional, Element.Electro));
             jingyuan.character.DealDamage(enemies[j], d); 
             if (jingyuan.character.constellaLevel >= 6)
             {
@@ -53,7 +53,7 @@ public class JingyuanShenjun : ASummonTalents
         if(jingyuan.character.constellaLevel >= 2)
         {
             jingyuan.character.AddBuff("jingyuanC2DmgUp", BuffType.Buff, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .2f, 
-                (s,t,dt)=> { return dt == DamageType.Attack || dt == DamageType.Skill || dt == DamageType.Burst;  }, 2);
+                (s,t,dt)=> { return dt.type == DamageType.Attack || dt.type == DamageType.Skill || dt.type == DamageType.Burst;  }, 2);
         }
     }
 

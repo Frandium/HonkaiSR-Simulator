@@ -322,7 +322,7 @@ public class CharacterDetailUI : MonoBehaviour
             GameObject go = Instantiate(attrLine, attrScroll.transform);
             go.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight);
             go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -lineHeight * i);
-            go.GetComponent<Image>().color = attrLineColor[i % 2 + 1];
+            go.GetComponent<Image>().color = attrLineColor[(i + 1) % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
             texts[0].text = attrName;

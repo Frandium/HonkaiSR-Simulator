@@ -99,7 +99,7 @@ public class Enemy : Creature
 
     public override void EndNormalTurn()
     {
-        base.EndNormalTurn();
         onBreak.RemoveAll(t => t.CountDown(CountDownType.Turn));
+        base.EndNormalTurn();
     }
 }
