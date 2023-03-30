@@ -49,15 +49,16 @@ public class Yanqing : ACharacterTalents
                 Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk1, new DamageConfig(DamageType.Additional, Element.Cryo));
                 self.DealDamage(target, d);
 
-                if (!Utils.TwoRandom(self.GetFinalAttr(CommonAttribute.EffectHit)))
-                    continue;
-                target.AddState(self, new State(StateType.Frozen, 1));
-                target.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("yanqingTalentCryoDmg", () =>
+                self.TestAndAddEffect(1, target, () =>
                 {
-                    Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk2, new DamageConfig(DamageType.Continue, Element.Cryo));
-                    self.DealDamage(target, d);
-                    return true;
-                }));
+                    target.AddState(self, new State(StateType.Frozen, 1));
+                    target.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("yanqingTalentCryoDmg", () =>
+                    {
+                        Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk2, new DamageConfig(DamageType.Continue, Element.Cryo));
+                        self.DealDamage(target, d);
+                        return true;
+                    }));
+                });
             }
         });
         self.afterNormalAttack.Add(talentTrigger);

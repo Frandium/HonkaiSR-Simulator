@@ -197,7 +197,7 @@ public class Creature
 
     public virtual bool StartNormalTurn()
     {
-        bool canMoveThisTurn = IsUnderControlledDebuff();
+        bool canMoveThisTurn = IsUnderControlledState();
         mono?.StartMyTurn();
         // 必须先调用 mono 再调用 trigger，因为 trigger 的表现需要 mono
         foreach (var p in onTurnStart)
@@ -248,7 +248,7 @@ public class Creature
         for(int i = states.Count - 1; i >= 0; --i) {
             if (states[i].CountDown(CountDownType.Turn))
             {
-                states[i].onremove();
+                states[i].onremove?.Invoke();
                 states.RemoveAt(i);
             }
         }
@@ -361,32 +361,67 @@ public class Creature
         }
     }
 
+    public virtual void AddAnemoPhyQuant(Creature source, StateType s, int turn, float instantRate, 
+        float continualRate, CommonAttribute dmgAttr = CommonAttribute.ATK)
+    {
+        // 风 物理 量子
+        Damage d = Damage.NormalDamage(source, this, dmgAttr, instantRate, new DamageConfig(DamageType.Continue, (Element)s));
+        source.DealDamage(this, d);
+        AddPyroElecCryo(source, s, turn, continualRate, dmgAttr);
+    }
+
+    public virtual void AddPyroElecCryo(Creature source, StateType s, int turn, float rate, CommonAttribute dmgAttr = CommonAttribute.ATK)
+    {
+        // 风 物理 量子 fall in this
+        // 火 雷 冰 start with this
+        onTurnStart.Add(new TriggerEvent<TurnStartEvent>(source.dbname, () =>
+        {
+            if (IsUnderState(s))
+            {
+                Damage d = Damage.NormalDamage(source, this, dmgAttr, rate, new DamageConfig(DamageType.Continue, (Element)s));
+                source.DealDamage(this, d);
+            }
+            return true;
+        }));
+        AddState(source, new State(s, turn, () => {
+            onTurnStart.RemoveAll(t => t.tag == source.dbname);
+        }));
+    }
+
+    public virtual void AddRestricted(Creature source, int turn, float back, float speedRate)
+    {
+        ChangePercentageLocation(back);
+        AddBuff(source.dbname + "Restricted", BuffType.Permanent, CommonAttribute.Speed, ValueType.Percentage, speedRate, (_, _, _) =>
+        {
+            return IsUnderState(StateType.Restricted);
+        });
+        AddState(source, new State(StateType.Restricted, turn));
+    }
+
     public virtual void AddState(Creature source, State state)
     {
-        float resist = 1 - 1 / (1 + GetFinalAttr(source, this, CommonAttribute.EffectResist, DamageConfig.defaultDC));
-        if(!Utils.TwoRandom(resist))
+        State cur = states.Find(s => s.state == state.state);
+        if(cur == null)
         {
             states.Add(state);
-            mono?.UpdateState();
-            switch (state.state)
-            {
-                case StateType.Frozen:
-                    mono?.ShowMessage("冻结", CreatureMono.CryoColor);
-                    break;
-                case StateType.Restricted:
-                    mono?.ShowMessage("束缚", CreatureMono.ImaginaryColor);
-                    break;
-                case StateType.Burning:
-                    mono?.ShowMessage("灼烧", CreatureMono.PyroColor); 
-                    break;
-                default:
-                    break;
-            }
         }
         else
         {
-            mono?.ShowMessage("抵抗", Color.black);
+            cur.ChangeTurnTime(Mathf.Max(0, state._turnTimes - cur._turnTimes));
+            cur.onremove += state.onremove;
         }
+        mono?.UpdateState();
+        mono?.ShowMessage(state.state switch
+        {
+            StateType.Split => "裂伤",
+            StateType.Weathered => "风化",
+            StateType.Burning => "灼烧",
+            StateType.Electric => "触电",
+            StateType.Frozen => "冻结",
+            StateType.Restricted => "禁锢",
+            StateType.Entangle => "纠缠",
+            _ => "未知状态"
+        }, CreatureMono.ElementColors[(int)state.state]);
     }
 
     public virtual void RemoveState(StateType t)
@@ -407,11 +442,21 @@ public class Creature
         return states.Find(s => s.state == t) != null;
     }
 
-    public virtual bool IsUnderControlledDebuff()
+    public virtual bool IsUnderControlledState()
     {
         return states.Find(s => 
             s.state == StateType.Frozen || 
-            s.state == StateType.Restricted
+            s.state == StateType.Restricted ||
+            s.state == StateType.Entangle
+            ) != null;
+    }
+
+    public virtual bool IsUnderNegativeState()
+    {
+        return states.Find(s =>
+            s.state == StateType.Frozen ||
+            s.state == StateType.Restricted ||
+            s.state == StateType.Burning
             ) != null;
     }
 
@@ -427,5 +472,21 @@ public class Creature
         onTurnEnd.Clear();
         onTurnStart.Clear();
         onDying.Clear();
+    }
+
+    public delegate void EffectAction();
+    public void TestAndAddEffect(float baseProb, Creature target, EffectAction action,  DamageConfig dc = null)
+    {
+        if (dc == null)
+            dc = DamageConfig.defaultDC;
+        if( Utils.TwoRandom(baseProb * (1 + GetFinalAttr(this, target, CommonAttribute.EffectHit, dc))) && 
+            ! Utils.TwoRandom(1 - 1 / (1 + target.GetFinalAttr(this, target, CommonAttribute.EffectResist, dc))))
+        {
+            action?.Invoke();
+        }
+        else
+        {
+            target.mono?.ShowMessage("抵抗", Color.black);
+        }
     }
 }

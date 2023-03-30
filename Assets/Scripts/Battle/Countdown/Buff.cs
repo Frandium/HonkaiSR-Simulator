@@ -10,7 +10,7 @@ public enum BuffType
     Count
 }
 
-public struct DamageConfig
+public class DamageConfig
 {
     public DamageType type;
     public Element element;
@@ -20,7 +20,7 @@ public struct DamageConfig
         this.element = element;
     }
 
-    public static DamageConfig defaultDC = new DamageConfig();
+    public static DamageConfig defaultDC = new DamageConfig(DamageType.All, Element.Count);
 }
 
 public class Buff : ACountDownBehaviour

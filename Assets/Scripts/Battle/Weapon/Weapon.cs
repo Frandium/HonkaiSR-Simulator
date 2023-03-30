@@ -102,6 +102,7 @@ public class Weapon: Equipment
             "beforeDawn" => new BeforeDawn(data, refine),
             "soundlySleep" => new SoundlySleep(data, refine),
             "starRailNight" => new StarRailNight(data, refine),
+            "inTheNameOfWorld" => new InTheNameOfWorld(data, refine),
             _ => new DefaultWeapon(data, refine),
         };
     }

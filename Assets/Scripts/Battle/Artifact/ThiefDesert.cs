@@ -18,7 +18,7 @@ public class ThiefDesert : AArtifactTalent
             return;
         character.AddBuff("thiefDesert4CrtRate", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, .1f, (s, t, d) => {
             return t.buffs.Find(b => b.buffType == BuffType.Debuff) != null ||
-            t.IsUnderControlledDebuff();
+            t.IsUnderNegativeState();
         });
         character.AddBuff("thiefDesert4CrtDmg", BuffType.Permanent, CommonAttribute.CriticalDamage, ValueType.InstantNumber, .2f, (s, t, d) => {
             return t.states.Find(s => s.state == StateType.Restricted) != null;

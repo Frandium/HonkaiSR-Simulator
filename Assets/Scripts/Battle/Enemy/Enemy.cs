@@ -69,7 +69,7 @@ public class Enemy : Creature
 
     public override void TakeDamage(Creature source, Damage damage)
     {
-        if (weakHp > 0 && weakPoint.Contains(damage.element))
+        if (weakHp > 0) // && weakPoint.Contains(damage.element))
         {
             weakHp -= damage.type switch
             {
@@ -80,14 +80,39 @@ public class Enemy : Creature
                 DamageType.CoAttack => 5.0f,
                 _ => 0.0f
             };
+            weakHp -= 100000;
             if (weakHp <= 0)
             {
                 weakHp = 0;
                 ChangePercentageLocation(-.25f);
                 mono?.ShowMessage("Èõµã»÷ÆÆ", Color.green);
-                mono?.ShowMessage("»÷ÍË25%", Color.green);
                 mono?.ShowMessage("¼õ·À30%", Color.green);
                 AddBuff("breakDefDown", BuffType.Permanent, CommonAttribute.DEF, ValueType.Percentage, -.3f);
+                switch (damage.element)
+                {
+                    case Element.Physical:
+                        AddAnemoPhyQuant(source, StateType.Split, 2, 1, .5f);
+                        break;
+                    case Element.Pyro:
+                        AddPyroElecCryo(source, StateType.Burning, 2, .5f);
+                        break;
+                    case Element.Electro:
+                        AddPyroElecCryo(source, StateType.Electric, 2, .5f);
+                        break;
+                    case Element.Anemo:
+                        AddAnemoPhyQuant(source, StateType.Weathered, 2, 1, .5f);
+                        break;
+                    case Element.Quantus:
+                        AddAnemoPhyQuant(source, StateType.Entangle, 1, 1, .5f);
+                        break;
+                    case Element.Imaginary:
+                        AddRestricted(source, 1, .25f, .1f);
+                        break;
+                    case Element.Cryo:
+                        AddPyroElecCryo(source, StateType.Frozen, 1, .5f);
+                        break;
+                        default: break;
+                }
                 foreach(var t in onBreak)
                 {
                     t.trigger(source, damage);

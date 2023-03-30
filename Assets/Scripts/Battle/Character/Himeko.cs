@@ -56,8 +56,8 @@ public class Himeko : ACharacterTalents
         Enemy e = enemies[0];
         Damage d = Damage.NormalDamage(self, e, CommonAttribute.ATK, attackAtk, new DamageConfig(DamageType.Attack, Element.Pyro));
         self.DealDamage(e, d);
-        if (self.config.abilityActivated[0] &&
-            Utils.TwoRandom((1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, DamageConfig.defaultDC)) * .8f))
+        if (self.config.abilityActivated[0])
+            self.TestAndAddEffect(.8f, e, () =>
         {
             e.AddState(self, new State(StateType.Burning, 3, () =>
             {
@@ -68,12 +68,13 @@ public class Himeko : ACharacterTalents
                 {
                     if (e.IsUnderState(StateType.Burning))
                     {
-                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, 3000f, new DamageConfig(DamageType.Continue, Element.Pyro));
+                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, attackAtk * .3f, new DamageConfig(DamageType.Attack, Element.Pyro));
+                        dmg.type = DamageType.Continue;
                         self.DealDamage(e, dmg);
                     }
                     return true;
                 }));
-        }
+        });
         base.AttackEnemyAction(enemies);
     }
 
@@ -170,23 +171,15 @@ public class Himeko : ACharacterTalents
 
     public override void Mystery(List<Character> characters, List<Enemy> enemies)
     {
-        foreach(Enemy e in enemies)
+        foreach (Enemy e in enemies)
         {
-            if(Utils.TwoRandom(self.GetFinalAttr(CommonAttribute.EffectHit) * 1))
+            self.TestAndAddEffect(1, e, () =>
             {
-                float resist = 1 - 1 / (1 + e.GetFinalAttr(self, e, CommonAttribute.EffectResist, DamageConfig.defaultDC));
-                if (Utils.TwoRandom(resist))
+                e.AddBuff("himekoMystery", BuffType.Debuff, CommonAttribute.DmgUp, ValueType.InstantNumber, .1f, (s, t, d) =>
                 {
-                    e.mono?.ShowMessage("µÖ¿¹", Color.red);
-                }
-                else
-                {
-                    e.AddBuff("himekoMystery", BuffType.Debuff, CommonAttribute.DmgUp, ValueType.InstantNumber, .1f, (s, t, d) =>
-                    {
-                        return d.element == Element.Pyro;
-                    });
-                }
-            }
+                    return d.element == Element.Pyro;
+                });
+            });
         }
     }
 

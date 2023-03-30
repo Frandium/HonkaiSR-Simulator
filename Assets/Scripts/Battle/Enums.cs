@@ -30,9 +30,13 @@ public enum Career
 
 public enum StateType
 {
-    Frozen,   // ¶³½á = 0
-    Restricted, // ½ûïÀ = 1
+    Split, // ÁÑÉË
     Burning, // ×ÆÉÕ
+    Frozen,   // ¶³½á = 0
+    Electric, // ´¥µç
+    Weathered, //·ç»¯,
+    Entangle, // ¾À²ø
+    Restricted, // ½ûïÀ = 1
     Count
 }
 

@@ -23,28 +23,29 @@ public class Gepard : ACharacterTalents
         Enemy e = enemies[0];
         Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillAtk, new DamageConfig(DamageType.Skill, Element.Cryo));
         self.DealDamage(e, dmg);
-        float hit = (self.constellaLevel >= 1 ? 1 : .65f) * (1 + self.GetFinalAttr(self, e, CommonAttribute.EffectHit, new DamageConfig(DamageType.Skill, Element.Cryo)));
-        if (Utils.TwoRandom(hit))
+        self.TestAndAddEffect(self.constellaLevel >= 1 ? 1 : .65f, e, () =>
         {
             // ¶³½áµÐÈË
-            e.AddState(self, new State(StateType.Frozen, 1, () => {
-                e.onTurnStart.RemoveAll(s => s.tag == "gepardFreeze");
-            }));
-            if(e.onTurnStart.Find(t => t.tag == "gepardFreeze") == null)
-                e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("gepardFreeze", () =>
-                {
-                    if (e.IsUnderState(StateType.Frozen))
-                    {
-                        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillFreeze, new DamageConfig(DamageType.Continue, Element.Cryo));
-                        self.DealDamage(e, dmg);
-                    }
-                    return true;
-                }));
+            e.AddPyroElecCryo(self, StateType.Frozen, 1, skillFreeze);
+            //e.AddState(self, new State(StateType.Frozen, 1, () =>
+            //{
+            //    e.onTurnStart.RemoveAll(s => s.tag == "gepardFreeze");
+            //}));
+            //if (e.onTurnStart.Find(t => t.tag == "gepardFreeze") == null)
+            //    e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("gepardFreeze", () =>
+            //    {
+            //        if (e.IsUnderState(StateType.Frozen))
+            //        {
+            //            Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillFreeze, new DamageConfig(DamageType.Continue, Element.Cryo));
+            //            self.DealDamage(e, dmg);
+            //        }
+            //        return true;
+            //    }));
             if (self.constellaLevel >= 2)
             {
                 e.AddBuff("gepardContellation2SpeedDown", BuffType.Debuff, CommonAttribute.Speed, ValueType.Percentage, -.2f, 1);
             }
-        }
+        });
         base.SkillEnemyAction(enemies);
     }
 

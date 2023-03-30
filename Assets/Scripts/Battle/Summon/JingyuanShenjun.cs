@@ -78,7 +78,7 @@ public class JingyuanShenjun : ASummonTalents
         }
         self.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("jingyuanShenjunCanMove", () =>
         {
-            return jingyuan.character.IsUnderControlledDebuff();
+            return jingyuan.character.IsUnderControlledState();
         }));
     }
 }
