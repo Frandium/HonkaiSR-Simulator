@@ -26,10 +26,11 @@ public class Creature
 
     public delegate Damage DamageEvent(Creature sourceOrTarget, Damage damage);
     public DamageEvent d;
-    public List<TriggerEvent<DamageEvent>> beforeTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
     public List<TriggerEvent<DamageEvent>> beforeDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
-    public List<TriggerEvent<DamageEvent>> afterDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public List<TriggerEvent<DamageEvent>> beforeTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public List<TriggerEvent<DamageEvent>> beforeDying { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
     public List<TriggerEvent<DamageEvent>> afterTakingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
+    public List<TriggerEvent<DamageEvent>> afterDealingDamage { get; protected set; } = new List<TriggerEvent<DamageEvent>>();
 
     public delegate Heal HealEvent(Creature sourceOrTarget, Heal heal);
 
@@ -154,20 +155,36 @@ public class Creature
         hp -= damage.realValue;
         mono?.TakeDamage(damage);
 
-        if(damage.type != DamageType.CoAttack)
+        // 如果一个附加伤害在造成伤害前已经死了，还要触发它的击杀 trigger 吗？
+        // 或者说，算在谁头上呢？附加伤害的伤害来源算谁的啊……
+        if (hp <= 0)
+        {
+            // 触发急救事件，这里要修改白露和杰帕德的逻辑
+            for(int i = 0; i < beforeDying.Count; i++) {
+                beforeDying[i].trigger(source, damage);
+                if (hp > 0)
+                {
+                    if (beforeDying[i].CountDown(CountDownType.Trigger))
+                    {
+                        beforeDying.RemoveAt(i);
+                    }
+                    break;
+                }
+            }
+        }
+        // 没救活
+        if(hp <= 0)
+        {
+            hp = 0;
+            foreach (var p in onDying)
+            {
+                p.trigger();
+            }
+        }else if (damage.type != DamageType.CoAttack)
             foreach (var p in afterTakingDamage)
             {
                 p.trigger(source, damage);
             }
-        
-        if (hp < 0)
-        {
-            hp = 0;
-            foreach(var p in onDying)
-            {
-                p.trigger();
-            }
-        }
     }
 
     public virtual void TakeHeal(Creature source, Heal heal)
@@ -365,7 +382,7 @@ public class Creature
         float continualRate, CommonAttribute dmgAttr = CommonAttribute.ATK)
     {
         // 风 物理 量子
-        Damage d = Damage.NormalDamage(source, this, dmgAttr, instantRate, new DamageConfig(DamageType.Continue, (Element)s));
+        Damage d = Damage.NormalDamage(source, this, dmgAttr, instantRate, new DamageConfig(DamageType.Continue, (Element)s, s));
         source.DealDamage(this, d);
         AddPyroElecCryo(source, s, turn, continualRate, dmgAttr);
     }
@@ -378,7 +395,7 @@ public class Creature
         {
             if (IsUnderState(s))
             {
-                Damage d = Damage.NormalDamage(source, this, dmgAttr, rate, new DamageConfig(DamageType.Continue, (Element)s));
+                Damage d = Damage.NormalDamage(source, this, dmgAttr, rate, new DamageConfig(DamageType.Continue, (Element)s, s));
                 source.DealDamage(this, d);
             }
             return true;

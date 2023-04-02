@@ -116,6 +116,7 @@ public class Character : Creature
             "yanqing" => new Yanqing(this),
             "himeko" => new Himeko(this),
             "welt" => new Welt(this),
+            "clara" => new Clara(this),
             _ => new DefaultCharacterTalents(this),
         };
         talents.OnEquipping();

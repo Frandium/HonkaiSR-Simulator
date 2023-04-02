@@ -102,7 +102,7 @@ public class Bailu : ACharacterTalents
                 }
                 return d;
             }));
-            thisone.afterTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("bailuReborn", (s, d) => {
+            thisone.beforeDying.Add(new TriggerEvent<Creature.DamageEvent>("bailuReborn", (s, d) => {
                 if (thisone.hp <= 0 && shengxiCure <= (self.constellaLevel >= 6 ? 2 : 1))
                 {
                     Heal h = Heal.NormalHeal(self, thisone, CommonAttribute.MaxHP, talentMaxHp2, talentHpOffset2);

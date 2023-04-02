@@ -113,14 +113,15 @@ public class Welt : ACharacterTalents
     int chargedAttack = 0;
     public override void BurstEnemyAction(List<Enemy> enemies)
     {
-        foreach(Enemy enemy in enemies)
+        DamageConfig dc = new DamageConfig(DamageType.Burst, Element.Imaginary, StateType.Restricted);
+        foreach (Enemy enemy in enemies)
         {
-            Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, burstAtk, new DamageConfig(DamageType.Burst, Element.Imaginary));
+            Damage d = Damage.NormalDamage(self, enemy, CommonAttribute.ATK, burstAtk, dc);
             self.DealDamage(enemy, d);
             self.TestAndAddEffect(1, enemy, () =>
             {
                 enemy.AddRestricted(self, 1, .32f, .1f);
-            });
+            }, dc);
             if (self.constellaLevel >= 4)
             {
                 enemy.AddBuff("weltC4DmgUp", BuffType.Debuff, CommonAttribute.DmgUp, ValueType.InstantNumber, .12f, null, 2);
@@ -133,11 +134,12 @@ public class Welt : ACharacterTalents
 
     public override void Mystery(List<Character> characters, List<Enemy> enemies)
     {
+        DamageConfig dc = new DamageConfig(DamageType.CoAttack, Element.Imaginary, StateType.Restricted);
         foreach(Enemy e in enemies) {
             self.TestAndAddEffect(1, e, () =>
             {
                 e.AddRestricted(self, 1, .2f, .1f);
-            });
+            }, dc);
         }
     }
 

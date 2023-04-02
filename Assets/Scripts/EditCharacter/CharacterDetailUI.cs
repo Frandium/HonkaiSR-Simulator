@@ -217,22 +217,27 @@ public class CharacterDetailUI : MonoBehaviour
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage ||
-                        curCharacter.config.artifacts[num].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
-                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s) / 100;
-                        else
-                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
+                        if (double.TryParse(s, out double value)) {
+                            if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage ||
+                            curCharacter.config.artifacts[num].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
+                                curCharacter.config.artifacts[num].mainPhrase.value = value / 100;
+                            else
+                                curCharacter.config.artifacts[num].mainPhrase.value = value;
+                        }
                     });
                 }
                 else
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        if (curCharacter.config.artifacts[num].vicePhrases[num2].type == ValueType.Percentage || 
-                        curCharacter.config.artifacts[num].vicePhrases[num2].attr > CommonAttribute.InstantNumberPercentageDividing)
-                            curCharacter.config.artifacts[num].vicePhrases[num2].value = double.Parse(s) / 100;
-                        else
-                            curCharacter.config.artifacts[num].vicePhrases[num2].value = double.Parse(s);
+                        if (double.TryParse(s, out double value))
+                        {
+                            if (curCharacter.config.artifacts[num].vicePhrases[num2].type == ValueType.Percentage ||
+                            curCharacter.config.artifacts[num].vicePhrases[num2].attr > CommonAttribute.InstantNumberPercentageDividing)
+                                curCharacter.config.artifacts[num].vicePhrases[num2].value = value / 100;
+                            else
+                                curCharacter.config.artifacts[num].vicePhrases[num2].value = value;
+                        }
                     });
                 }
             }

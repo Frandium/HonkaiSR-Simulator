@@ -103,6 +103,7 @@ public class Weapon: Equipment
             "soundlySleep" => new SoundlySleep(data, refine),
             "starRailNight" => new StarRailNight(data, refine),
             "inTheNameOfWorld" => new InTheNameOfWorld(data, refine),
+            "unreplaceable" => new Unreplaceable(data, refine),
             _ => new DefaultWeapon(data, refine),
         };
     }

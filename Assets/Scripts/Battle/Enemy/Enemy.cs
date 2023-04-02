@@ -80,7 +80,6 @@ public class Enemy : Creature
                 DamageType.CoAttack => 5.0f,
                 _ => 0.0f
             };
-            weakHp -= 100000;
             if (weakHp <= 0)
             {
                 weakHp = 0;

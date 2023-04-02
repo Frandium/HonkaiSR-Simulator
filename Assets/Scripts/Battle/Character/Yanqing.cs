@@ -39,6 +39,7 @@ public class Yanqing : ACharacterTalents
             (s, t, d) => { return s.buffs.Find(b => b.tag == "yanqingZhijianlianxin") != null; });
         self.AddBuff("yanqingTalentCrtDmg", BuffType.Permanent, CommonAttribute.CriticalDamage, ValueType.InstantNumber, talentCrtDmg,
             (s, t, d) => { return s.buffs.Find(b => b.tag == "yanqingZhijianlianxin") != null; });
+        DamageConfig dc = new DamageConfig(DamageType.Additional, Element.Cryo, StateType.Frozen);
         var talentTrigger = new TriggerEvent<Character.TalentUponTarget>("talentAdditional", targets =>
         {
             if (!Utils.TwoRandom(.4f)) return;
@@ -46,19 +47,13 @@ public class Yanqing : ACharacterTalents
             {
                 if (target == null)
                     continue;
-                Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk1, new DamageConfig(DamageType.Additional, Element.Cryo));
+                Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk1, dc);
                 self.DealDamage(target, d);
 
                 self.TestAndAddEffect(1, target, () =>
                 {
-                    target.AddState(self, new State(StateType.Frozen, 1));
-                    target.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("yanqingTalentCryoDmg", () =>
-                    {
-                        Damage d = Damage.NormalDamage(self, target, CommonAttribute.ATK, talentAtk2, new DamageConfig(DamageType.Continue, Element.Cryo));
-                        self.DealDamage(target, d);
-                        return true;
-                    }));
-                });
+                    target.AddPyroElecCryo(self, StateType.Frozen, 1, talentAtk2);
+                }, dc);
             }
         });
         self.afterNormalAttack.Add(talentTrigger);

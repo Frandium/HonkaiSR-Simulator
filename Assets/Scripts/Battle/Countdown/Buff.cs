@@ -14,10 +14,12 @@ public class DamageConfig
 {
     public DamageType type;
     public Element element;
-    public DamageConfig(DamageType type =DamageType.All, Element element = Element.Count)
+    public StateType state;
+    public DamageConfig(DamageType type =DamageType.All, Element element = Element.Count, StateType state = StateType.Count)
     {
         this.type = type;
         this.element = element;
+        this.state = state;
     }
 
     public static DamageConfig defaultDC = new DamageConfig(DamageType.All, Element.Count);

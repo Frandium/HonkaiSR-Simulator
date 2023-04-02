@@ -21,31 +21,18 @@ public class Gepard : ACharacterTalents
     public override void SkillEnemyAction(List<Enemy> enemies)
     {
         Enemy e = enemies[0];
-        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillAtk, new DamageConfig(DamageType.Skill, Element.Cryo));
+        DamageConfig dc = new DamageConfig(DamageType.Skill, Element.Cryo, StateType.Frozen);
+        Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillAtk, dc);
         self.DealDamage(e, dmg);
         self.TestAndAddEffect(self.constellaLevel >= 1 ? 1 : .65f, e, () =>
         {
             // 冻结敌人
             e.AddPyroElecCryo(self, StateType.Frozen, 1, skillFreeze);
-            //e.AddState(self, new State(StateType.Frozen, 1, () =>
-            //{
-            //    e.onTurnStart.RemoveAll(s => s.tag == "gepardFreeze");
-            //}));
-            //if (e.onTurnStart.Find(t => t.tag == "gepardFreeze") == null)
-            //    e.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("gepardFreeze", () =>
-            //    {
-            //        if (e.IsUnderState(StateType.Frozen))
-            //        {
-            //            Damage dmg = Damage.NormalDamage(self, e, CommonAttribute.ATK, skillFreeze, new DamageConfig(DamageType.Continue, Element.Cryo));
-            //            self.DealDamage(e, dmg);
-            //        }
-            //        return true;
-            //    }));
             if (self.constellaLevel >= 2)
             {
                 e.AddBuff("gepardContellation2SpeedDown", BuffType.Debuff, CommonAttribute.Speed, ValueType.Percentage, -.2f, 1);
             }
-        });
+        }, dc);
         base.SkillEnemyAction(enemies);
     }
 
@@ -77,24 +64,18 @@ public class Gepard : ACharacterTalents
         burstDefIns = (int)self.metaData["burst"]["defIns"]["value"][self.burstLevel];
         talentHp = (float)(double)self.metaData["talent"]["hp"]["value"][self.talentLevel];
         
-        TriggerEvent<Creature.DamageEvent> t = new TriggerEvent<Creature.DamageEvent>("gepardTalent");
-        t.trigger = (s, d) =>
+        self.beforeDying.Add(new TriggerEvent<Creature.DamageEvent>("gepardTalent", (s, d) =>
         {
-            if (self.hp <= 0)
+            self.hp = ((self.constellaLevel >= 6 ? .5f : 0) + talentHp) * self.GetFinalAttr(CommonAttribute.MaxHP);
+            self.mono.hpLine.fillAmount = self.mono.hpPercentage;
+            self.mono?.ShowMessage("不屈之身", Color.blue);
+            if (self.constellaLevel >= 6)
             {
-                self.hp = ((self.constellaLevel >= 6 ? .5f : 0) + talentHp) * self.GetFinalAttr(CommonAttribute.MaxHP);
-                self.mono.hpLine.fillAmount = self.mono.hpPercentage;
-                self.mono?.ShowMessage("不屈之身", Color.blue);
-                t.Zero();
-                if (self.constellaLevel >= 6)
-                {
-                    self.mono?.ShowMessage("行动提前", Color.blue);
-                    self.ChangePercentageLocation(1);
-                }
+                self.mono?.ShowMessage("行动提前", Color.blue);
+                self.ChangePercentageLocation(1);
             }
             return d;
-        };
-        self.afterTakingDamage.Add(t);
+        }, countdownType: CountDownType.Trigger, triggerTimes: 1));
     }
 
     public override void Mystery(List<Character> characters, List<Enemy> enemies)
