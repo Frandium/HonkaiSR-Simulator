@@ -69,7 +69,7 @@ public class Enemy : Creature
 
     public override void TakeDamage(Creature source, Damage damage)
     {
-        if (weakHp > 0) // && weakPoint.Contains(damage.element))
+        if (weakHp > 0 && weakPoint.Contains(damage.element))
         {
             weakHp -= damage.type switch
             {

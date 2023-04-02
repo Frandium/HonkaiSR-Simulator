@@ -64,6 +64,26 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
+    protected Vector3 origPosition = Vector3.zero;
+    protected Quaternion origRotation = Quaternion.identity;
+    private void Start()
+    {
+        origPosition = transform.position;
+        origRotation = transform.rotation;
+    }
+
+    public void MoveTo(Vector3 pos, Quaternion rot)
+    {
+        transform.Translate(pos - transform.position, Space.World);
+        transform.rotation = rot;
+    }
+
+    public void MoveBack()
+    {
+        transform.position = origPosition;
+        transform.rotation = origRotation;
+    }
+
     //Battle functions
     public virtual void TakeDamage(Damage d)
     {
@@ -244,14 +264,15 @@ public class CreatureMono : MonoBehaviour
 
     public virtual void UpdateState()
     {
-        if(self.IsUnderState(StateType.Frozen))
+        for(int i = 0; i < (int)StateType.Count - 1; ++i)
         {
-            cardSR.material.SetColor("_bodyColor", Color.blue);
+            if (self.IsUnderState((StateType)i))
+            {
+                cardSR.material.SetColor("_bodyColor", ElementColors[i]);
+                return;
+            }
         }
-        else
-        {
-            cardSR.material.SetColor("_bodyColor", Color.white);
-        }
+        cardSR.material.SetColor("_bodyColor", Color.white);
     }
 
     public virtual void UpdateHpLine() {

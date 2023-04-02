@@ -11,6 +11,15 @@ public class EnemyMono : CreatureMono
 
     public Image weakFilling;
     public List<Image> weakpointImage;
+    readonly Vector3 enemyActionPos = new Vector3(179.2f, 1.44f, 92.23f);
+    readonly Quaternion enemyActionRot = Quaternion.Euler(new Vector3(0, 180, 0));
+
+
+    private void Start()
+    {
+        
+    }
+
     private void Update()
     {
         if (isMyTurn || isSelected)
@@ -63,4 +72,15 @@ public class EnemyMono : CreatureMono
         base.TakeDamage(d);
     }
 
+    public void MoveToSpot()
+    {
+        transform.position = enemyActionPos;
+        transform.rotation = enemyActionRot;
+    }
+
+    public void SetOrigPosition(Vector3 pos, Quaternion rot)
+    {
+        origPosition = pos;
+        origRotation = rot;
+    }
 }

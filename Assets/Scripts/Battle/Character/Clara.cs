@@ -139,6 +139,7 @@ public class Clara : ACharacterTalents
         {
             self.AddBuff("claraBurstAtk", BuffType.Buff, CommonAttribute.ATK, ValueType.Percentage, .3f, null, 3);
         }
+        self.mono?.ShowMessage("ºı…À", CreatureMono.PhysicalColor);
         base.BurstCharacterAction(characters);
     }
 

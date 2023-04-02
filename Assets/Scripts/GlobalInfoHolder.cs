@@ -14,10 +14,10 @@ public class GlobalInfoHolder
     public static string battleDir { get; protected set; } = Application.persistentDataPath + "/battles";
     public static string characterConfigDir { get; protected set; } = Application.persistentDataPath + "/user";
 
-    public static string battleFilePath = Application.persistentDataPath + "/battles/boss.json";
+    public static string battleFilePath = Application.persistentDataPath + "/battles/boss4+3.json";
 
     public static string mystery = "tingyun";
 
-    public static string[] teamMembers = new string[] { "bailu", "gepard", "jingyuan", "bronya" };
+    public static string[] teamMembers = new string[] { "himeko", "clara", "jingyuan", "bronya" };
 
 }

@@ -8,6 +8,9 @@ public class Selection : MonoBehaviour
     public GameObject selectLeft;
     public GameObject selectRight;
 
+    public Camera characterCam;
+    public Camera enemyCam;
+
     public AudioClip changeSlelect;
     public AudioClip error;
     public AudioSource audioSource;
@@ -37,21 +40,21 @@ public class Selection : MonoBehaviour
                 selectedCreatures.Add(BattleManager.Instance.enemies[i]);
                 if (selectionType == SelectionType.OneAndNeighbour)
                 {
-                    if(i - 1 >= 0)
+                    if (i - 1 >= 0)
                     {
                         selectedEnemies.Add(BattleManager.Instance.enemies[i - 1]);
                         selectedCreatures.Add(BattleManager.Instance.enemies[i - 1]);
                     }
-                    if(i + 1 < BattleManager.Instance.enemies.Count)
+                    if (i + 1 < BattleManager.Instance.enemies.Count)
                     {
                         selectedEnemies.Add(BattleManager.Instance.enemies[i + 1]);
                         selectedCreatures.Add(BattleManager.Instance.enemies[i + 1]);
                     }
                 }
             }
-            foreach(var t in before)
+            foreach (var t in before)
             {
-                t.trigger(selectedCreatures);   
+                t.trigger(selectedCreatures);
             }
             enemyAction(selectedEnemies);
             foreach (var t in after)
@@ -95,7 +98,9 @@ public class Selection : MonoBehaviour
     List<Character> characters { get { return BattleManager.Instance.characters; } }
     Character curCharacter { get { return BattleManager.Instance.curCharacter; } }
 
-    public void StartCharacterSelection(SelectionType type, ActionUponCharacter action)
+    List<Enemy> enemies { get { return BattleManager.Instance.enemies; } }
+
+    public void StartCharacterSelection(SelectionType type, ActionUponCharacter action, bool isAnimControlledByGM = false)
     {
         ClearSelection();
         isTargetEnemy = false;
@@ -106,6 +111,20 @@ public class Selection : MonoBehaviour
         selectRight.SetActive(true);
         selectLeft.SetActive(true);
         curCharacterIndex = characters.FindIndex(c => c == curCharacter);
+        curCharacter.mono.MoveBack();
+        foreach (Character character in characters)
+        {
+            character.mono.cardSR.enabled = true;
+        }
+        foreach(Enemy e in enemies)
+        {
+            e.mono.gameObject.SetActive(false);
+        }
+        if (!isAnimControlledByGM)
+        {
+            characterCam.enabled = true;
+            enemyCam.enabled = false;
+        }
         switch (type)
         {
             case SelectionType.Self:
@@ -117,7 +136,7 @@ public class Selection : MonoBehaviour
                 selectedCreatureIndices.Add(0);
                 break;
             case SelectionType.OneExceptSelf:
-                for(int i = 0;i<characters.Count; ++i)
+                for(int i = 0; i < characters.Count; ++i)
                 {
                     Character c = characters[i];
                     if(c != curCharacter)
@@ -150,7 +169,9 @@ public class Selection : MonoBehaviour
         }
     }
 
-    public void StartEnemySelection(SelectionType type, ActionUponEnemy action)
+    Vector3 chaSpotSeat = new Vector3(142.4f, 3.4f, 72.9f);
+    Quaternion chaSpotRotation = Quaternion.Euler(new Vector3(0, -18, 0));
+    public void StartEnemySelection(SelectionType type, ActionUponEnemy action, bool isAnimControlledByGM = false)
     {
         ClearSelection();
         isTargetEnemy = true;
@@ -160,7 +181,21 @@ public class Selection : MonoBehaviour
         isDuringSelection = true;
         selectRight.SetActive(true);
         selectLeft.SetActive(true);
-        List<Enemy> enemies = BattleManager.Instance.enemies;
+        if (!isAnimControlledByGM)
+        {
+            enemyCam.enabled = true;
+            characterCam.enabled = false;
+        }
+        
+        curCharacter.mono.MoveTo(chaSpotSeat, chaSpotRotation);
+        foreach (Character character in characters)
+        {
+            character.mono.cardSR.enabled = curCharacter == character;
+        }
+        foreach (Enemy e in enemies)
+        {
+            e.mono.gameObject.SetActive(true);
+        }
         switch (type)
         {
             case SelectionType.Self:
@@ -338,7 +373,6 @@ public class Selection : MonoBehaviour
                     characters[curSelected].mono.SetSelected();
                     selectedCreatureIndices[0] = curSelected;
                 }
-
             }
         }
         else if (selectionType == SelectionType.OneExceptSelf)
@@ -346,6 +380,7 @@ public class Selection : MonoBehaviour
             int curSelected = selectedCreatureIndices[0];
             if (curSelected < characters.Count - 1)
             {
+
                 if (curSelected + 1 == curCharacterIndex)
                 {
                     if (curSelected + 2 < characters.Count)
