@@ -284,38 +284,38 @@ public class Character : Creature
 
     public virtual void StartBurstTurn()
     {
-        foreach (var p in onTurnStart)
-        {
-            p.trigger();
-        }
-        onTurnStart.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        //foreach (var p in onTurnStart)
+        //{
+        //    p.trigger();
+        //}
+        //onTurnStart.RemoveAll(p => p.CountDown(CountDownType.Turn));
         mono?.StartMyTurn();
     }
 
     public virtual void EndBurstTurn()
     {
         // Remove event
-        foreach (var p in onTurnEnd)
-        {
-            p.trigger();
-        }
-        onTurnEnd.RemoveAll(p => p.CountDown(CountDownType.Turn));
+        //foreach (var p in onTurnEnd)
+        //{
+        //    p.trigger();
+        //}
+        //onTurnEnd.RemoveAll(p => p.CountDown(CountDownType.Turn));
 
-        // Remove Buff
-        for (int i = buffs.Count - 1; i >= 0; --i)
-        {
-            if (buffs[i].CountDown(CountDownType.Turn))
-            {
-                Utils.valueBuffPool.ReturnOne(buffs[i]);
-                buffs.RemoveAt(i);
-            }
-        }
+        //// Remove Buff
+        //for (int i = buffs.Count - 1; i >= 0; --i)
+        //{
+        //    if (buffs[i].CountDown(CountDownType.Turn))
+        //    {
+        //        Utils.valueBuffPool.ReturnOne(buffs[i]);
+        //        buffs.RemoveAt(i);
+        //    }
+        //}
 
-        // Remove shields
-        shields.RemoveAll(s => s.CountDown(CountDownType.Turn));
+        //// Remove shields
+        //shields.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
-        // Remove states
-        states.RemoveAll(s => s.CountDown(CountDownType.Turn));
+        //// Remove states
+        //states.RemoveAll(s => s.CountDown(CountDownType.Turn));
 
         mono?.EndBurstTurn();
     }

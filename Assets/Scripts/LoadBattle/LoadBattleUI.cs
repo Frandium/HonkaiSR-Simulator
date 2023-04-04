@@ -19,6 +19,7 @@ public class LoadBattleUI : MonoBehaviour
     Dictionary<string, string> chaDbname2Disname;
     List<string> chaDisname;
     List<string> chaDbname;
+    List<BattleConfig> battles;
 
     // Start is called before the first frame update
     void Awake()
@@ -110,12 +111,13 @@ public class LoadBattleUI : MonoBehaviour
         if (files.Count == 0)
             return;
 
+        battles = new List<BattleConfig>();
         List<string> options = new List<string>();
         for (int i = 0; i < files.Count; ++i)
         {
-            string s = files[i];
-            string dbname = Path.GetFileNameWithoutExtension(s);
-            options.Add(dbname);
+            BattleConfig bc = new BattleConfig(files[i]);
+            battles.Add(bc);
+            options.Add(bc.disname);
         }
         battleList.AddOptions(options);
         OnBattleSelected(0);
@@ -123,19 +125,16 @@ public class LoadBattleUI : MonoBehaviour
 
     public void OnBattleSelected(int o)
     {
-        string file = files[o];
-        GlobalInfoHolder.battleFilePath = file;
-        string jsonString = File.ReadAllText(file);
-        JsonData data = JsonMapper.ToObject(jsonString);
-
+        BattleConfig bc = battles[o];
+        GlobalInfoHolder.battle = bc;
         // load json
         string s = "敌人列表："; 
-        for (int i = 0; i < data["enemies"].Count; ++i)
+        for (int i = 0; i < bc.enemies.Count; ++i)
         {
             s += "\n第" + (i + 1) + "波： ";
-            for (int j = 0; j < data["enemies"][i].Count; ++j)
+            for (int j = 0; j < bc.enemies[i].Count; ++j)
             {
-                JsonData d = JsonMapper.ToObject(File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + (string)data["enemies"][i][j] + ".json"));
+                JsonData d = JsonMapper.ToObject(File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + bc.enemies[i][j].dbname + ".json"));
                 string disname = (string)d["disname"];
                 s += disname + "， ";
             }

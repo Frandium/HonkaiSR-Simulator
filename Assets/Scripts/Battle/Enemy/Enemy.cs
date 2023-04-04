@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using LitJson;
+using UnityEditor.UI;
 
 public class Enemy : Creature
 {
@@ -22,13 +23,13 @@ public class Enemy : Creature
         m.Initialize(this);
     }
 
-    public Enemy(string _dbname)
+    public Enemy(EnemyConfig ec)
     {
-        dbname = _dbname;
-        LoadJson(_dbname);
+        dbname = ec.dbname;
+        LoadJson(ec.dbname, ec.level);
     }
 
-    public void LoadJson(string name)
+    public void LoadJson(string name, int level)
     {
         dbname = name;
         // Load 角色基本属性
@@ -60,6 +61,7 @@ public class Enemy : Creature
                 talents = new Hilichurl(this);
                 break;
             default:
+                talents = new Hilichurl(this);
                 break;
         }
         base.talents = talents;
@@ -119,6 +121,16 @@ public class Enemy : Creature
             }
         }
         base.TakeDamage(source, damage);
+    }
+
+    public override bool StartNormalTurn()
+    {
+        if(weakHp <= 0)
+        {
+            weakHp = weakMaxHp;
+            mono?.UpdateHpLine();
+        }
+        return base.StartNormalTurn();
     }
 
     public override void EndNormalTurn()

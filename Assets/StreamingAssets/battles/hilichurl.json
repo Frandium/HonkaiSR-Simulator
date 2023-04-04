@@ -1,7 +1,29 @@
 {
-    "characters": ["tingyun", "japard", "seele", "bronya"],
+    "dbname": "hilichurl",
+    "disname": "丘丘人4+3",
     "enemies": [
-        ["hilichurl", "hilichurl", "hilichurl", "hilichurl"],
-        ["hilichurl", "hilichurl", "hilichurl"]
+        [{
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }],
+        [{
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }]
     ]
 }

@@ -1,0 +1,10 @@
+{
+    "dbname": "anemoBoss",
+    "disname": "风丘丘王",
+    "speed": 150.0,
+    "maxHp": 21047.4,
+    "atk": 227.1,
+    "def": 465.9,
+    "weakPoint": [4],
+    "weakMaxHp": 350.0
+}

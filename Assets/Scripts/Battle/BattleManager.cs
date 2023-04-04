@@ -47,8 +47,7 @@ public class BattleManager : MonoBehaviour
     public GameObject characterDetail;
 
     // battle configuration
-    List<string> chaNames;
-    List<List<string>> enmNames;
+    List<List<EnemyConfig>> enemyConfigs;
 
     // characters & enemies
 
@@ -136,32 +135,36 @@ public class BattleManager : MonoBehaviour
                 break;
         }
 
-        // 任意时刻，插入大招
-        for(int i = 0; i < 4; ++i)
+        if (!isBurstVideoShowing)
         {
-            if(Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
+            // 任意时刻，插入大招
+            for (int i = 0; i < 4; ++i)
             {
-                TestAndInsertBurst(i);
-            } 
-        }
-
-
-        foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
-        {
-            if (Input.GetKeyDown(p.Key)) {
-                if (characterDetail.activeSelf)
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
                 {
-                    if (curShowingDetail != p.Value)
-                        ShowCharacterDetail(p.Value);
+                    TestAndInsertBurst(i);
+                }
+            }
+
+
+            foreach (KeyValuePair<KeyCode, int> p in detailKey2Character)
+            {
+                if (Input.GetKeyDown(p.Key))
+                {
+                    if (characterDetail.activeSelf)
+                    {
+                        if (curShowingDetail != p.Value)
+                            ShowCharacterDetail(p.Value);
+                        else
+                        {
+                            characterDetail.SetActive(false);
+                            curShowingDetail = -1;
+                        }
+                    }
                     else
                     {
-                        characterDetail.SetActive(false);
-                        curShowingDetail = -1;
+                        ShowCharacterDetail(p.Value);
                     }
-                }
-                else
-                {
-                    ShowCharacterDetail(p.Value);
                 }
             }
         }
@@ -170,20 +173,9 @@ public class BattleManager : MonoBehaviour
     // Game process
     public void LoadBattle()
     {
-        string jsonString = File.ReadAllText(GlobalInfoHolder.battleFilePath);
-        JsonData data = JsonMapper.ToObject(jsonString);
-
         // load json
-        enmNames = new List<List<string>>();
-        for(int i = 0; i < data["enemies"].Count; ++i)
-        {
-            List<string> enm = new List<string>();
-            for(int j = 0; j < data["enemies"][i].Count; ++j)
-            {
-                enm.Add((string)data["enemies"][i][j]);
-            }
-            enmNames.Add(enm);
-        }
+        enemyConfigs = GlobalInfoHolder.battle.enemies;
+        
         // enemies are instantiated in NextTurn
         for (int i = 0; i < GlobalInfoHolder.teamMembers.Length; ++i)
         {
@@ -211,7 +203,7 @@ public class BattleManager : MonoBehaviour
         // 首先判断是否游戏结束
         if (enemies.Count == 0) // 所有敌人都死了
         {   
-            if (++enmWave >= enmNames.Count) // 没有下一波了，结束
+            if (++enmWave >= enemyConfigs.Count) // 没有下一波了，结束
             {
                 StartCoroutine(ShowBanner("挑 战 成 功", new Color(1, .5f, 0, .875f), 1, true));
                 bgm.Stop();
@@ -220,12 +212,12 @@ public class BattleManager : MonoBehaviour
             }
             else// 还有下一波
             {
-                StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enmNames.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
-                for (int i = 0; i < enmNames[enmWave].Count; ++i)
+                StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enemyConfigs.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
+                for (int i = 0; i < enemyConfigs[enmWave].Count; ++i)
                 {
                     EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.identity).GetComponent<EnemyMono>();
                     em.SetOrigPosition(enmOriginal + i * enmInternal, Quaternion.identity);
-                    Enemy e = new Enemy(enmNames[enmWave][i]);
+                    Enemy e = new Enemy(enemyConfigs[enmWave][i]);
                     enemies.Add(e);
                     e.SetMono(em);
                     runway.AddCreature(e);
@@ -317,7 +309,9 @@ public class BattleManager : MonoBehaviour
             curCharacter = curCreature as Character;
             // 先进入输入指令阶段
             if (isBurst)
-            { // 元素爆发回合触发 burst start hook
+            {   
+                // 元素爆发回合触发 burst start hook
+                // 元素爆发回合不占用回合数
                 BurstTurn();
             }
             else
@@ -630,8 +624,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    bool isBurstVideoShowing = false;
     IEnumerator CloseVideoAfterPlay(double seconds)
     {
+        isBurstVideoShowing = true;
         bgm.Pause();
         screenCanvas.SetActive(false);
         foreach(Character c in characters)
@@ -659,6 +655,7 @@ public class BattleManager : MonoBehaviour
         bgm.Play();
         QButton.gameObject.SetActive(true);
         EButton.gameObject.SetActive(true);
+        isBurstVideoShowing = false;
     }
 
     IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)

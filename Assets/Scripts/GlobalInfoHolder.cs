@@ -14,7 +14,7 @@ public class GlobalInfoHolder
     public static string battleDir { get; protected set; } = Application.persistentDataPath + "/battles";
     public static string characterConfigDir { get; protected set; } = Application.persistentDataPath + "/user";
 
-    public static string battleFilePath = Application.persistentDataPath + "/battles/boss4+3.json";
+    public static BattleConfig battle = new BattleConfig(battleDir + "/boss4+3.json");
 
     public static string mystery = "tingyun";
 

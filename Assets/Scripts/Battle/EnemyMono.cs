@@ -83,4 +83,10 @@ public class EnemyMono : CreatureMono
         origPosition = pos;
         origRotation = rot;
     }
+
+    public override void UpdateHpLine()
+    {
+        weakFilling.fillAmount = self.weakHp / self.weakMaxHp;
+        base.UpdateHpLine();
+    }
 }

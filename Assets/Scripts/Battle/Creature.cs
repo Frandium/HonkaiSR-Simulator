@@ -114,13 +114,18 @@ public class Creature
     public void DealDamage(Creature target, Damage damage)
     {
         // 附加伤害视为同一次伤害，不会触发额外的 damage 事件了
-        if (damage.type != DamageType.CoAttack)
+        // Continue 伤害是因为，彦卿造成的冻结在回合开始时会触发彦卿的附加伤害，
+        // 导致再次冻结；此时，会移除先前的冻结，移除冻结又触发了移除回合开始时
+        // 附加的伤害，导致死循环。
+        if (damage.type != DamageType.CoAttack &&
+            damage.type != DamageType.Continue)
             foreach(var p in beforeDealingDamage)
             {
                 p.trigger(target, damage);
             }
         target.TakeDamage(this, damage);
-        if(damage.type != DamageType.CoAttack)
+        if(damage.type != DamageType.CoAttack &&
+           damage.type != DamageType.Continue)
             foreach (var p in afterDealingDamage)
             {
                 p.trigger(target, damage);
@@ -219,6 +224,8 @@ public class Creature
         // 必须先调用 mono 再调用 trigger，因为 trigger 的表现需要 mono
         foreach (var p in onTurnStart)
         {
+            // 被冻结的 qq 王这里会出问题？
+            // 奥！yanqing 和 gepard 的冻结 on remove 事件会把 on turn start 里面的 trigger
             canMoveThisTurn = p.trigger() && canMoveThisTurn;
         }
 

@@ -1,0 +1,19 @@
+{
+    "dbname": "cryo",
+    "disname": "冰BOSS",
+    "enemies": [
+        [{
+                "name": "hilichurl",
+                "level": 80
+            },
+            {
+                "name": "cryoBoss",
+                "level": 80
+            },
+            {
+                "name": "hilichurl",
+                "level": 80
+            }
+        ]
+    ]
+}
