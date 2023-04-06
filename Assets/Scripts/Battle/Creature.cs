@@ -1,7 +1,6 @@
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
-using UnityEditor.UI;
 using UnityEngine;
 
 public class Creature
@@ -124,6 +123,7 @@ public class Creature
                 p.trigger(target, damage);
             }
         target.TakeDamage(this, damage);
+        BattleManager.Instance?.UpdateDealDamage(this, damage);
         if(damage.type != DamageType.CoAttack &&
            damage.type != DamageType.Continue)
             foreach (var p in afterDealingDamage)
@@ -144,7 +144,7 @@ public class Creature
         shields.RemoveAll(s => s.CountDown(CountDownType.Trigger) || s.hp <= 0);
         remain = Mathf.Max(0, remain);
         damage.realValue = remain;
-
+        
         if (damage.realValue <= 0)
         {
             mono?.TakeDamage(damage);
@@ -157,6 +157,7 @@ public class Creature
                 p.trigger(source, damage);
             }
 
+        BattleManager.Instance.UpdateTakeDamage(this, damage);
         hp -= damage.realValue;
         mono?.TakeDamage(damage);
 

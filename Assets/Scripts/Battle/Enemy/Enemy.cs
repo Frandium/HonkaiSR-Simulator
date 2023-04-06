@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using LitJson;
-using UnityEditor.UI;
 
 public class Enemy : Creature
 {
@@ -52,18 +51,12 @@ public class Enemy : Creature
         weakMaxHp = (float)(double)data["weakMaxHp"];
         weakHp = weakMaxHp;
 
-        switch (dbname)
+        talents = dbname switch
         {
-            case "hilichurl":
-                talents = new Hilichurl(this);
-                break;
-            case "boss":
-                talents = new Hilichurl(this);
-                break;
-            default:
-                talents = new Hilichurl(this);
-                break;
-        }
+            "hilichurl" => new Hilichurl(this),
+            "boss" => new Hilichurl(this),
+            _ => new Hilichurl(this),
+        };
         base.talents = talents;
 
         hp = GetFinalAttr(CommonAttribute.MaxHP);
@@ -128,6 +121,8 @@ public class Enemy : Creature
         if(weakHp <= 0)
         {
             weakHp = weakMaxHp;
+            RemoveBuff("breakDefDown");
+            mono?.ShowMessage("ÈÍÐÔ»Ö¸´", Color.black);
             mono?.UpdateHpLine();
         }
         return base.StartNormalTurn();

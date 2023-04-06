@@ -1,0 +1,10 @@
+{
+    "dbname": "0test",
+    "disname": "80级测试木桩",
+    "enemies": [
+        [{
+            "name": "damageTest",
+            "level": 80
+        }]
+    ]
+}

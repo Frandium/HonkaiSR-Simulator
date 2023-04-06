@@ -21,10 +21,17 @@
 /artifacts/thiefDesert.json
 /artifacts/wheatGunner.json
 /battles
+/battles/0test.json
+/battles/1test.json
+/battles/anemo.json
 /battles/boss4+3.json
 /battles/cryo.json
+/battles/electro.json
 /battles/hilichurl.json
+/battles/imaginary.json
 /battles/physical.json
+/battles/pyro.json
+/battles/quantus.json
 /characters
 /characters/bailu.json
 /characters/bronya.json
@@ -40,6 +47,7 @@
 /enemies
 /enemies/anemoBoss.json
 /enemies/cryoBoss.json
+/enemies/damageTest.json
 /enemies/electroBoss.json
 /enemies/hilichurl.json
 /enemies/imaginaryBoss.json

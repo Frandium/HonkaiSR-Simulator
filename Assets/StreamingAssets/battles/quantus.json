@@ -1,13 +1,13 @@
 {
-    "dbname": "physical",
-    "disname": "物理丘丘王带两个小怪",
+    "dbname": "quantus",
+    "disname": "量子丘丘王带两个小怪",
     "enemies": [
         [{
                 "name": "hilichurl",
                 "level": 80
             },
             {
-                "name": "physicalBoss",
+                "name": "quantusBoss",
                 "level": 80
             },
             {

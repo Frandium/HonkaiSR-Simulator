@@ -1,6 +1,6 @@
 {
     "dbname": "cryo",
-    "disname": "冰BOSS",
+    "disname": "冰丘丘王带两个小怪",
     "enemies": [
         [{
                 "name": "hilichurl",

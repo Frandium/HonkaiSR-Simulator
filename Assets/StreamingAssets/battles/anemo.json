@@ -1,13 +1,13 @@
 {
-    "dbname": "physical",
-    "disname": "物理丘丘王带两个小怪",
+    "dbname": "anemo",
+    "disname": "风丘丘王带两个小怪",
     "enemies": [
         [{
                 "name": "hilichurl",
                 "level": 80
             },
             {
-                "name": "physicalBoss",
+                "name": "anemoBoss",
                 "level": 80
             },
             {

@@ -38,13 +38,13 @@ public class LoadBattleUI : MonoBehaviour
         chaDbname2Disname.Add("none", "£¨¿Õ£©");
         chaDisname.Add("£¨¿Õ£©");
         chaDbname.Add("none");
-        for(int i = 0; i < 4; ++i)
+        GlobalInfoHolder.teamMembers = new List<string> { "none", "none", "none", "none" };
+        for (int i = 0; i < 4; ++i)
         {
             int idx = i;
             teamCharacter[i].ClearOptions();
             teamCharacter[i].AddOptions(chaDisname);
             teamCharacter[i].SetValueWithoutNotify(chaDisname.Count - 1);
-            GlobalInfoHolder.teamMembers[i] = "none";
             teamCharacter[i].onValueChanged.AddListener(ci =>
             {
                 string newName = chaDbname[ci];
@@ -144,7 +144,7 @@ public class LoadBattleUI : MonoBehaviour
 
     public void OnMysterySelected(int o)
     {
-        if (o >= GlobalInfoHolder.teamMembers.Length)
+        if (o >= GlobalInfoHolder.teamMembers.Count)
             GlobalInfoHolder.mystery = "none";
         else
             GlobalInfoHolder.mystery = GlobalInfoHolder.teamMembers[o];

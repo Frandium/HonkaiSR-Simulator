@@ -60,9 +60,13 @@ public class BattleManager : MonoBehaviour
 
     // UI Bounding
     public Text bannerText;
+    public Text[] dealDamageText;
+    public Text[] takeDamageText;
     public Image attackImage;
     public Image skillImage;
     public Image splash;
+    public RectTransform[] dealDamageBar;
+    public RectTransform[] takeDamageBar;
     public Image bannerImgae;
     public Button QButton;
     public Button EButton;
@@ -175,15 +179,22 @@ public class BattleManager : MonoBehaviour
     {
         // load json
         enemyConfigs = GlobalInfoHolder.battle.enemies;
-        
+
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < GlobalInfoHolder.teamMembers.Length; ++i)
+        
+        GlobalInfoHolder.teamMembers.RemoveAll(s => s == "none");
+        int i;
+        for (i = 0; i < GlobalInfoHolder.teamMembers.Count; ++i)
         {
             string chaname = GlobalInfoHolder.teamMembers[i];
             if (chaname == "none")
             {
                 cMonos[i].gameObject.SetActive(false);
                 cMonos[i].avatar.SetActive(false);
+                dealDamageBar[i].anchorMin = new Vector2(1, 0);
+                dealDamageBar[i].anchorMax = new Vector2(1, 1);
+                takeDamageBar[i].anchorMin = new Vector2(1, 0);
+                takeDamageBar[i].anchorMax = new Vector2(1, 1);
             }
             else
             {
@@ -192,7 +203,18 @@ public class BattleManager : MonoBehaviour
                 characters.Add(c);
                 c.SetMono(cMonos[i]);
                 runway.AddCreature(c);
+                characterDealDamage[c] = 0;
+                characterTakeDamage[c] = 0;
             }
+        }
+        for (; i < 4; ++i)
+        {
+            cMonos[i].gameObject.SetActive(false);
+            cMonos[i].avatar.SetActive(false);
+            dealDamageBar[i].anchorMin = new Vector2(1, 0);
+            dealDamageBar[i].anchorMax = new Vector2(1, 1);
+            takeDamageBar[i].anchorMin = new Vector2(1, 0);
+            takeDamageBar[i].anchorMax = new Vector2(1, 1);
         }
         mystery = GlobalInfoHolder.mystery;
     }
@@ -530,9 +552,6 @@ public class BattleManager : MonoBehaviour
         runway.RemoveCreature(s);
     }
 
-
-    // Animation Settings
-
     IEnumerator ChangeLocalScale(RectTransform tran, Vector3 target, float time)
     {
         Vector3 diff = target - tran.localScale;
@@ -670,5 +689,63 @@ public class BattleManager : MonoBehaviour
         bannerImgae.gameObject.SetActive(false);
         if(returnToIndex)
             SceneManager.LoadScene("Index");
+    }
+
+    float totalDealDamage = 0;
+    Dictionary<Character, float> characterDealDamage = new Dictionary<Character, float>();
+    public void UpdateDealDamage(Creature source, Damage d)
+    {
+        Character character = source as Character;
+        if(character == null)
+            return;
+        
+        characterDealDamage[character] += d.fullValue;
+        totalDealDamage += d.fullValue;
+        if(totalDealDamage == 0)
+        {
+
+        }
+        else
+        {
+            float prevPos = 0;
+            for(int i = 0; i < allCharacters.Count; ++i)
+            {
+                Character c = allCharacters[i];
+                float pct = characterDealDamage[c] / totalDealDamage;
+                dealDamageText[i].text = c.disname + ":" + characterDealDamage[c].ToString("F2") + "(" + (pct * 100).ToString("F2") + "%)";
+                dealDamageBar[i].anchorMin = new Vector2(prevPos, 0);
+                prevPos = i == allCharacters.Count - 1 ? 1 : prevPos + pct;
+                dealDamageBar[i].anchorMax = new Vector2(prevPos, 1);
+            }
+        }
+    }
+
+    float totalTakeDamage = 0;
+    Dictionary<Character, float> characterTakeDamage = new Dictionary<Character, float>();
+    public void UpdateTakeDamage(Creature target, Damage d)
+    {
+        Character character = target as Character;
+        if (character == null)
+            return;
+
+        characterTakeDamage[character] += d.fullValue;
+        totalTakeDamage += d.fullValue;
+        if (totalTakeDamage == 0)
+        {
+
+        }
+        else
+        {
+            float prevPos = 0;
+            for (int i = 0; i < allCharacters.Count; ++i)
+            {
+                Character c = allCharacters[i];
+                float pct = characterTakeDamage[c] / totalTakeDamage;
+                takeDamageText[i].text = c.disname + ":" + characterTakeDamage[c].ToString("F2") + "(" + (pct * 100).ToString("F2") + "%)";
+                takeDamageBar[i].anchorMin = new Vector2(prevPos, 0);
+                prevPos = i == allCharacters.Count - 1 ? 1 : prevPos + pct;
+                takeDamageBar[i].anchorMax = new Vector2(prevPos, 1);
+            }
+        }
     }
 }

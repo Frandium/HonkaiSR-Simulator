@@ -50,11 +50,12 @@ public class Seele : ACharacterTalents
                                 () =>
                                 {
                                     Debug.Log("希儿额外回合结束");
+                                    
                                     addtionalTurn = false;
                                 }, 1)
                             );
                             return true;
-                        }, 1));
+                        }, 2));
                 }
             }
             return dmg;

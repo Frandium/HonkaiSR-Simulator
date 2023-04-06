@@ -1,0 +1,10 @@
+{
+    "dbname": "damageTest",
+    "disname": "200万血500防测试木桩",
+    "speed": 10.0,
+    "maxHp": 2000000.0,
+    "atk": 100.1,
+    "def": 500.9,
+    "weakPoint": [0, 1, 2, 3, 4, 5, 6],
+    "weakMaxHp": 350.0
+}
