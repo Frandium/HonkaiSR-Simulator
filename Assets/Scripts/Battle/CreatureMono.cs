@@ -13,9 +13,16 @@ public class CreatureMono : MonoBehaviour
         new Color(0, .625f, .25f, 1), // 风
         new Color(0, .125f, .75f, 1), // 量子
         new Color(1, .75f, .25f, 1),  // 虚数
-        new Color(0, 0, 0, 1) };      // 黑色，缺省
+        new Color(0, 0, 0, 1)   // 黑色，缺省 
+    };
 
-
+    public static Color PhysicalColor { get { return ElementColors[0]; } }
+    public static Color PyroColor { get { return ElementColors[1]; } }
+    public static Color CryoColor { get { return ElementColors[2]; } }
+    public static Color ElectroColor { get { return ElementColors[3];} }
+    public static Color AnemoColor { get { return ElementColors[4]; } }
+    public static Color QuantusColor { get { return ElementColors[5]; } }
+    public static Color ImaginaryColor { get { return ElementColors[6]; } }
 
     public int uniqueID { get; protected set; } = -1;
     protected Creature self;
@@ -41,10 +48,9 @@ public class CreatureMono : MonoBehaviour
     protected float dmgBgBaseAlpha = .5f;
     public bool IsPerformanceFinished
     {
-        get { return isAnimFinished && isAudioFinished; }
-        protected set { isAudioFinished = value; isAnimFinished = value; }
+        get { return finishedMessageCount >= messageCount && isAudioFinished; }
     }
-    protected bool isAnimFinished = true;
+//    protected bool isAnimFinished = true;
     protected bool isAudioFinished = true;
 
     public delegate void Then();
@@ -58,11 +64,31 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
+
+    public void MoveTo(Vector3 pos, Quaternion rot)
+    {
+        transform.Translate(pos - transform.position, Space.World);
+        transform.rotation = rot;
+    }
+
+    public Vector3 origPosition;
+    public Quaternion origRotation;
+    public void MoveBack()
+    {
+        transform.position = origPosition;
+        transform.rotation = origRotation;
+    }
+
+    public void SetOrigPosition(Vector3 pos, Quaternion rot)
+    {
+        origPosition = pos;
+        origRotation = rot;
+    }
     //Battle functions
     public virtual void TakeDamage(Damage d)
     {
         hpLine.fillAmount = hpPercentage;
-        int dmg = -Mathf.RoundToInt(d.value);
+        int dmg = -Mathf.RoundToInt(d.realValue);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
         ShowMessage(content, ElementColors[(int)d.element], d.isCritical?2:1, () => { if (self.hp <= 0) OnDying(); });
     }
@@ -72,7 +98,7 @@ public class CreatureMono : MonoBehaviour
         hpLine.fillAmount = hpPercentage;
         int dmg = Mathf.RoundToInt(value);
         string content = dmg > 0 ? "+" + dmg.ToString() : dmg.ToString();
-        ShowMessage(content, Color.white);
+        ShowMessage(content, Color.green);
     }
 
 
@@ -92,6 +118,7 @@ public class CreatureMono : MonoBehaviour
         colors.Enqueue(c);
         fontSize.Enqueue(fontsize);
         thens.Enqueue(t);
+        messageCount++;
         if (!isMessageShowing)
         {
             isMessageShowing = true;
@@ -99,9 +126,11 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
+    int messageCount = 0;
+    int finishedMessageCount = 0;
     public virtual IEnumerator ConsumeMessage()
     {
-        while (messages.Count > 0) { 
+        while (messages.Count > 0) {
             StartCoroutine(TakeDamangeAnim(messages.Dequeue(), colors.Dequeue(), fontSize.Dequeue(), thens.Dequeue()));
             yield return new WaitForSeconds(.3f);
         }
@@ -110,7 +139,6 @@ public class CreatureMono : MonoBehaviour
 
     protected virtual IEnumerator TakeDamangeAnim(string content, Color c, int fontsize, Then then = null)
     {
-        isAnimFinished = false;
         GameObject go = Instantiate(dmgGO);
         go.SetActive(true);
         go.transform.SetParent(canvas, false);
@@ -135,8 +163,8 @@ public class CreatureMono : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
         Destroy(go);
-        isAnimFinished = true;
         then?.Invoke();
+        finishedMessageCount++;
     }
 
     public virtual void StartMyTurn()
@@ -144,6 +172,8 @@ public class CreatureMono : MonoBehaviour
         isMyTurn = true;
         cardSR.material.SetColor("_lineColor", Color.blue);
         alpha = 1;
+        messageCount = 0;
+        finishedMessageCount = 0;
     }
 
     public virtual void EndMyTurn()
@@ -178,11 +208,11 @@ public class CreatureMono : MonoBehaviour
         cardSR.material.SetFloat("_alpha", 0);
     }
 
-    public virtual void SetSelected()
+    public virtual void SetSelected(bool isMainTarget = true)
     {
         alpha = 1;
         isSelected = true;
-        cardSR.material.SetColor("_lineColor", Color.red);
+        cardSR.material.SetColor("_lineColor", isMainTarget ? Color.red : new Color(1, .5f, 0));
     }
 
     void UpdateBuffIcon(List<Buff> valueBuffs)
@@ -234,13 +264,18 @@ public class CreatureMono : MonoBehaviour
 
     public virtual void UpdateState()
     {
-        if(self.IsUnderState(StateType.Frozen))
+        for(int i = 0; i < (int)StateType.Count - 1; ++i)
         {
-            cardSR.material.SetColor("_bodyColor", Color.blue);
+            if (self.IsUnderState((StateType)i))
+            {
+                cardSR.material.SetColor("_bodyColor", ElementColors[i]);
+                return;
+            }
         }
-        else
-        {
-            cardSR.material.SetColor("_bodyColor", Color.white);
-        }
+        cardSR.material.SetColor("_bodyColor", Color.white);
+    }
+
+    public virtual void UpdateHpLine() {
+        hpLine.fillAmount = hpPercentage;
     }
 }

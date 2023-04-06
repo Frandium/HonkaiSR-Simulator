@@ -1,0 +1,37 @@
+{
+    "dbname": "boss4+3",
+    "disname": "上半风火雷冰+下半量虚物",
+    "characters": ["tingyun", "japard", "seele", "bronya"],
+    "enemies": [
+        [{
+                "name": "pyroBoss",
+                "level": 80
+            },
+            {
+                "name": "cryoBoss",
+                "level": 80
+            },
+            {
+                "name": "electroBoss",
+                "level": 80
+            },
+            {
+                "name": "anemoBoss",
+                "level": 80
+            }
+        ],
+        [{
+                "name": "quantusBoss",
+                "level": 80
+            },
+            {
+                "name": "physicalBoss",
+                "level": 80
+            },
+            {
+                "name": "imaginaryBoss",
+                "level": 80
+            }
+        ]
+    ]
+}

@@ -1,0 +1,10 @@
+{
+    "dbname": "cryoBoss",
+    "disname": "冰丘丘王",
+    "speed": 150.0,
+    "maxHp": 100345.4,
+    "atk": 479.1,
+    "def": 664.9,
+    "weakPoint": [2],
+    "weakMaxHp": 350.0
+}

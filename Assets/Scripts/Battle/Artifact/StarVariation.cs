@@ -14,13 +14,10 @@ public class StarVariation : AArtifactTalent
         if (count < 2)
             return;
         character.AddBuff("starVariation2", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, .08f);
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("starVariation2Cond", BuffType.Permanent, CommonAttribute.GeneralBonus, (s, t, d) => {
-            if (character.GetFinalAttr(CommonAttribute.Speed) >= .8f && (d== DamageType.Attack || d == DamageType.Skill))
-            {
-                return .2f;
-            }
-            return 0;
-        }));
+        character.AddBuff("starVariation2Cond", BuffType.Permanent, CommonAttribute.GeneralBonus, ValueType.InstantNumber, .2f,
+            (s, t, d) => {
+                return character.GetFinalAttr(CommonAttribute.Speed) >= .8f && (d.type == DamageType.Attack || d.type == DamageType.Skill);
+        });
     }
 
 

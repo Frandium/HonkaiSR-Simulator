@@ -66,6 +66,7 @@ public class Utils
         "虚数属性穿透",
         "无视防御",
         "减伤",
+        "易伤",
         "占位符"
     };
 
@@ -127,6 +128,7 @@ public class Utils
         return r < p;
     }
 
+
     public static string FormatDescription(string format, JsonData d, int l)
     {
         string[] strs = format.Split("#"); // 第1， 3， 5 …… 是要替换的字符串
@@ -140,7 +142,7 @@ public class Utils
                 if((string)d[strs[i]]["type"] == "instant")
                 {
                     if (d[strs[i]]["value"][0].IsDouble)
-                        res += "<color=#f08>" + ((float)(double)d[strs[i]]["value"][l] * 100).ToString() + "</color>";
+                        res += "<color=#f08>" + ((float)(double)d[strs[i]]["value"][l]).ToString() + "</color>";
                     else if (d[strs[i]]["value"][0].IsInt)
                         res += "<color=#f08>" + ((int)d[strs[i]]["value"][l]).ToString() + "</color>";
                 }

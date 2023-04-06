@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -184,41 +185,59 @@ public class CharacterDetailUI : MonoBehaviour
                 {
                     dropdowns[j].onValueChanged.AddListener(v =>
                     {
-                        curCharacter.config.artifacts[num].mainPhrase.type = (ValueType)v;
+                        if ((ValueType)v != curCharacter.config.artifacts[num].mainPhrase.type) {
+                            if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.InstantNumber)
+                                curCharacter.config.artifacts[num].mainPhrase.value /= 100;
+                            else
+                                curCharacter.config.artifacts[num].mainPhrase.value *= 100;
+                            curCharacter.config.artifacts[num].mainPhrase.type = (ValueType)v;
+                        }
                     });
                 }
                 else
                 {
                     dropdowns[j].onValueChanged.AddListener(v =>
                     {
-                        curCharacter.config.artifacts[num].vicePhrases[(num2 - 3) / 2].type = (ValueType)v;
+                        if ((ValueType)v != curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].type)
+                        {
+                            if (curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].type == ValueType.InstantNumber)
+                                curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].value /= 100;
+                            else
+                                curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].value *= 100;
+                            curCharacter.config.artifacts[num].vicePhrases[(num2 - 4) / 2].type = (ValueType)v;
+                        }
                     });
                 }
             }
 
             for (int j = 0; j < 5; ++j)
             {
-                int num2 = j;
+                int num2 = j - 1;
                 if (j == 0)
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage ||
-                        curCharacter.config.artifacts[num].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
-                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s) / 100;
-                        else
-                            curCharacter.config.artifacts[num].mainPhrase.value = double.Parse(s);
+                        if (double.TryParse(s, out double value)) {
+                            if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage ||
+                            curCharacter.config.artifacts[num].mainPhrase.attr > CommonAttribute.InstantNumberPercentageDividing)
+                                curCharacter.config.artifacts[num].mainPhrase.value = value / 100;
+                            else
+                                curCharacter.config.artifacts[num].mainPhrase.value = value;
+                        }
                     });
                 }
                 else
                 {
                     inputFields[j].onValueChanged.AddListener(s =>
                     {
-                        if (curCharacter.config.artifacts[num].mainPhrase.type == ValueType.Percentage || 
-                        curCharacter.config.artifacts[num].vicePhrases[num2 - 1].attr > CommonAttribute.InstantNumberPercentageDividing)
-                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s) / 100;
-                        else
-                            curCharacter.config.artifacts[num].vicePhrases[num2 - 1].value = double.Parse(s);
+                        if (double.TryParse(s, out double value))
+                        {
+                            if (curCharacter.config.artifacts[num].vicePhrases[num2].type == ValueType.Percentage ||
+                            curCharacter.config.artifacts[num].vicePhrases[num2].attr > CommonAttribute.InstantNumberPercentageDividing)
+                                curCharacter.config.artifacts[num].vicePhrases[num2].value = value / 100;
+                            else
+                                curCharacter.config.artifacts[num].vicePhrases[num2].value = value;
+                        }
                     });
                 }
             }
@@ -265,15 +284,22 @@ public class CharacterDetailUI : MonoBehaviour
             chaBreak.interactable = false;
             chaBreak.SetIsOnWithoutNotify(true);
         }
-        attrScroll.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30 * (int)CommonAttribute.Count);
+        // 每一页就显示15个 attrline
+#if UNITY_ANDROID
+        float lineHeight = attrScroll.transform.parent.GetComponent<RectTransform>().rect.height / 15;
+#else
+        float lineHeight = 30;
+#endif
+        attrScroll.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight * (int)CommonAttribute.Count);
 
         for (int i = 0; i < attrScroll.transform.childCount; i++)
         {
             Destroy(attrScroll.transform.GetChild(i).gameObject);
         }
-        // 护盾，位置
+        // 位置
         GameObject posAttr = Instantiate(attrLine, attrScroll.transform);
-        posAttr.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -15);
+        posAttr.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight);
+        posAttr.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, 0);
         posAttr.GetComponent<Image>().color = attrLineColor[1];
         posAttr.name = "position";
         texts = posAttr.GetComponentsInChildren<Text>();
@@ -285,8 +311,9 @@ public class CharacterDetailUI : MonoBehaviour
         {
             string attrName = Utils.attributeNames[i];
             GameObject go = Instantiate(attrLine, attrScroll.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 45);
-            go.GetComponent<Image>().color = attrLineColor[i % 3];
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -lineHeight * (i + 1));
+            go.GetComponent<Image>().color = attrLineColor[i % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
             texts[0].text = attrName;
@@ -298,8 +325,9 @@ public class CharacterDetailUI : MonoBehaviour
         {
             string attrName = Utils.attributeNames[i];
             GameObject go = Instantiate(attrLine, attrScroll.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i -15);
-            go.GetComponent<Image>().color = attrLineColor[i % 3];
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -lineHeight * i);
+            go.GetComponent<Image>().color = attrLineColor[(i + 1) % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
             texts[0].text = attrName;
@@ -506,7 +534,7 @@ public class CharacterDetailUI : MonoBehaviour
         artiSuitInfo.text = suittext;
 
         // Buff 界面
-        buffContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, 30 * (int)CommonAttribute.Count);
+        buffContent.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight * (c.buffs.Count + c.shields.Count));
 
         for (int i = 0; i < buffContent.transform.childCount; i++)
         {
@@ -517,7 +545,8 @@ public class CharacterDetailUI : MonoBehaviour
             Buff b = c.buffs[i];
             string attrName = b.tag;
             GameObject go = Instantiate(attrLine, buffContent.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * i - 15);
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -lineHeight * i);
             go.GetComponent<Image>().color = attrLineColor[i % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();
@@ -548,7 +577,8 @@ public class CharacterDetailUI : MonoBehaviour
             Shield s = c.shields[i];
             string attrName = s.tag;
             GameObject go = Instantiate(attrLine, buffContent.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -30 * (i + c.buffs.Count) - 15);
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(0, lineHeight);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(0, -lineHeight * (i + c.buffs.Count));
             go.GetComponent<Image>().color = attrLineColor[(i + c.buffs.Count) % 2];
             go.name = attrName;
             texts = go.GetComponentsInChildren<Text>();

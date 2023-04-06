@@ -19,6 +19,7 @@ public class LoadBattleUI : MonoBehaviour
     Dictionary<string, string> chaDbname2Disname;
     List<string> chaDisname;
     List<string> chaDbname;
+    List<BattleConfig> battles;
 
     // Start is called before the first frame update
     void Awake()
@@ -37,13 +38,13 @@ public class LoadBattleUI : MonoBehaviour
         chaDbname2Disname.Add("none", "（空）");
         chaDisname.Add("（空）");
         chaDbname.Add("none");
-        for(int i = 0; i < 4; ++i)
+        GlobalInfoHolder.teamMembers = new List<string> { "none", "none", "none", "none" };
+        for (int i = 0; i < 4; ++i)
         {
             int idx = i;
             teamCharacter[i].ClearOptions();
             teamCharacter[i].AddOptions(chaDisname);
             teamCharacter[i].SetValueWithoutNotify(chaDisname.Count - 1);
-            GlobalInfoHolder.teamMembers[i] = "none";
             teamCharacter[i].onValueChanged.AddListener(ci =>
             {
                 string newName = chaDbname[ci];
@@ -110,12 +111,13 @@ public class LoadBattleUI : MonoBehaviour
         if (files.Count == 0)
             return;
 
+        battles = new List<BattleConfig>();
         List<string> options = new List<string>();
         for (int i = 0; i < files.Count; ++i)
         {
-            string s = files[i];
-            string dbname = Path.GetFileNameWithoutExtension(s);
-            options.Add(dbname);
+            BattleConfig bc = new BattleConfig(files[i]);
+            battles.Add(bc);
+            options.Add(bc.disname);
         }
         battleList.AddOptions(options);
         OnBattleSelected(0);
@@ -123,19 +125,16 @@ public class LoadBattleUI : MonoBehaviour
 
     public void OnBattleSelected(int o)
     {
-        string file = files[o];
-        GlobalInfoHolder.battleFilePath = file;
-        string jsonString = File.ReadAllText(file);
-        JsonData data = JsonMapper.ToObject(jsonString);
-
+        BattleConfig bc = battles[o];
+        GlobalInfoHolder.battle = bc;
         // load json
         string s = "敌人列表："; 
-        for (int i = 0; i < data["enemies"].Count; ++i)
+        for (int i = 0; i < bc.enemies.Count; ++i)
         {
             s += "\n第" + (i + 1) + "波： ";
-            for (int j = 0; j < data["enemies"][i].Count; ++j)
+            for (int j = 0; j < bc.enemies[i].Count; ++j)
             {
-                JsonData d = JsonMapper.ToObject(File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + (string)data["enemies"][i][j] + ".json"));
+                JsonData d = JsonMapper.ToObject(File.ReadAllText(GlobalInfoHolder.enemyDir + "/" + bc.enemies[i][j].dbname + ".json"));
                 string disname = (string)d["disname"];
                 s += disname + "， ";
             }
@@ -145,7 +144,7 @@ public class LoadBattleUI : MonoBehaviour
 
     public void OnMysterySelected(int o)
     {
-        if (o >= GlobalInfoHolder.teamMembers.Length)
+        if (o >= GlobalInfoHolder.teamMembers.Count)
             GlobalInfoHolder.mystery = "none";
         else
             GlobalInfoHolder.mystery = GlobalInfoHolder.teamMembers[o];

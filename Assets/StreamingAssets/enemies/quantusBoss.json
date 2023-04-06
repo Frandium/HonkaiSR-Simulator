@@ -1,0 +1,10 @@
+{
+    "dbname": "quantusBoss",
+    "disname": "量子丘丘王",
+    "speed": 150.0,
+    "maxHp": 21047.4,
+    "atk": 227.1,
+    "def": 465.9,
+    "weakPoint": [5],
+    "weakMaxHp": 350.0
+}

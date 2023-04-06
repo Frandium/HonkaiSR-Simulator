@@ -1,0 +1,29 @@
+{
+    "dbname": "hilichurl",
+    "disname": "丘丘人小怪4+3",
+    "enemies": [
+        [{
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }],
+        [{
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }, {
+            "name": "hilichurl",
+            "level": 80
+        }]
+    ]
+}

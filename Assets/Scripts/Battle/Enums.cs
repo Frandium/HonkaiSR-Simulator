@@ -30,7 +30,12 @@ public enum Career
 
 public enum StateType
 {
+    Split, // 裂伤
+    Burning, // 灼烧
     Frozen,   // 冻结 = 0
+    Electric, // 触电
+    Weathered, //风化,
+    Entangle, // 纠缠
     Restricted, // 禁锢 = 1
     Count
 }
@@ -90,6 +95,7 @@ public enum CommonAttribute
     ImaginaryPenetrate,// 虚数穿透 = 35
     DEFIgnore, // 无视防御
     DmgDown, // 减伤
+    DmgUp, // 易伤
     Count // = 28
 }
 
@@ -101,6 +107,7 @@ public enum SelectionType
     OneExceptSelf, // 除自身外的一个 = 2
     All, // 全体 = 3
     AllExceptSelf, //除自身外全体 = 4
+    OneAndNeighbour, // 单体和邻居
     Count
 }
 
@@ -124,13 +131,13 @@ public enum ValueType
 
 public enum DamageType
 {
-    Attack,
-    Skill,
-    Burst,
-    Continue,
-    Additional,
+    Attack, // 普攻伤害
+    Skill,  // 技能伤害
+    Burst,  // 爆发伤害
+    Continue, // 持续伤害
+    Additional, // 追加攻击伤害
     All,
-    CoAttack,
+    CoAttack, // 附加伤害
     Count
 }
 

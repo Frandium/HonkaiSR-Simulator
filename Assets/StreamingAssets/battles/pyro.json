@@ -1,0 +1,19 @@
+{
+    "dbname": "pyro",
+    "disname": "火丘丘王带两个小怪",
+    "enemies": [
+        [{
+                "name": "hilichurl",
+                "level": 80
+            },
+            {
+                "name": "pyroBoss",
+                "level": 80
+            },
+            {
+                "name": "hilichurl",
+                "level": 80
+            }
+        ]
+    ]
+}

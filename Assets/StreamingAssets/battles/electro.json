@@ -1,0 +1,19 @@
+{
+    "dbname": "electro",
+    "disname": "雷丘丘王带两个小怪",
+    "enemies": [
+        [{
+                "name": "hilichurl",
+                "level": 80
+            },
+            {
+                "name": "electroBoss",
+                "level": 80
+            },
+            {
+                "name": "hilichurl",
+                "level": 80
+            }
+        ]
+    ]
+}

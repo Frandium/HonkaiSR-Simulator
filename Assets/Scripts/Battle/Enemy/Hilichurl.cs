@@ -9,9 +9,13 @@ public class Hilichurl : AEnemyTalents
 
     }
 
-    public override void MyTurn()
+    public override void OnEquipping()
     {
-        List<Character> characters = BattleManager.Instance.characters;
+
+    }
+
+    public override void MyTurn(List<Character> characters, List<Enemy> enemies)
+    {
         float tauntWeight = 0;
         foreach(Character c in characters)
         {
@@ -30,7 +34,7 @@ public class Hilichurl : AEnemyTalents
             Debug.LogError("Wrong character index selected.");
             return;
         }
-        Damage dmg = Damage.NormalDamage(self, characters[i], CommonAttribute.ATK, Element.Physical, 1.5f, DamageType.Attack);
+        Damage dmg = Damage.NormalDamage(self, characters[i], CommonAttribute.ATK, 1.5f, new DamageConfig(DamageType.Attack, Element.Physical));
         self.DealDamage(characters[i], dmg);
         self.mono.PlayAudio(AudioType.Attack);
     }

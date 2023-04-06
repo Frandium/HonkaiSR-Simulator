@@ -27,7 +27,7 @@ public class DawnEagle : AArtifactTalent
                 locationUpTurn = BattleManager.Instance.curTurnNumber;
             }
         }, countdownType: CountDownType.Permanent));
-        character.onTurnEnd.Add(new TriggerEvent<Creature.TurnStartEndEvent>("dawnEagle4LocationUp", () =>
+        character.onTurnEnd.Add(new TriggerEvent<Creature.TurnEndEvent>("dawnEagle4LocationUp", () =>
         {
             if (talentActivated)
             {

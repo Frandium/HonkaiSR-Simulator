@@ -5,6 +5,6 @@
     "maxHp": 1504.5,
     "atk": 105.0,
     "def": 300.0,
-    "weakPoint": [1, 2],
+    "weakPoint": [1, 2, 3, 4],
     "weakMaxHp": 100.0
 }

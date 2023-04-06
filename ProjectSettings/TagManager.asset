@@ -36,8 +36,14 @@ TagManager:
   - 
   - 
   - 
-  - 
+  - VeryTop
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Creature
+    uniqueID: 3008119873
+    locked: 0
+  - name: MsgUI
+    uniqueID: 239812265
     locked: 0

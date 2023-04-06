@@ -16,15 +16,15 @@ public class SnowGuard : AArtifactTalent
         character.AddBuff("snowGuard2", BuffType.Permanent, CommonAttribute.DmgDown, ValueType.InstantNumber, .08f);
         if (count < 4)
             return;
-        character.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEndEvent>("snowGuard4", () =>
+        character.onTurnStart.Add(new TriggerEvent<Creature.TurnStartEvent>("snowGuard4", () =>
         {
             if(character.hp < character.GetFinalAttr(CommonAttribute.MaxHP) * .5f)
             {
-                character.TakeHeal(character, .08f * character.GetFinalAttr(CommonAttribute.MaxHP));
+                character.TakeHeal(character, new Heal(.08f * character.GetFinalAttr(CommonAttribute.MaxHP)));
                 character.ChangeEnergy(5);
             }
+            return true;
         }));
-
     }
 
     public override void OnTakingOff(Character character)

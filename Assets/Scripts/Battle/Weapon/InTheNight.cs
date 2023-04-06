@@ -5,11 +5,11 @@ using LitJson;
 
 public class InTheNight : AWeaponTalent
 {
-    int refine = 0;
-    public InTheNight(JsonData d, int r): base(d)
+    public InTheNight(JsonData d, int r): base(d, r)
     {
-        refine = r;
+
     }
+
     float crit, atkSkill, burst;
     public override void OnEquiping(Character character)
     {
@@ -17,31 +17,22 @@ public class InTheNight : AWeaponTalent
         atkSkill = (float)(double)config["effect"]["atkSkill"]["value"][refine];
         burst = (float)(double)config["effect"]["burst"]["value"][refine];
         character.AddBuff("inTheNightCritRate", BuffType.Permanent, CommonAttribute.CriticalRate, ValueType.InstantNumber, crit);
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("inTheNightAtkSkill", BuffType.Permanent, CommonAttribute.GeneralBonus, (c, e, t) =>
+        character.AddBuff("inTheNightAtkSkill", BuffType.Permanent, CommonAttribute.GeneralBonus, (c, e, t) =>
         {
-            if (t == DamageType.Attack || t == DamageType.Skill)
-            {
-                float additionalSpeed = c.GetFinalAttr(CommonAttribute.Speed) - 100;
-                if (additionalSpeed <= 0) return 0;
-                int times = (int)additionalSpeed / 10;
-                if (times > 8) times = 8;
-                return atkSkill * times;
-            }
-            return 0;
-        })
-            );
-        character.AddBuff(Utils.valueBuffPool.GetOne().Set("inTheNightBurst", BuffType.Permanent, CommonAttribute.GeneralBonus, (c, e, t) =>
+            float additionalSpeed = c.GetFinalAttr(CommonAttribute.Speed) - 100;
+            if (additionalSpeed <= 0) return 0;
+            int times = (int)additionalSpeed / 10;
+            if (times > 8) times = 8;
+            return atkSkill * times;
+        }, (s, d, t) => { return t.type == DamageType.Attack || t.type == DamageType.Skill; });
+        character.AddBuff("inTheNightBurst", BuffType.Permanent, CommonAttribute.GeneralBonus, (c, e, t) =>
         {
-            if (t == DamageType.Attack || t == DamageType.Skill)
-            {
-                float additionalSpeed = c.GetFinalAttr(CommonAttribute.Speed) - 100;
-                if (additionalSpeed <= 0) return 0;
-                int times = (int)additionalSpeed / 10;
-                if (times > 8) times = 8;
-                return burst * times;
-            }
-            return 0;
-        })
+            float additionalSpeed = c.GetFinalAttr(CommonAttribute.Speed) - 100;
+            if (additionalSpeed <= 0) return 0;
+            int times = (int)additionalSpeed / 10;
+            if (times > 8) times = 8;
+            return burst * times;
+        }, (s, t, d) => { return d.type == DamageType.Attack || d.type == DamageType.Skill; }
             );
     }
 

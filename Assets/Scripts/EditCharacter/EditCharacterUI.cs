@@ -31,7 +31,8 @@ public class EditCharacterUI : MonoBehaviour
         files.RemoveAll(s => !Path.GetExtension(s).Equals(".json"));
         if (files.Count == 0)
             return;
-        scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(70 * files.Count, 0);
+        float w = scrollContent.GetComponent<RectTransform>().rect.height;
+        scrollContent.GetComponent<RectTransform>().sizeDelta = new Vector2(w * files.Count * 1.05f, 0);
         // 对所有的角色，在上方的滚动条里 add 一个选项，然后找 Resources 里有没有他的照片，有就add，没有就 fall back 到默认图片
         for(int i = 0; i < files.Count; ++i) 
         {
@@ -42,7 +43,7 @@ public class EditCharacterUI : MonoBehaviour
             if (avatar == null)
                 avatar = defaultAvatar;
             GameObject go = Instantiate(headButtonGO, scrollContent.transform);
-            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(35 + 70 * i, 0);
+            go.GetComponent<RectTransform>().anchoredPosition = new Vector2(w * i * 1.05f, 0);
             go.GetComponent<Image>().sprite = avatar;
             go.name = dbname;
             go.GetComponent<Button>().onClick.AddListener(() => OnHeadClick(dbname));

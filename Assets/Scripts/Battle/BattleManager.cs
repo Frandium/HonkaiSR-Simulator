@@ -34,17 +34,19 @@ public class BattleManager : MonoBehaviour
     public List<Character> characters { get; protected set; } = new List<Character>();
     public List<Character> deadCharacters { get; protected set; } = new List<Character>();
     public List<Character> allCharacters { get; protected set; } = new List<Character>();
+    public List<Summon> summons { get; protected set; } = new List<Summon>();
 
     public List<CharacterMono> cMonos = new List<CharacterMono>();
     public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
+    public Camera mainCamera;
     public GameObject enemyPrefab;
+    public GameObject summonPrefab;
     public GameObject screenCanvas;
     public GameObject characterDetail;
 
     // battle configuration
-    List<string> chaNames;
-    List<List<string>> enmNames;
+    List<List<EnemyConfig>> enemyConfigs;
 
     // characters & enemies
 
@@ -57,9 +59,13 @@ public class BattleManager : MonoBehaviour
 
     // UI Bounding
     public Text bannerText;
+    public Text[] dealDamageText;
+    public Text[] takeDamageText;
     public Image attackImage;
     public Image skillImage;
     public Image splash;
+    public RectTransform[] dealDamageBar;
+    public RectTransform[] takeDamageBar;
     public Image bannerImgae;
     public Button QButton;
     public Button EButton;
@@ -78,8 +84,10 @@ public class BattleManager : MonoBehaviour
     public Sprite buffSprite;
     public Sprite debuffSprite;
     public Sprite nullBuffSprite;
-    Vector3 enmInternal = - new Vector3(12.8f, 0, 7.4f);  // 敌人排布间距
-    Vector3 enmOriginal = new Vector3(185.6f, 8.1f, 121.2f);
+    Vector3 enmInternal = - new Vector3(4f, 0, 0f);  // 敌人排布间距
+    Vector3 enmOriginal = new Vector3(157.61f, 6.4f, 76.55f);
+    Vector3 chaOriginal = new Vector3(196.5f, 5, 84.41f);
+    Vector3 chaInternal = - new Vector3(4.5f, 0, 0);
     bool interrupted = false;
     string mystery = "";
 
@@ -95,6 +103,7 @@ public class BattleManager : MonoBehaviour
     void Start()
     {
         Application.targetFrameRate = 60;
+        bgm.volume = GlobalSettings.volume;
         LoadBattle();
         skillPoint.GainPoint(2);
         NextTurn();
@@ -117,6 +126,7 @@ public class BattleManager : MonoBehaviour
                     RespondtoKeycodeSpace();
                 break;
             case TurnStage.Animation:
+                // 问题出在，敌人死了，被从列表里移除，但这个时候它的动画可能还没播完，不能进下一回合。
                 if (turnTime > minTurnTime && cMonos.TrueForAll(c => c.IsPerformanceFinished) && enemies.TrueForAll(e => e.mono.IsPerformanceFinished))
                 {
                     NextTurn();
@@ -130,32 +140,36 @@ public class BattleManager : MonoBehaviour
                 break;
         }
 
-        // 任意时刻，插入大招
-        for(int i = 0; i < 4; ++i)
+        if (!isBurstVideoShowing)
         {
-            if(Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
+            // 任意时刻，插入大招
+            for (int i = 0; i < 4; ++i)
             {
-                TestAndInsertBurst(i);
-            } 
-        }
-
-
-        foreach(KeyValuePair<KeyCode, int> p in detailKey2Character)
-        {
-            if (Input.GetKeyDown(p.Key)) {
-                if (characterDetail.activeSelf)
+                if (Input.GetKeyDown(KeyCode.Alpha1 + i) || Input.GetKeyDown(KeyCode.Keypad1 + i))
                 {
-                    if (curShowingDetail != p.Value)
-                        ShowCharacterDetail(p.Value);
+                    TestAndInsertBurst(i);
+                }
+            }
+
+
+            foreach (KeyValuePair<KeyCode, int> p in detailKey2Character)
+            {
+                if (Input.GetKeyDown(p.Key))
+                {
+                    if (characterDetail.activeSelf)
+                    {
+                        if (curShowingDetail != p.Value)
+                            ShowCharacterDetail(p.Value);
+                        else
+                        {
+                            characterDetail.SetActive(false);
+                            curShowingDetail = -1;
+                        }
+                    }
                     else
                     {
-                        characterDetail.SetActive(false);
-                        curShowingDetail = -1;
+                        ShowCharacterDetail(p.Value);
                     }
-                }
-                else
-                {
-                    ShowCharacterDetail(p.Value);
                 }
             }
         }
@@ -164,28 +178,24 @@ public class BattleManager : MonoBehaviour
     // Game process
     public void LoadBattle()
     {
-        string jsonString = File.ReadAllText(GlobalInfoHolder.battleFilePath);
-        JsonData data = JsonMapper.ToObject(jsonString);
-
         // load json
-        enmNames = new List<List<string>>();
-        for(int i = 0; i < data["enemies"].Count; ++i)
-        {
-            List<string> enm = new List<string>();
-            for(int j = 0; j < data["enemies"][i].Count; ++j)
-            {
-                enm.Add((string)data["enemies"][i][j]);
-            }
-            enmNames.Add(enm);
-        }
+        enemyConfigs = GlobalInfoHolder.battle.enemies;
+
         // enemies are instantiated in NextTurn
-        for (int i = 0; i < GlobalInfoHolder.teamMembers.Length; ++i)
+        
+        GlobalInfoHolder.teamMembers.RemoveAll(s => s == "none");
+        int i;
+        for (i = 0; i < GlobalInfoHolder.teamMembers.Count; ++i)
         {
             string chaname = GlobalInfoHolder.teamMembers[i];
             if (chaname == "none")
             {
                 cMonos[i].gameObject.SetActive(false);
                 cMonos[i].avatar.SetActive(false);
+                dealDamageBar[i].anchorMin = new Vector2(1, 0);
+                dealDamageBar[i].anchorMax = new Vector2(1, 1);
+                takeDamageBar[i].anchorMin = new Vector2(1, 0);
+                takeDamageBar[i].anchorMax = new Vector2(1, 1);
             }
             else
             {
@@ -194,7 +204,19 @@ public class BattleManager : MonoBehaviour
                 characters.Add(c);
                 c.SetMono(cMonos[i]);
                 runway.AddCreature(c);
+                characterDealDamage[c] = 0;
+                characterTakeDamage[c] = 0;
+                cMonos[i].SetOrigPosition(chaOriginal + i * chaInternal, Quaternion.Euler(new Vector3(0, 180, 0)));
             }
+        }
+        for (; i < 4; ++i)
+        {
+            cMonos[i].gameObject.SetActive(false);
+            cMonos[i].avatar.SetActive(false);
+            dealDamageBar[i].anchorMin = new Vector2(1, 0);
+            dealDamageBar[i].anchorMax = new Vector2(1, 1);
+            takeDamageBar[i].anchorMin = new Vector2(1, 0);
+            takeDamageBar[i].anchorMax = new Vector2(1, 1);
         }
         mystery = GlobalInfoHolder.mystery;
     }
@@ -205,7 +227,7 @@ public class BattleManager : MonoBehaviour
         // 首先判断是否游戏结束
         if (enemies.Count == 0) // 所有敌人都死了
         {   
-            if (++enmWave >= enmNames.Count) // 没有下一波了，结束
+            if (++enmWave >= enemyConfigs.Count) // 没有下一波了，结束
             {
                 StartCoroutine(ShowBanner("挑 战 成 功", new Color(1, .5f, 0, .875f), 1, true));
                 bgm.Stop();
@@ -214,11 +236,12 @@ public class BattleManager : MonoBehaviour
             }
             else// 还有下一波
             {
-                StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enmNames.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
-                for (int i = 0; i < enmNames[enmWave].Count; ++i)
+                StartCoroutine(ShowBanner("第 " + (enmWave + 1).ToString() + " / " + enemyConfigs.Count.ToString() + " 波 敌 人", new Color(1, .5f, 0, .875f), 1));
+                for (int i = 0; i < enemyConfigs[enmWave].Count; ++i)
                 {
-                    EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.Euler(0, -65, 0)).GetComponent<EnemyMono>();
-                    Enemy e = new Enemy(enmNames[enmWave][i]);
+                    EnemyMono em = Instantiate(enemyPrefab, enmOriginal + i * enmInternal, Quaternion.identity).GetComponent<EnemyMono>();
+                    em.SetOrigPosition(enmOriginal + i * enmInternal, Quaternion.identity);
+                    Enemy e = new Enemy(enemyConfigs[enmWave][i]);
                     enemies.Add(e);
                     e.SetMono(em);
                     runway.AddCreature(e);
@@ -231,7 +254,6 @@ public class BattleManager : MonoBehaviour
                         at.OnEnemyRefresh(c, enemies);
                     }
                 }
-
             }
         }
         if (characters.Count == 0)
@@ -242,7 +264,7 @@ public class BattleManager : MonoBehaviour
             return;
         }
 
-        // 对上一回合进行收尾，= null 时是第一回合，跳过这个阶段
+        // 对上一回合进行收尾，= null 时是第一回合
         if (curCreature != null)
         {
             // 刚结束的回合是元素爆发回合
@@ -253,17 +275,37 @@ public class BattleManager : MonoBehaviour
             else
             {
                 // 若是非元素爆发回合，就将行动条置 0，触发回合结束 hook
-                curCreature.ChangePercentageLocation(-1);
-                curCreature.EndNormalTurn();
+                if (curCreature.hp > 0)
+                {
+                    curCreature.ChangePercentageLocation(-1);
+                    curCreature.EndNormalTurn();
+                } 
             }
         }
         else
         {
-            // 第一回合发动秘技
+            // 第一回合流程
+            // 1. 生成所有角色召唤物
             foreach(Character c in characters)
             {
+                Summon s = c.talents.Summon();
+                if(s != null)
+                {
+                    summons.Add(s);
+                    SummonMono sm = Instantiate(summonPrefab).GetComponent<SummonMono>();
+                    s.SetMono(sm);
+                    runway.AddCreature(s);
+                }
+            }
+            // 2. 触发角色 on battle start
+            // 3. 触发角色武器 on battle start
+            // 4. 触发角色遗器套装 on battle start
+            // 5. 触发角色秘技
+            foreach (Character c in characters)
+            {
                 c.talents.OnBattleStart(characters);
-                foreach(AArtifactTalent at in c.artifactsSuit)
+                c.weapon.talents.OnBattleStart(c, characters);
+                foreach (AArtifactTalent at in c.artifactsSuit)
                 {
                     at.OnBattleStart(c, characters);
                 }
@@ -275,13 +317,25 @@ public class BattleManager : MonoBehaviour
         // 开启新回合
         // 向 runway 询问本回合是否是元素爆发回合。元素爆发是特殊回合，不触发回合开始的结束的 hook
         curCreature = runway.UpdateRunway(out isBurst, out bool isAdditional);
+        foreach(Character c in characters)
+        {
+            c.mono.MoveBack();
+            c.mono.cardSR.enabled = true;
+        }
+        foreach(Enemy e in enemies)
+        {
+            e.mono.gameObject.SetActive(true);
+            e.mono.MoveBack();
+        }
         if (curCreature is Character) // 玩家的回合
         {
             curStage = TurnStage.Instruction;
             curCharacter = curCreature as Character;
             // 先进入输入指令阶段
             if (isBurst)
-            { // 元素爆发回合触发 burst start hook
+            {   
+                // 元素爆发回合触发 burst start hook
+                // 元素爆发回合不占用回合数
                 BurstTurn();
             }
             else
@@ -316,24 +370,43 @@ public class BattleManager : MonoBehaviour
             ++curTurnNumber;
             // 敌人的回合直接进入结算动画阶段，插入的 burst 要等敌人行动完
             Enemy e = curCreature as Enemy;
+            e.mono.MoveToSpot();
+            mainCamera.transform.position = chaCamEnemyActionPos;
+            mainCamera.transform.rotation = chaCamEnemyActionRot;
+            
             bool skip = e.StartNormalTurn();
             curStage = TurnStage.Animation;
-            if(!skip)
-                e.talents.MyTurn();
+            if(!skip && e.hp > 0)
+                e.talents.MyTurn(characters, enemies);
+        }else if (curCreature is Summon)
+        {
+            ++curTurnNumber;
+            Summon s = curCreature as Summon;
+            foreach(Character c in characters)
+            {
+                c.mono.cardSR.enabled = false;
+            }
+            mainCamera.transform.position = enmCamOrigPos;
+            mainCamera.transform.rotation = enmCamOrigRot;
+
+            bool skip = s.StartNormalTurn();
+            curStage = TurnStage.Animation;
+            if (!skip)
+                s.talents.MyTurn(characters, enemies);
         }
     }
 
     protected void BurstTurn()
     {
         curCharacter.StartBurstTurn();
-        BurstSplash(curCharacter.mono);
         QButton.gameObject.SetActive(false);
         EButton.gameObject.SetActive(false);
         curCharacter.mono.PlayAudio(AudioType.BurstPrepare);
         if (curCharacter.isBurstTargetEnemy)
-            selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.talents.BurstEnemyAction);
+            selection.StartEnemySelection(curCharacter.burstSelectionType, curCharacter.talents.BurstEnemyAction, true);
         else
-            selection.StartCharacterSelection(curCharacter.burstSelectionType, curCharacter.talents.BurstCharacterAction);
+            selection.StartCharacterSelection(curCharacter.burstSelectionType, curCharacter.talents.BurstCharacterAction, true);
+        BurstSplash(curCharacter.mono);
     }
 
     protected void SelectTarget()
@@ -344,10 +417,14 @@ public class BattleManager : MonoBehaviour
         isAttackOrSkill = true;
         if (curCharacter.isAttackTargetEnemy)
         {
+            mainCamera.transform.SetPositionAndRotation(enmCamOrigPos, enmCamOrigRot);
             selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.talents.AttackEnemyAction);
         }
         else
+        {
+            mainCamera.transform.SetPositionAndRotation(chaCamOrigPos, chacamorigRot);
             selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.talents.AttackCharacterAction);
+        }
     }
 
     public void RespondtoKeycodeE()
@@ -364,9 +441,15 @@ public class BattleManager : MonoBehaviour
 
             isAttackOrSkill = false;
             if (curCharacter.isSkillTargetEnemy)
+            {
+                mainCamera.transform.SetPositionAndRotation(enmCamOrigPos, enmCamOrigRot);
                 selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.talents.SkillEnemyAction);
+            }
             else
+            {
+                mainCamera.transform.SetPositionAndRotation(chaCamOrigPos, chacamorigRot);
                 selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.talents.SkillCharacterAction);
+            }
         }
         else
         {
@@ -416,6 +499,8 @@ public class BattleManager : MonoBehaviour
 
     public void TestAndInsertBurst(int i)
     {
+        if (i >= characters.Count)
+            return;
         Character c = allCharacters[i];
         if (c.mono.isBurstActivated || !(c.hp > 0) || c.energy < c.maxEnergy)
             return;
@@ -466,8 +551,13 @@ public class BattleManager : MonoBehaviour
         deadCharacters.Add(c);
     }
 
-
-    // Animation Settings
+    public void RemoveSummon(Summon s)
+    {
+        if (!summons.Contains(s))
+            return;
+        summons.Remove(s);
+        runway.RemoveCreature(s);
+    }
 
     IEnumerator ChangeLocalScale(RectTransform tran, Vector3 target, float time)
     {
@@ -492,11 +582,22 @@ public class BattleManager : MonoBehaviour
     }
 
     const float ACCELERATION = .5f; // 加速度
+    readonly Vector3 chaCamOrigPos = new Vector3(190, 5, 95);
+    readonly Quaternion chacamorigRot = Quaternion.Euler(new Vector3(0, 180, 0));
+    readonly Vector3 chaCamStartPos = new Vector3(195, 15, 90);
+    readonly Vector3 chaCamEnemyActionPos = new Vector3(182, 1.44f, 98.48f);
+    readonly Quaternion chaCamEnemyActionRot = Quaternion.Euler(new Vector3(-4.5f, 168, 0));
 
+
+    readonly Vector3 enmCamOrigPos = new Vector3(153.2f, 6, 63.3f);
+    readonly Quaternion enmCamOrigRot = Quaternion.Euler(new Vector3(0, -18, 0));
+    readonly Vector3 enmCamStartPos = new Vector3(140, 10.22f, 70.6f);
+    readonly Vector3 enmCamEnemyActionPos = new Vector3(182.5f, 1.73f, 96.7f);
+    readonly Vector3 enmCamEnemyActionRot = new Vector3(-4.5f, 171, 0);
     IEnumerator BurstSplashAnim()
     {
         float burstSplashSpeed = .5f;
-        splash.gameObject.SetActive(true);
+        splash.transform.parent.gameObject.SetActive(true);
         float scale = 1.25f;
         splash.rectTransform.localScale = Vector3.one * scale;
         float timer = 0;
@@ -511,14 +612,64 @@ public class BattleManager : MonoBehaviour
             timer += Time.deltaTime;
         }
         new WaitForSeconds(.2f);
-        splash.gameObject.SetActive(false);
+        splash.transform.parent.gameObject.SetActive(false);
+        if (curCharacter.isBurstTargetEnemy)
+        {
+            mainCamera.transform.position = enmCamStartPos;
+            mainCamera.transform.rotation = enmCamOrigRot;
+            Vector3 dir = enmCamOrigPos - enmCamStartPos;
+            while (dir.magnitude > .01f)
+            {
+                yield return new WaitForEndOfFrame();
+                mainCamera.transform.Translate(5 * Time.deltaTime * dir, Space.World);
+                dir = enmCamOrigPos - mainCamera.transform.position;
+            }
+            mainCamera.transform.position = enmCamOrigPos;
+        }
+        else
+        {
+            foreach(Character c in characters)
+            {
+                c.mono.MoveBack();
+            }
+            // 镜头运动：从 （195，15，100）运动到（190，5，95）
+            mainCamera.transform.position = chaCamStartPos;
+            mainCamera.transform.rotation = chacamorigRot;
+            Vector3 dir = chaCamOrigPos - chaCamStartPos;
+            while (dir.magnitude > .01f)
+            {
+                yield return new WaitForEndOfFrame();
+                mainCamera.transform.Translate(5 * Time.deltaTime * dir, Space.World);
+                dir = chaCamOrigPos - mainCamera.transform.position;
+            }
+            mainCamera.transform.position = chaCamOrigPos;
+        }
     }
 
+    bool isBurstVideoShowing = false;
     IEnumerator CloseVideoAfterPlay(double seconds)
     {
+        isBurstVideoShowing = true;
         bgm.Pause();
         screenCanvas.SetActive(false);
+        foreach(Character c in characters)
+        {
+            c.mono.cardSR.enabled = false;
+        }
+        foreach(Enemy e in enemies)
+        {
+            e.mono.gameObject.SetActive(false);
+        }
         yield return new WaitForSeconds((float)seconds);
+        foreach (Character c in characters)
+        {
+            c.mono.cardSR.enabled = !curCharacter.isBurstTargetEnemy;
+        }
+        foreach (Enemy e in enemies)
+        {
+            e.mono.gameObject.SetActive(curCharacter.isBurstTargetEnemy);
+        }
+
         videoPlayer.enabled = false;
         selection.ApplyAction(curCharacter.beforeBurst, curCharacter.afterBurst);
         curStage = TurnStage.Animation;
@@ -526,6 +677,7 @@ public class BattleManager : MonoBehaviour
         bgm.Play();
         QButton.gameObject.SetActive(true);
         EButton.gameObject.SetActive(true);
+        isBurstVideoShowing = false;
     }
 
     IEnumerator ShowBanner(string info, Color c, float seconds, bool returnToIndex = false)
@@ -540,5 +692,63 @@ public class BattleManager : MonoBehaviour
         bannerImgae.gameObject.SetActive(false);
         if(returnToIndex)
             SceneManager.LoadScene("Index");
+    }
+
+    float totalDealDamage = 0;
+    Dictionary<Character, float> characterDealDamage = new Dictionary<Character, float>();
+    public void UpdateDealDamage(Creature source, Damage d)
+    {
+        Character character = source as Character;
+        if(character == null)
+            return;
+        
+        characterDealDamage[character] += d.fullValue;
+        totalDealDamage += d.fullValue;
+        if(totalDealDamage == 0)
+        {
+
+        }
+        else
+        {
+            float prevPos = 0;
+            for(int i = 0; i < allCharacters.Count; ++i)
+            {
+                Character c = allCharacters[i];
+                float pct = characterDealDamage[c] / totalDealDamage;
+                dealDamageText[i].text = c.disname + ":" + characterDealDamage[c].ToString("F2") + "(" + (pct * 100).ToString("F2") + "%)";
+                dealDamageBar[i].anchorMin = new Vector2(prevPos, 0);
+                prevPos = i == allCharacters.Count - 1 ? 1 : prevPos + pct;
+                dealDamageBar[i].anchorMax = new Vector2(prevPos, 1);
+            }
+        }
+    }
+
+    float totalTakeDamage = 0;
+    Dictionary<Character, float> characterTakeDamage = new Dictionary<Character, float>();
+    public void UpdateTakeDamage(Creature target, Damage d)
+    {
+        Character character = target as Character;
+        if (character == null)
+            return;
+
+        characterTakeDamage[character] += d.fullValue;
+        totalTakeDamage += d.fullValue;
+        if (totalTakeDamage == 0)
+        {
+
+        }
+        else
+        {
+            float prevPos = 0;
+            for (int i = 0; i < allCharacters.Count; ++i)
+            {
+                Character c = allCharacters[i];
+                float pct = characterTakeDamage[c] / totalTakeDamage;
+                takeDamageText[i].text = c.disname + ":" + characterTakeDamage[c].ToString("F2") + "(" + (pct * 100).ToString("F2") + "%)";
+                takeDamageBar[i].anchorMin = new Vector2(prevPos, 0);
+                prevPos = i == allCharacters.Count - 1 ? 1 : prevPos + pct;
+                takeDamageBar[i].anchorMax = new Vector2(prevPos, 1);
+            }
+        }
     }
 }

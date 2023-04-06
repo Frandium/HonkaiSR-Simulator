@@ -61,7 +61,7 @@ public class CharacterMono : CreatureMono
         }
     }
 
-    public override void SetSelected()
+    public override void SetSelected(bool isMainTarget = true)
     {
         alpha = 1;
         isSelected = true;

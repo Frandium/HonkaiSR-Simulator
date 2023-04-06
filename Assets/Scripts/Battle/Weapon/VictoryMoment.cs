@@ -5,10 +5,9 @@ using LitJson;
 
 public class VictoryMoment : AWeaponTalent
 {
-    int refine;
-    public VictoryMoment(JsonData c, int r) : base(c)
+    public VictoryMoment(JsonData c, int r) : base(c, r)
     {
-        refine = r;
+
     }
     float def1, effHit, def2;
     public override void OnEquiping(Character character)
@@ -20,7 +19,7 @@ public class VictoryMoment : AWeaponTalent
         character.AddBuff("victoryMomentEffectHit", BuffType.Permanent, CommonAttribute.EffectHit, ValueType.InstantNumber, effHit);
         character.AddBuff("victoryMomentTaunt", BuffType.Permanent, CommonAttribute.Taunt, ValueType.InstantNumber, 100);
 
-        character.onTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, d) =>
+        character.beforeTakingDamage.Add(new TriggerEvent<Creature.DamageEvent>("victoryMomentDEF2", (s, d) =>
         {
             character.AddBuff("victoryMomentDEF2", BuffType.Buff, CommonAttribute.DEF, ValueType.Percentage, def2, 1);
             return d;
@@ -32,6 +31,6 @@ public class VictoryMoment : AWeaponTalent
         character.RemoveBuff("victoryMomentDEF");
         character.RemoveBuff("victoryMomentEffectHit");
         character.RemoveBuff("victoryMomentTaunt");
-        character.onTakingDamage.RemoveAll(r => r.tag == "victoryMomentDEF2");
+        character.beforeTakingDamage.RemoveAll(r => r.tag == "victoryMomentDEF2");
     }
 }
