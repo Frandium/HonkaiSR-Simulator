@@ -8,9 +8,6 @@ public class Selection : MonoBehaviour
     public GameObject selectLeft;
     public GameObject selectRight;
 
-    public Camera characterCam;
-    public Camera enemyCam;
-
     public AudioClip changeSlelect;
     public AudioClip error;
     public AudioSource audioSource;
@@ -120,11 +117,6 @@ public class Selection : MonoBehaviour
         {
             e.mono.gameObject.SetActive(false);
         }
-        if (!isAnimControlledByGM)
-        {
-            characterCam.enabled = true;
-            enemyCam.enabled = false;
-        }
         switch (type)
         {
             case SelectionType.Self:
@@ -181,12 +173,6 @@ public class Selection : MonoBehaviour
         isDuringSelection = true;
         selectRight.SetActive(true);
         selectLeft.SetActive(true);
-        if (!isAnimControlledByGM)
-        {
-            enemyCam.enabled = true;
-            characterCam.enabled = false;
-        }
-        
         curCharacter.mono.MoveTo(chaSpotSeat, chaSpotRotation);
         foreach (Character character in characters)
         {

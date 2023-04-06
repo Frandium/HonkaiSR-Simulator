@@ -39,8 +39,7 @@ public class BattleManager : MonoBehaviour
     public List<CharacterMono> cMonos = new List<CharacterMono>();
     public List<Enemy> enemies { get; protected set; } = new List<Enemy>();
 
-    public Camera characterCamera;
-    public Camera enemyCamera;
+    public Camera mainCamera;
     public GameObject enemyPrefab;
     public GameObject summonPrefab;
     public GameObject screenCanvas;
@@ -87,6 +86,8 @@ public class BattleManager : MonoBehaviour
     public Sprite nullBuffSprite;
     Vector3 enmInternal = - new Vector3(4f, 0, 0f);  // 敌人排布间距
     Vector3 enmOriginal = new Vector3(157.61f, 6.4f, 76.55f);
+    Vector3 chaOriginal = new Vector3(196.5f, 5, 84.41f);
+    Vector3 chaInternal = - new Vector3(4.5f, 0, 0);
     bool interrupted = false;
     string mystery = "";
 
@@ -205,6 +206,7 @@ public class BattleManager : MonoBehaviour
                 runway.AddCreature(c);
                 characterDealDamage[c] = 0;
                 characterTakeDamage[c] = 0;
+                cMonos[i].SetOrigPosition(chaOriginal + i * chaInternal, Quaternion.Euler(new Vector3(0, 180, 0)));
             }
         }
         for (; i < 4; ++i)
@@ -338,10 +340,6 @@ public class BattleManager : MonoBehaviour
             }
             else
             {
-                characterCamera.transform.position = chaCamOrigPos;
-                characterCamera.transform.rotation = chacamorigRot;
-                enemyCamera.transform.position = enmCamOrigPos;
-                enemyCamera.transform.rotation = enmCamOrigRot;
                 ++curTurnNumber;
                 // 如果我这个回合是刚才被元素爆发打断的回合，不触发 start。
                 if (interrupted && !isAdditional)
@@ -373,10 +371,8 @@ public class BattleManager : MonoBehaviour
             // 敌人的回合直接进入结算动画阶段，插入的 burst 要等敌人行动完
             Enemy e = curCreature as Enemy;
             e.mono.MoveToSpot();
-            characterCamera.enabled = true;
-            enemyCamera.enabled = false;
-            characterCamera.transform.position = chaCamEnemyActionPos;
-            characterCamera.transform.rotation = chaCamEnemyActionRot;
+            mainCamera.transform.position = chaCamEnemyActionPos;
+            mainCamera.transform.rotation = chaCamEnemyActionRot;
             
             bool skip = e.StartNormalTurn();
             curStage = TurnStage.Animation;
@@ -390,8 +386,9 @@ public class BattleManager : MonoBehaviour
             {
                 c.mono.cardSR.enabled = false;
             }
-            enemyCamera.enabled = true;
-            characterCamera.enabled = false;
+            mainCamera.transform.position = enmCamOrigPos;
+            mainCamera.transform.rotation = enmCamOrigRot;
+
             bool skip = s.StartNormalTurn();
             curStage = TurnStage.Animation;
             if (!skip)
@@ -420,10 +417,14 @@ public class BattleManager : MonoBehaviour
         isAttackOrSkill = true;
         if (curCharacter.isAttackTargetEnemy)
         {
+            mainCamera.transform.SetPositionAndRotation(enmCamOrigPos, enmCamOrigRot);
             selection.StartEnemySelection(curCharacter.attackSelectionType, curCharacter.talents.AttackEnemyAction);
         }
         else
+        {
+            mainCamera.transform.SetPositionAndRotation(chaCamOrigPos, chacamorigRot);
             selection.StartCharacterSelection(curCharacter.attackSelectionType, curCharacter.talents.AttackCharacterAction);
+        }
     }
 
     public void RespondtoKeycodeE()
@@ -440,9 +441,15 @@ public class BattleManager : MonoBehaviour
 
             isAttackOrSkill = false;
             if (curCharacter.isSkillTargetEnemy)
+            {
+                mainCamera.transform.SetPositionAndRotation(enmCamOrigPos, enmCamOrigRot);
                 selection.StartEnemySelection(curCharacter.skillSelectionType, curCharacter.talents.SkillEnemyAction);
+            }
             else
+            {
+                mainCamera.transform.SetPositionAndRotation(chaCamOrigPos, chacamorigRot);
                 selection.StartCharacterSelection(curCharacter.skillSelectionType, curCharacter.talents.SkillCharacterAction);
+            }
         }
         else
         {
@@ -606,21 +613,18 @@ public class BattleManager : MonoBehaviour
         }
         new WaitForSeconds(.2f);
         splash.transform.parent.gameObject.SetActive(false);
-        characterCamera.enabled = !curCharacter.isBurstTargetEnemy;
-        enemyCamera.enabled = curCharacter.isBurstTargetEnemy;
         if (curCharacter.isBurstTargetEnemy)
         {
-            videoPlayer.targetCamera = enemyCamera;
-            enemyCamera.transform.position = enmCamStartPos;
-            enemyCamera.transform.rotation = enmCamOrigRot;
+            mainCamera.transform.position = enmCamStartPos;
+            mainCamera.transform.rotation = enmCamOrigRot;
             Vector3 dir = enmCamOrigPos - enmCamStartPos;
             while (dir.magnitude > .01f)
             {
                 yield return new WaitForEndOfFrame();
-                enemyCamera.transform.Translate(dir * Time.deltaTime * 5, Space.World);
-                dir = enmCamOrigPos - enemyCamera.transform.position;
+                mainCamera.transform.Translate(5 * Time.deltaTime * dir, Space.World);
+                dir = enmCamOrigPos - mainCamera.transform.position;
             }
-            enemyCamera.transform.position = enmCamOrigPos;
+            mainCamera.transform.position = enmCamOrigPos;
         }
         else
         {
@@ -628,18 +632,17 @@ public class BattleManager : MonoBehaviour
             {
                 c.mono.MoveBack();
             }
-            // 镜头运动：从 （195，15，100）运动到（190，5，95）            
-            videoPlayer.targetCamera = characterCamera;
-            characterCamera.transform.position = chaCamStartPos;
-            characterCamera.transform.rotation = chacamorigRot;
+            // 镜头运动：从 （195，15，100）运动到（190，5，95）
+            mainCamera.transform.position = chaCamStartPos;
+            mainCamera.transform.rotation = chacamorigRot;
             Vector3 dir = chaCamOrigPos - chaCamStartPos;
             while (dir.magnitude > .01f)
             {
                 yield return new WaitForEndOfFrame();
-                characterCamera.transform.Translate(dir * Time.deltaTime * 5, Space.World);
-                dir = chaCamOrigPos - characterCamera.transform.position;
+                mainCamera.transform.Translate(5 * Time.deltaTime * dir, Space.World);
+                dir = chaCamOrigPos - mainCamera.transform.position;
             }
-            characterCamera.transform.position = chaCamOrigPos;
+            mainCamera.transform.position = chaCamOrigPos;
         }
     }
 

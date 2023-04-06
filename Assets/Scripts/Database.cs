@@ -50,6 +50,7 @@ public class Database: MonoBehaviour
     IEnumerator CopyStreamingAssets()
     {
 #if !UNITY_EDITOR
+        bool copied = PlayerPrefs.GetInt(Application.productName + Application.version + "DataCopy", 0) > 0;
         string afPath = Application.streamingAssetsPath + "/allfiles.txt";
         string result;
         if (afPath.Contains("://") || afPath.Contains(":///"))
@@ -69,7 +70,14 @@ public class Database: MonoBehaviour
             log.text = "checking: " + targetPath;
             if (filePath.EndsWith(".json"))
             {
-                if (!File.Exists(targetPath))
+                // 如果是 user，不覆盖；
+                // 非 user 的目录，或者我要求更新其他覆盖。
+                if (filePath.StartsWith("/user") && copied) // 用户 data 不覆盖
+                {
+                    // 但是现在是 0.5 版本，人物的 data 结构有变化，所以请覆盖用户所有的旧 data。
+                    // 不复制
+                }
+                else if(!copied || !File.Exists(targetPath))
                 {
                     string safilePath = Application.streamingAssetsPath + filePath;
                     UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(safilePath);
@@ -97,6 +105,7 @@ public class Database: MonoBehaviour
 #endif
         sourceCompleteChecked = true;
         gameObject.SetActive(false);
+        PlayerPrefs.SetInt(Application.productName + Application.version + "DataCopy", 1);
     }
 
 }

@@ -78,11 +78,6 @@ public class EnemyMono : CreatureMono
         transform.rotation = enemyActionRot;
     }
 
-    public void SetOrigPosition(Vector3 pos, Quaternion rot)
-    {
-        origPosition = pos;
-        origRotation = rot;
-    }
 
     public override void UpdateHpLine()
     {

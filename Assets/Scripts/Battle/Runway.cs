@@ -30,8 +30,12 @@ public class Runway : MonoBehaviour
     public Transform runwayTransform;
 
 
-    private readonly Vector3 firstRunwayAvatarPos = new Vector3(10, -25, 0);
-    private readonly Vector3 runwayAvatarInternal = new Vector3(0, -55, 0);
+    private Vector3 firstRunwayAvatarPos = Vector3.zero;
+    private Vector3 runwayAvatarInternal;
+    private Vector3 newAvatarPos;
+    private Vector3 firstBurstStartPos;
+    private Vector3 firstBurstEndPos;
+    private Vector3 burstAvatarInternal;
 
     void Start()
     {
@@ -39,6 +43,12 @@ public class Runway : MonoBehaviour
         burstAvatars = new List<RunwayAvatar>();
         runwayAvatars = new List<RunwayAvatar>();
         creature2RunwayAvatar = new Dictionary<Creature, RunwayAvatar>();
+        float width = GetComponent<RectTransform>().rect.width;
+        runwayAvatarInternal = new Vector3(0, - width - 5, 0);
+        newAvatarPos = new Vector3(0, -transform.parent.GetComponent<RectTransform>().rect.height, 0);
+        firstBurstStartPos = new Vector3(width * 4f, 0, 0);
+        firstBurstEndPos = new Vector3(width / 2.0f, 0, 0);
+        burstAvatarInternal = new Vector3(width, 0, 0);
     }
 
 
@@ -48,7 +58,7 @@ public class Runway : MonoBehaviour
         c.ChangePercentageLocation(-1);
         RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
         newOne.SetCreature(c, false);
-        newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(10, -500, 0);
+        newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = newAvatarPos;
         runwayAvatars.Add(newOne);
         creature2RunwayAvatar[c] = newOne;
     }
@@ -61,13 +71,13 @@ public class Runway : MonoBehaviour
         {
             // 移除第一个 avatar，如果被移除的不是 burst，在队尾创建一个新的
             RunwayAvatar firstAvatar = runwayAvatars[0];
-            firstAvatar.MoveTowards(new Vector3(10, 25, 0), () => { Destroy(firstAvatar.gameObject); });
+            firstAvatar.MoveTowards(-runwayAvatarInternal, () => { Destroy(firstAvatar.gameObject); });
             runwayAvatars.RemoveAt(0);
             if (!firstAvatar.IsBurst && !isAdditionalTurn)
             {
                 RunwayAvatar newOne = Instantiate(avatarPrefab, runwayTransform).GetComponent<RunwayAvatar>();
                 newOne.SetCreature(firstAvatar.creature, false);
-                newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = new Vector3(10, -500, 0);
+                newOne.gameObject.GetComponent<RectTransform>().anchoredPosition3D = newAvatarPos;
                 runwayAvatars.Add(newOne);
                 creature2RunwayAvatar[firstAvatar.creature] = newOne;
             }
@@ -96,9 +106,9 @@ public class Runway : MonoBehaviour
         // 有插入的大招时，先放大招
         if (isBurst)
         {
-            for(int i  =0; i < burstAvatars.Count; ++i)
+            for(int i  = 0; i < burstAvatars.Count; ++i)
             {
-                burstAvatars[i].MoveTowards(firstBurstEndPos + i * burstAvatarInternal);// burstEndPos[i]);
+                burstAvatars[i].MoveTowards(firstRunwayAvatarPos + i * burstAvatarInternal);// burstEndPos[i]);
             }
             runwayAvatars.Insert(0, burstAvatars[0]);
             burstAvatars.RemoveAt(0);
@@ -195,7 +205,4 @@ public class Runway : MonoBehaviour
         addtionalWaiting = c;
     }
 
-    private readonly Vector3 firstBurstStartPos = new Vector3(200, -25, 0);
-    private readonly Vector3 firstBurstEndPos = new Vector3(10, -25, -0);
-    private readonly Vector3 burstAvatarInternal = new Vector3(70, 0, 0);
 }

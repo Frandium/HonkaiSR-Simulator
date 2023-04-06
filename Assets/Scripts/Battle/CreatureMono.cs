@@ -64,13 +64,6 @@ public class CreatureMono : MonoBehaviour
         }
     }
 
-    protected Vector3 origPosition = Vector3.zero;
-    protected Quaternion origRotation = Quaternion.identity;
-    private void Start()
-    {
-        origPosition = transform.position;
-        origRotation = transform.rotation;
-    }
 
     public void MoveTo(Vector3 pos, Quaternion rot)
     {
@@ -78,12 +71,19 @@ public class CreatureMono : MonoBehaviour
         transform.rotation = rot;
     }
 
+    public Vector3 origPosition;
+    public Quaternion origRotation;
     public void MoveBack()
     {
         transform.position = origPosition;
         transform.rotation = origRotation;
     }
 
+    public void SetOrigPosition(Vector3 pos, Quaternion rot)
+    {
+        origPosition = pos;
+        origRotation = rot;
+    }
     //Battle functions
     public virtual void TakeDamage(Damage d)
     {
